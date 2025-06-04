@@ -7,20 +7,14 @@ import { cn } from "@/lib/utils";
 import { AnyFieldApi } from "@tanstack/react-form";
 
 function FormLabel({
-  field,
+  error,
   className,
   ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root> & { field: AnyFieldApi }) {
+}: React.ComponentProps<typeof Label> & { error: any }) {
   return (
     <Label
-      htmlFor={field.name}
-      className={cn(
-        field.state.meta.isTouched &&
-          !field.state.meta.isValid &&
-          "text-destructive",
-        className,
-      )}
-      {...props}
+      data-error={!!error}
+      className={cn("data-[error=true]:text-destructive", className)}
     />
   );
 }
@@ -41,4 +35,4 @@ function Label({
   );
 }
 
-export { Label, FormLabel };
+export { Label };
