@@ -7,7 +7,7 @@ import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { GeneratedAvatar } from "@/components/generated-avatar";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";
 import { PlusIcon } from "lucide-react";
@@ -100,6 +100,7 @@ export const SelectOrganizationContent = () => {
           variant="outline"
           className="w-full justify-start gap-2 p-2"
           onClick={onCreateOrganization}
+          disabled={loading}
         >
           <PlusIcon className="size-4" />
           Create new organization

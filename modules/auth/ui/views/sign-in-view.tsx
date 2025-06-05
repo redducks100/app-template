@@ -30,7 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";

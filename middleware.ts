@@ -10,7 +10,9 @@ const isPublicRoute = (request: NextRequest) => {
 };
 
 const isProtectedRoute = (request: NextRequest) => {
-  return ["/dashboard", "/create-org"].includes(request.nextUrl.pathname);
+  return ["/dashboard", "/create-org", "/select-org"].includes(
+    request.nextUrl.pathname,
+  );
 };
 
 export async function middleware(request: NextRequest) {

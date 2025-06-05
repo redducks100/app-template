@@ -1,5 +1,5 @@
 import { member } from "@/drizzle/auth";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
 import { createOrganizationSchema } from "@/modules/schemas/create-organization-schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";

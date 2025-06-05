@@ -18,6 +18,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DashboardUserButton } from "./dashboard-user-button";
 import { DashboardOrganizationSwitcher } from "./dashboard-organization-switcher";
+import { useState } from "react";
 
 const section = [
   {
@@ -34,7 +35,6 @@ const section = [
 
 export const DashboardSidebar = () => {
   const pathname = usePathname();
-
   return (
     <Sidebar>
       <SidebarHeader className="text-sidebar-accent-foreground">

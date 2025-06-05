@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { useTRPC } from "@/trpc/client";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

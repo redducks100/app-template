@@ -1,16 +1,8 @@
-import { auth } from "@/lib/auth";
+import { verifySession } from "@/lib/auth/route-helpers";
 import { CreateOrganizationView } from "@/modules/organizations/ui/views/create-organization-view";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 const Page = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/sign-in");
-  }
+  const session = await verifySession();
 
   return (
     <CreateOrganizationView

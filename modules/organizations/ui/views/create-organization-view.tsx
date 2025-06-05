@@ -32,7 +32,7 @@ import { useTRPC } from "@/trpc/client";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 
 interface CreateOrganizationViewProps {

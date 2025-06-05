@@ -1,16 +1,9 @@
-import { auth } from "@/lib/auth";
+import { verifySession } from "@/lib/auth/route-helpers";
 import { SelectOrganizationView } from "@/modules/organizations/ui/views/select-organization-view";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 const Page = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/sign-in");
-  }
+  const session = await verifySession();
 
   if (!!session.session.activeOrganizationId) {
     redirect("/dashboard");
