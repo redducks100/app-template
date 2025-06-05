@@ -1,5 +1,8 @@
-import { SignOutButton } from "@/components/ui/sign-out";
+import { member } from "@/drizzle/auth";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { DashboardView } from "@/modules/dashboard/ui/views/dashboard-view";
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -8,16 +11,21 @@ const Page = async () => {
     headers: await headers(),
   });
 
-  if (!session?.session.activeOrganizationId) {
-    redirect("/create-org");
+  if (!session) {
+    redirect("/sign-in");
   }
 
-  return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <p>{session ? session.user.name : "Not Authenticated"}</p>
-      {session && <SignOutButton />}
-    </div>
-  );
+  const userMember = await db.query.member.findFirst({
+    where: eq(member.userId, session.session.userId),
+  });
+
+  if (!userMember) {
+    redirect("/create-org");
+  } else if (userMember && !session.session.activeOrganizationId) {
+    redirect("/select-org");
+  }
+
+  return <DashboardView />;
 };
 
 export default Page;

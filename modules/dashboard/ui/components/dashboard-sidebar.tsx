@@ -6,6 +6,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -16,6 +17,7 @@ import { LayoutDashboardIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DashboardUserButton } from "./dashboard-user-button";
+import { DashboardOrganizationSwitcher } from "./dashboard-organization-switcher";
 
 const section = [
   {
@@ -34,9 +36,9 @@ export const DashboardSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <Sidebar className="border-l-0">
+    <Sidebar>
       <SidebarHeader className="text-sidebar-accent-foreground">
-        <div className="flex items-center px-2 pt-3">
+        <div className="flex items-center px-2 pt-2">
           <Link href="/">
             <h1 className="text-xl font-bold">TEMPLATEAPP</h1>
           </Link>
@@ -47,6 +49,10 @@ export const DashboardSidebar = () => {
       </div>
       <SidebarContent>
         <SidebarGroup>
+          <DashboardOrganizationSwitcher />
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarMenu>
             {section.map((item) => (
               <SidebarMenuItem key={item.href}>

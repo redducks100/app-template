@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { CreateOrganizationView } from "@/modules/organizations/ui/views/create-organization-view";
+import { SelectOrganizationView } from "@/modules/organizations/ui/views/select-organization-view";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -12,11 +12,11 @@ const Page = async () => {
     redirect("/sign-in");
   }
 
-  return (
-    <CreateOrganizationView
-      canGoBack={!!session.session.activeOrganizationId}
-    />
-  );
+  if (!!session.session.activeOrganizationId) {
+    redirect("/dashboard");
+  }
+
+  return <SelectOrganizationView />;
 };
 
 export default Page;

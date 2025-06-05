@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -101,3 +102,10 @@ export const invitation = pgTable("invitation", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });
+
+export const memberRelations = relations(member, ({ one }) => ({
+  organization: one(organization, {
+    fields: [member.organizationId],
+    references: [organization.id],
+  }),
+}));

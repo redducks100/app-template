@@ -24,13 +24,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { authClient } from "@/lib/auth-client";
-import { signUpSchema } from "@/server/schemas/sign-up-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { signUpSchema } from "@/modules/schemas/sign-up-schema";
 
 export const SignUpView = () => {
   const router = useRouter();

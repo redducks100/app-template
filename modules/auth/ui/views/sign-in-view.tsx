@@ -21,7 +21,6 @@ import {
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { signInSchema } from "@/server/schemas/sign-in-schema";
 import { z } from "zod";
 import {
   Form,
@@ -36,6 +35,7 @@ import { useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signInSchema } from "@/modules/schemas/sign-in-schema";
 
 export const SignInView = () => {
   const router = useRouter();
