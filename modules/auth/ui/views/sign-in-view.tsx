@@ -7,13 +7,11 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import { LogoGoogle } from "@/components/ui/logo";
 import { Separator } from "@/components/ui/separator";
 import { AtSignIcon, LockIcon } from "lucide-react";
 
-import { z } from "zod";
 import { authClient } from "@/lib/auth/auth-client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,8 +19,6 @@ import { signInSchema } from "@/modules/schemas/sign-in-schema";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
-
-type FormData = z.infer<typeof signInSchema>;
 
 export const SignInView = () => {
   const router = useRouter();
@@ -32,7 +28,7 @@ export const SignInView = () => {
     defaultValues: {
       email: "",
       password: "",
-    } satisfies FormData as FormData,
+    },
     validators: {
       onSubmit: signInSchema,
     },
@@ -51,9 +47,7 @@ export const SignInView = () => {
           },
           onError: ({ error }) => {
             setLoading(false);
-            toast.error(error.statusText, {
-              description: "An error has occured.",
-            });
+            toast.error(error.message);
           },
         }
       );
@@ -70,9 +64,7 @@ export const SignInView = () => {
         },
         onError: ({ error }) => {
           setLoading(false);
-          toast.error(error.statusText, {
-            description: "An error has occured.",
-          });
+          toast.error(error.message);
         },
       }
     );
@@ -105,7 +97,6 @@ export const SignInView = () => {
           <Separator className="flex-1" />
         </div>
         <form
-          className="space-y-2"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();

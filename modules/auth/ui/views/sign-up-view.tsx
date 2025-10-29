@@ -14,20 +14,16 @@ import { Separator } from "@/components/ui/separator";
 import { AtSignIcon, LockIcon, UserIcon } from "lucide-react";
 
 import { authClient } from "@/lib/auth/auth-client";
-import Link from "next/link";
 import { useState } from "react";
-import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { signUpSchema } from "@/modules/schemas/sign-up-schema";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
-
-type FormData = z.infer<typeof signUpSchema>;
+import { toast } from "sonner";
 
 export const SignUpView = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const form = useAppForm({
     defaultValues: {
@@ -35,10 +31,9 @@ export const SignUpView = () => {
       email: "",
       password: "",
       confirmPassword: "",
-    } satisfies FormData as FormData,
+    },
     validators: { onSubmit: signUpSchema },
     onSubmit: async ({ value }) => {
-      setError(null);
       setLoading(true);
 
       authClient.signUp.email(
@@ -54,7 +49,7 @@ export const SignUpView = () => {
           },
           onError: ({ error }) => {
             setLoading(false);
-            setError(error.statusText);
+            toast.error(error.message || "Failed to sign up");
           },
         }
       );
@@ -71,7 +66,7 @@ export const SignUpView = () => {
         },
         onError: ({ error }) => {
           setLoading(false);
-          setError(error.statusText);
+          toast.error(error.message);
         },
       }
     );
@@ -104,7 +99,6 @@ export const SignUpView = () => {
           <Separator className="flex-1" />
         </div>
         <form
-          className="space-y-2"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
@@ -136,6 +130,7 @@ export const SignUpView = () => {
                 <field.Input
                   label="Password"
                   type="password"
+                  description="Must be at least 8 characters long."
                   disabled={loading}
                   LeftIcon={LockIcon}
                 />
@@ -146,20 +141,21 @@ export const SignUpView = () => {
                 <field.Input
                   label="Confirm Password"
                   type="password"
+                  description="Please confirm your password."
                   disabled={loading}
                   LeftIcon={LockIcon}
                 />
               )}
             </form.AppField>
             <Field>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" disabled={loading}>
                 Create account
               </Button>
               <p className="text-xs text-center text-muted-foreground">
                 By signing up, you agree to our Terms of Service and Privacy
                 Policy.
               </p>
-              <FieldDescription className="text-center">
+              <FieldDescription className="px-6 text-center">
                 Already have an account? <a href="/sign-in">Sign in</a>
               </FieldDescription>
             </Field>

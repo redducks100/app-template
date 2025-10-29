@@ -30,11 +30,11 @@ export const DashboardOrganizationSwitcher = () => {
   const queryClient = useQueryClient();
 
   const { data: activeOrganization, isLoading } = useQuery(
-    trpc.organizations.getActiveOrganization.queryOptions(),
+    trpc.organizations.getActiveOrganization.queryOptions()
   );
 
   const { data: organizations, isLoading: isOrganizationsLoading } = useQuery(
-    trpc.organizations.getMany.queryOptions(),
+    trpc.organizations.getMany.queryOptions()
   );
 
   if (isLoading || !activeOrganization) {
@@ -61,7 +61,7 @@ export const DashboardOrganizationSwitcher = () => {
     }
 
     await queryClient.invalidateQueries(
-      trpc.organizations.getActiveOrganization.queryOptions(),
+      trpc.organizations.getActiveOrganization.queryOptions()
     );
   };
 
@@ -103,13 +103,13 @@ export const DashboardOrganizationSwitcher = () => {
               onClick={() => onOrganizationSwitch(org.id)}
             >
               <div className="flex items-center mr-2">
-                {activeOrganization.logo ? (
+                {org.logo ? (
                   <Avatar className="rounded-md size-9 mr-4">
-                    <AvatarImage src={activeOrganization.logo} />
+                    <AvatarImage src={org.logo} />
                   </Avatar>
                 ) : (
                   <GeneratedAvatar
-                    seed={activeOrganization.name}
+                    seed={org.name}
                     className="rounded-md size-9 mr-4"
                   />
                 )}

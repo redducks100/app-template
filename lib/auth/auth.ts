@@ -1,17 +1,19 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/lib/db";
-import * as authSchema from "@/drizzle/auth";
 import { nextCookies } from "better-auth/next-js";
 import { organization } from "better-auth/plugins";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema: {
-      ...authSchema,
-    },
   }),
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 60, // 1 minute
+    },
+  },
   socialProviders: {
     google: {
       prompt: "select_account",

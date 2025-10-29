@@ -4,4 +4,4 @@ import * as auth from "@/drizzle/auth";
 
 const client = postgres(process.env.DATABASE_URL!);
 
-export const db = drizzle(client, { schema: {...auth} });
+export const db = drizzle(client, { schema: { ...auth } });

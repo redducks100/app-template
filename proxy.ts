@@ -11,11 +11,11 @@ const isPublicRoute = (request: NextRequest) => {
 
 const isProtectedRoute = (request: NextRequest) => {
   return ["/dashboard", "/create-org", "/select-org"].includes(
-    request.nextUrl.pathname,
+    request.nextUrl.pathname
   );
 };
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
 
   if (sessionCookie && isAuthRoute(request)) {
