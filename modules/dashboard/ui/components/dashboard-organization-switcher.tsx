@@ -1,7 +1,7 @@
 "use client";
 
 import { GeneratedAvatar } from "@/components/generated-avatar";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth/auth-client";
 import { useTRPC } from "@/trpc/client";
 import { AvatarImage } from "@radix-ui/react-avatar";
@@ -18,6 +24,7 @@ import {
   ArrowRightIcon,
   CheckIcon,
   ChevronDown,
+  ChevronsUpDownIcon,
   Loader2Icon,
   PlusIcon,
 } from "lucide-react";
@@ -28,6 +35,7 @@ export const DashboardOrganizationSwitcher = () => {
   const trpc = useTRPC();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { isMobile } = useSidebar();
 
   const { data: activeOrganization, isLoading } = useQuery(
     trpc.organizations.getActiveOrganization.queryOptions()
@@ -65,82 +73,83 @@ export const DashboardOrganizationSwitcher = () => {
     );
   };
 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-md border border-border/10 p-2 gap-x-2 flex items-center justify-between bg-white/5 hover:bg-white/10 overflow-hidden">
-        {activeOrganization.logo ? (
-          <Avatar className="rounded-md size-6 mr-2">
-            <AvatarImage src={activeOrganization.logo} />
-          </Avatar>
-        ) : (
-          <GeneratedAvatar
-            seed={activeOrganization.name}
-            className="rounded-md size-6 mr-2"
-          />
-        )}
-        <div className="flex flex-col gap-0.5 text-left overflow-hidden flex-1 min-w-0">
-          <p className="text-sm truncate w-full">{activeOrganization.name}</p>
-        </div>
-        <ChevronDown className="size-4 shrink-0" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        <DropdownMenuLabel>
-          <p className="text-sm font-medium text-muted-foreground">
-            Switch Organization
-          </p>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+  if (!activeOrganization) {
+    return null;
+  }
 
-        {isOrganizationsLoading || !organizations ? (
-          <div className="flex items-center p-2">
-            <Loader2Icon className="mx-auto size-9 animate-spin" />
-          </div>
-        ) : (
-          organizations.map((org) => (
-            <DropdownMenuItem
-              key={org.id}
-              className="cursor-pointer w-full flex items-center justify-between gap-2 p-2"
-              onClick={() => onOrganizationSwitch(org.id)}
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex items-center mr-2">
-                {org.logo ? (
-                  <Avatar className="rounded-md size-9 mr-4">
-                    <AvatarImage src={org.logo} />
-                  </Avatar>
-                ) : (
-                  <GeneratedAvatar
-                    seed={org.name}
-                    className="rounded-md size-9 mr-4"
-                  />
-                )}
-                <div className="flex flex-col gap-0.5 text-left overflow-hidden flex-1 min-w-0">
-                  <span className="text-sm truncate w-full">{org.name}</span>
-                  <span className="text-xs text-muted-foreground w-full">
-                    {org.role.toUpperCase()}
-                  </span>
-                </div>
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                <Avatar className="rounded-md">
+                  <AvatarImage src={activeOrganization.logo ?? undefined} />
+                  <AvatarFallback className="rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
+                    {activeOrganization.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
               </div>
-              {activeOrganization.id === org.id ? (
-                <CheckIcon className="size-4 shrink-0" />
-              ) : (
-                <ArrowRightIcon className="size-4 shrink-0" />
-              )}
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">
+                  {activeOrganization.name}
+                </span>
+                <span className="truncate text-xs">
+                  {activeOrganization.slug}
+                </span>
+              </div>
+              <ChevronsUpDownIcon className="ml-auto" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            align="start"
+            side={isMobile ? "bottom" : "right"}
+            sideOffset={4}
+          >
+            <DropdownMenuLabel className="text-muted-foreground text-xs">
+              Organizations
+            </DropdownMenuLabel>
+            {isOrganizationsLoading || !organizations ? (
+              <div className="flex items-center p-2">
+                <Loader2Icon className="mx-auto size-9 animate-spin" />
+              </div>
+            ) : (
+              organizations.map((organization) => (
+                <DropdownMenuItem
+                  key={organization.name}
+                  onClick={() => onOrganizationSwitch(organization.id)}
+                  className="gap-2 p-2"
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border">
+                    <Avatar className="rounded-md size-6">
+                      <AvatarImage src={organization.logo ?? undefined} />
+                      <AvatarFallback className="rounded-md">
+                        {organization.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  {organization.name}
+                </DropdownMenuItem>
+              ))
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="gap-2 p-2"
+              onClick={() => onOrganizationCreate()}
+            >
+              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                <PlusIcon className="size-4" />
+              </div>
+              <div className="text-muted-foreground font-medium">Add team</div>
             </DropdownMenuItem>
-          ))
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="cursor-pointer w-full flex items-center justify-between gap-2 p-2"
-          onClick={onOrganizationCreate}
-        >
-          <div className="flex items-center mr-2">
-            <PlusIcon className="size-4 mr-4 shrink-0" />
-            <div className="flex flex-col gap-0.5 text-left overflow-hidden flex-1 min-w-0">
-              <span className="text-sm w-full">Create Organization</span>
-            </div>
-          </div>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 };

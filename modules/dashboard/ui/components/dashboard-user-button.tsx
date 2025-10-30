@@ -1,5 +1,5 @@
 import { GeneratedAvatar } from "@/components/generated-avatar";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -13,22 +13,35 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { authClient } from "@/lib/auth/auth-client";
 import { UserSettingsDialog } from "@/modules/user/ui/components/user-settings-dialog";
-import { ChevronDownIcon, CogIcon, LogOutIcon } from "lucide-react";
+import {
+  BadgeCheckIcon,
+  BellIcon,
+  ChevronDownIcon,
+  ChevronsUpDownIcon,
+  CogIcon,
+  CreditCardIcon,
+  LogOutIcon,
+  SparklesIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export const DashboardUserButton = () => {
   const router = useRouter();
   const isMobile = useIsMobile();
-  const [open, setOpen] = useState<boolean>(false);
   const { data, isPending } = authClient.useSession();
 
   const onLogout = () => {
@@ -45,86 +58,79 @@ export const DashboardUserButton = () => {
     return null;
   }
 
-  if (isMobile) {
-    return (
-      <Drawer>
-        <DrawerTrigger className="rounded-lg gap-x-2 border border-border/10 p-3 w-full flex items-center justify-between bg-white/5 hover:bg-white/10 overflow-hidden">
-          {data.user.image ? (
-            <Avatar>
-              <AvatarImage src={data.user.image} />
-            </Avatar>
-          ) : (
-            <GeneratedAvatar seed={data.user.name} className="size-9 mr-3" />
-          )}
-          <div className="flex flex-col gap-0.5 text-left overflow-hidden flex-1 min-w-0">
-            <p className="text-sm truncate w-full">{data.user.name}</p>
-            <p className="text-xs truncate w-full">{data.user.email}</p>
-          </div>
-          <ChevronDownIcon className="size-4 shrink-0" />
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{data.user.name}</DrawerTitle>
-            <DrawerDescription>{data.user.email}</DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter>
-            <Button variant="outline">
-              <CogIcon className="size-4 text-black" />
-              Settings
-            </Button>
-            <Button variant="outline" onClick={onLogout}>
-              <LogOutIcon className="size-4 text-black" />
-              Sign out
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
+  const userInitials = data.user.name.charAt(0).toUpperCase();
   return (
-    <>
-      <UserSettingsDialog open={open} onOpenChange={setOpen} />
-      <DropdownMenu>
-        <DropdownMenuTrigger className="rounded-md border border-border/10 p-2 gap-x-2 flex items-center justify-between bg-white/5 hover:bg-white/10 overflow-hidden">
-          {data.user.image ? (
-            <Avatar className="size-6 mr-3">
-              <AvatarImage src={data.user.image} />
-            </Avatar>
-          ) : (
-            <GeneratedAvatar seed={data.user.name} className="size-6 mr-3" />
-          )}
-          <div className="flex flex-col gap-0.5 text-left overflow-hidden flex-1 min-w-0">
-            <p className="text-sm truncate w-full">{data.user.name}</p>
-          </div>
-          <ChevronDownIcon className="size-4 shrink-0" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="right" className="w-72">
-          <DropdownMenuLabel>
-            <div className="flex flex-col gap-1">
-              <span className="font-medium truncate">{data.user.name}</span>
-              <span className="text-sm font-normal text-muted-foreground">
-                {data.user.email}
-              </span>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => setOpen(true)}
-            className="cursor-pointer flex items-center justify-between"
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage src={data.user.image ?? undefined} />
+                <AvatarFallback className="rounded-lg">
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{data.user.name}</span>
+                <span className="truncate text-xs">{data.user.email}</span>
+              </div>
+              <ChevronsUpDownIcon className="ml-auto size-4" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            side={isMobile ? "bottom" : "right"}
+            align="end"
+            sideOffset={4}
           >
-            Settings
-            <CogIcon className="size-4" />
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={onLogout}
-            className="cursor-pointer flex items-center justify-between"
-          >
-            Sign out
-            <LogOutIcon className="size-4" />
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage src={data.user.image ?? undefined} />
+                  <AvatarFallback className="rounded-lg">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{data.user.name}</span>
+                  <span className="truncate text-xs">{data.user.email}</span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <SparklesIcon />
+                Upgrade to Pro
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <BadgeCheckIcon />
+                Account
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <CreditCardIcon />
+                Billing
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <BellIcon />
+                Notifications
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onLogout}>
+              <LogOutIcon />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 };

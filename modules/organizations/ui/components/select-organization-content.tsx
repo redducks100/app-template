@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GeneratedAvatar } from "@/components/generated-avatar";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
@@ -19,11 +19,11 @@ export const SelectOrganizationContent = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { data: organizations } = useSuspenseQuery(
-    trpc.organizations.getMany.queryOptions(),
+    trpc.organizations.getMany.queryOptions()
   );
 
   const { data: activeOrganization } = useSuspenseQuery(
-    trpc.organizations.getActiveOrganization.queryOptions(),
+    trpc.organizations.getActiveOrganization.queryOptions()
   );
 
   const onCreateOrganization = () => {
@@ -47,7 +47,7 @@ export const SelectOrganizationContent = () => {
     }
 
     await queryClient.invalidateQueries(
-      trpc.organizations.getActiveOrganization.queryOptions(),
+      trpc.organizations.getActiveOrganization.queryOptions()
     );
 
     router.push("/dashboard");
@@ -68,16 +68,12 @@ export const SelectOrganizationContent = () => {
                   "flex items-center w-full rounded-lg px-4 py-8 border border-border transition-all"
                 }
               >
-                {org.logo ? (
-                  <Avatar className="rounded-md size-9 mr-3">
-                    <AvatarImage src={org.logo} />
-                  </Avatar>
-                ) : (
-                  <GeneratedAvatar
-                    seed={org.name}
-                    className="rounded-md size-9 mr-3"
-                  />
-                )}
+                <Avatar className="rounded-md size-9 mr-3">
+                  <AvatarImage src={org.logo ?? undefined} />
+                  <AvatarFallback className="rounded-md">
+                    {org.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
 
                 <div className="flex-1">
                   <div className="flex items-center gap-2">

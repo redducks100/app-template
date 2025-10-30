@@ -1,21 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useSidebar } from "@/components/ui/sidebar";
-import { PanelLeftCloseIcon, PanelLeftIcon } from "lucide-react";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@radix-ui/react-separator";
 
 export const DashboardNavbar = () => {
-  const { state, toggleSidebar, isMobile } = useSidebar();
-
   return (
-    <nav className="flex px-4 gap-x-2 items-center justify-between py-3 border-b bg-background">
-      <Button className="size-9" variant="outline" onClick={toggleSidebar}>
-        {state === "collapsed" || isMobile ? (
-          <PanelLeftIcon className="size-4" />
-        ) : (
-          <PanelLeftCloseIcon className="size-4" />
-        )}
-      </Button>
-    </nav>
+    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <div className="flex items-center gap-2 px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator
+          orientation="vertical"
+          className="mr-2 data-[orientation=vertical]:h-4"
+        />
+      </div>
+    </header>
   );
 };

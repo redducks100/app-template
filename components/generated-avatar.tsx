@@ -5,14 +5,23 @@ import { cn } from "@/lib/utils";
 
 interface GeneratedAvatarProps {
   seed: string;
+  backgroundColor?: string[];
+  textColor?: string[];
   className?: string;
 }
 
-export const GeneratedAvatar = ({ seed, className }: GeneratedAvatarProps) => {
+export const GeneratedAvatar = ({
+  seed,
+  backgroundColor,
+  textColor,
+  className,
+}: GeneratedAvatarProps) => {
   const avatar = createAvatar(initials, {
     seed,
     fontWeight: 500,
     fontSize: 42,
+    backgroundColor,
+    textColor,
   });
 
   return (
