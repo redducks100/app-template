@@ -10,7 +10,7 @@ type SendEmailProps = {
 
 export default function sendEmail({ to, subject, react }: SendEmailProps) {
   return resend.emails.send({
-    from: "Enomisoft <noreply@noreply.enomisoft.com>",
+    from: "EnomiSoft <noreply@noreply.enomisoft.com>",
     to: to,
     subject: subject,
     react: react,
