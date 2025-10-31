@@ -9,7 +9,7 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import { User } from "better-auth";
+import { type User } from "better-auth";
 
 type ForgotPasswordEmailProps = {
   user: User;
@@ -42,7 +42,7 @@ export const ForgotPasswordEmail = ({
 
               <Section className="text-center mb-8">
                 <Button
-                  href="https://example.com/reset-password"
+                  href={resetUrl}
                   className="bg-blue-600 text-white px-8 py-4 rounded-xl text-[16px] font-medium no-underline box-border"
                 >
                   Reset Your Password
@@ -61,7 +61,7 @@ export const ForgotPasswordEmail = ({
               </Text>
 
               <Text className="text-[14px] text-blue-600 mb-8 mt-0 break-all">
-                https://example.com/reset-password
+                {resetUrl}
               </Text>
             </Section>
           </Container>

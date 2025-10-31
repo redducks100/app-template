@@ -19,6 +19,7 @@ import { signInSchema } from "@/modules/schemas/sign-in-schema";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export const SignInView = () => {
   const router = useRouter();
@@ -122,12 +123,12 @@ export const SignInView = () => {
                   disabled={loading}
                   LeftIcon={LockIcon}
                   labelRight={
-                    <a
-                      href="#"
+                    <Link
+                      href="/forgot-password"
                       className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                     >
                       Forgot your password?
-                    </a>
+                    </Link>
                   }
                 />
               )}
@@ -142,7 +143,7 @@ export const SignInView = () => {
                 Policy.
               </p>
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="/sign-up">Sign up</a>
+                Don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

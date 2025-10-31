@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,6 +19,7 @@ import { signUpSchema } from "@/modules/schemas/sign-up-schema";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export const SignUpView = () => {
   const router = useRouter();
@@ -156,7 +156,7 @@ export const SignUpView = () => {
                 Policy.
               </p>
               <FieldDescription className="px-6 text-center">
-                Already have an account? <a href="/sign-in">Sign in</a>
+                Already have an account? <Link href="/sign-in">Sign in</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>
