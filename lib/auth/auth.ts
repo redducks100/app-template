@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { nextCookies } from "better-auth/next-js";
 import { organization } from "better-auth/plugins";
 import sendForgotPasswordEmail from "../emails/send-forgot-password-email";
+import sendVerificationEmail from "../emails/send-verification-email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -24,8 +25,16 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, url, token }, request) => {
       await sendForgotPasswordEmail({ user, url });
+    },
+  },
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendVerificationEmail({ user, url });
     },
   },
   plugins: [organization(), nextCookies()],

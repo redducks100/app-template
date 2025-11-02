@@ -14,6 +14,6 @@ export default function sendForgotPasswordEmail({
   return sendEmail({
     to: "delivered+forgotpassword@resend.dev",
     subject: "Reset your password",
-    react: ForgotPasswordEmail({ user, resetUrl: url }),
+    react: ForgotPasswordEmail({ resetUrl: url }),
   });
 }

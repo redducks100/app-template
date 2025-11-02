@@ -34,9 +34,7 @@ export const SignUpView = () => {
     },
     validators: { onSubmit: signUpSchema },
     onSubmit: async ({ value }) => {
-      setLoading(true);
-
-      authClient.signUp.email(
+      await authClient.signUp.email(
         {
           name: value.name,
           email: value.email,
@@ -48,7 +46,6 @@ export const SignUpView = () => {
             router.push("/dashboard");
           },
           onError: ({ error }) => {
-            setLoading(false);
             toast.error(error.message || "Failed to sign up");
           },
         }
@@ -110,7 +107,6 @@ export const SignUpView = () => {
                 <field.Input
                   label="Name"
                   placeholder="John Smith"
-                  disabled={loading}
                   LeftIcon={UserIcon}
                 />
               )}
@@ -120,7 +116,6 @@ export const SignUpView = () => {
                 <field.Input
                   label="Email"
                   placeholder="you@example.com"
-                  disabled={loading}
                   LeftIcon={AtSignIcon}
                 />
               )}
@@ -131,7 +126,6 @@ export const SignUpView = () => {
                   label="Password"
                   type="password"
                   description="Must be at least 8 characters long."
-                  disabled={loading}
                   LeftIcon={LockIcon}
                 />
               )}
@@ -142,15 +136,14 @@ export const SignUpView = () => {
                   label="Confirm Password"
                   type="password"
                   description="Please confirm your password."
-                  disabled={loading}
                   LeftIcon={LockIcon}
                 />
               )}
             </form.AppField>
             <Field>
-              <Button type="submit" disabled={loading}>
-                Create account
-              </Button>
+              <form.AppForm>
+                <form.SubmitButton label="Create account" />
+              </form.AppForm>
               <p className="text-xs text-center text-muted-foreground">
                 By signing up, you agree to our Terms of Service and Privacy
                 Policy.

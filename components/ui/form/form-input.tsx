@@ -2,17 +2,15 @@ import type { LucideIcon } from "lucide-react";
 import { Input } from "../input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "../input-group";
 import { FormBase, FormControlProps } from "./form-base";
-import { useFieldContext } from "./hooks";
+import { useFieldContext, useFormContext } from "./hooks";
 import { HTMLInputTypeAttribute } from "react";
 
 export function FormInput({
   placeholder,
-  disabled,
   type,
   LeftIcon,
   ...props
 }: FormControlProps & {
-  disabled?: boolean;
   LeftIcon?: LucideIcon;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
@@ -33,7 +31,6 @@ export function FormInput({
           onBlur={field.handleBlur}
           onChange={(e) => field.handleChange(e.target.value)}
           aria-invalid={isInvalid}
-          disabled={disabled}
         />
         {LeftIcon && (
           <InputGroupAddon>

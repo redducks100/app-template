@@ -23,7 +23,7 @@ import Link from "next/link";
 
 export const SignInView = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const form = useAppForm({
     defaultValues: {
@@ -34,9 +34,7 @@ export const SignInView = () => {
       onSubmit: signInSchema,
     },
     onSubmit: async ({ value }) => {
-      setLoading(true);
-
-      authClient.signIn.email(
+      await authClient.signIn.email(
         {
           email: value.email,
           password: value.password,
@@ -47,7 +45,6 @@ export const SignInView = () => {
             router.push("/dashboard");
           },
           onError: ({ error }) => {
-            setLoading(false);
             toast.error(error.message);
           },
         }
@@ -109,7 +106,6 @@ export const SignInView = () => {
                 <field.Input
                   label="Email"
                   placeholder="you@example.com"
-                  disabled={loading}
                   LeftIcon={AtSignIcon}
                 />
               )}
@@ -120,7 +116,6 @@ export const SignInView = () => {
                 <field.Input
                   label="Password"
                   type="password"
-                  disabled={loading}
                   LeftIcon={LockIcon}
                   labelRight={
                     <Link
@@ -135,9 +130,9 @@ export const SignInView = () => {
             </form.AppField>
 
             <Field>
-              <Button type="submit" className="w-full" disabled={loading}>
-                Sign in
-              </Button>
+              <form.AppForm>
+                <form.SubmitButton label="Sign in" />
+              </form.AppForm>
               <p className="text-center text-xs text-muted-foreground">
                 By continuing, you agree to our Terms of Service and Privacy
                 Policy.

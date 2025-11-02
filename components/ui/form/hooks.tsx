@@ -3,6 +3,7 @@ import { FormInput } from "./form-input";
 import { FormTextarea } from "./form-textarea";
 import { FormSelect } from "./form-select";
 import { FormCheckbox } from "./form-checkbox";
+import { FormSubmitButton } from "./form-submit-button";
 
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts();
@@ -14,7 +15,9 @@ const { useAppForm } = createFormHook({
     Select: FormSelect,
     Checkbox: FormCheckbox,
   },
-  formComponents: {},
+  formComponents: {
+    SubmitButton: FormSubmitButton,
+  },
   fieldContext,
   formContext,
 });
