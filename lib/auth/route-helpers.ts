@@ -6,13 +6,33 @@ import { db } from "../db";
 import { member } from "@/drizzle/auth";
 import { eq } from "drizzle-orm";
 
-export const verifySession = async () => {
+export const verifySession = async (path?: string) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) {
     redirect("/sign-in");
+  }
+
+  if (!session.user.emailVerified) {
+    redirect("/verify-email");
+  }
+
+  return session;
+};
+
+export const verify = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
+  if (session.user.emailVerified) {
+    redirect("/verify-email");
   }
 
   return session;
@@ -29,5 +49,5 @@ export const protectRoute = cache(
     } else if (userMember && !activeOrganizationId) {
       redirect("/select-org");
     }
-  },
+  }
 );
