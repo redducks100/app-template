@@ -15,8 +15,10 @@ export const verifySession = async (path?: string) => {
     redirect("/sign-in");
   }
 
-  if (!session.user.emailVerified) {
+  if (!session.user.emailVerified && path !== "/verify-email") {
     redirect("/verify-email");
+  } else if (session.user.emailVerified && path === "/verify-email") {
+    redirect("/dashboard");
   }
 
   return session;
