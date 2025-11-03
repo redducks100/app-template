@@ -57,8 +57,9 @@ export const DashboardUserButton = () => {
   if (isPending || !data?.user) {
     return null;
   }
-
-  const userInitials = data.user.name.charAt(0).toUpperCase();
+  const userInitials = `${data.user.name
+    .charAt(0)
+    .toUpperCase()}${data.user.name.charAt(1).toUpperCase()}`;
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -110,7 +111,9 @@ export const DashboardUserButton = () => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/dashboard/account")}
+              >
                 <BadgeCheckIcon />
                 Account
               </DropdownMenuItem>

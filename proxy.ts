@@ -10,7 +10,7 @@ const isPublicRoute = (request: NextRequest) => {
 };
 
 const isProtectedRoute = (request: NextRequest) => {
-  return ["/dashboard", "/create-org", "/select-org"].includes(
+  return ["/dashboard", "/create-org", "/select-org", "/account"].includes(
     request.nextUrl.pathname
   );
 };
