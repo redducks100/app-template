@@ -6,17 +6,22 @@ import { useEffect, useRef, useState } from "react";
 export function FormSubmitButton({
   label,
   timer,
+  dontStartOnRender,
   ...props
 }: Omit<React.ComponentProps<typeof Button>, "type" | "disabled"> & {
   label: string;
   timer?: number;
+  dontStartOnRender?: boolean;
 }) {
   const form = useFormContext();
   const [timeToNextSubmit, setTimeToNextSubmit] = useState(timer ?? 0);
   const interval = useRef<NodeJS.Timeout>(undefined);
 
   useEffect(() => {
-    startCountdown();
+    if (!dontStartOnRender) startCountdown();
+    else {
+      setTimeToNextSubmit(0);
+    }
   }, []);
 
   function startCountdown(time = timer) {
@@ -39,7 +44,7 @@ export function FormSubmitButton({
 
   const submit = async () => {
     await form.handleSubmit();
-    startCountdown();
+    startCountdown(timer);
   };
 
   return (

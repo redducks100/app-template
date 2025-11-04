@@ -6,7 +6,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GeneratedAvatar } from "@/components/generated-avatar";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";

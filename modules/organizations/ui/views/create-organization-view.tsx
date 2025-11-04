@@ -18,7 +18,6 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth/auth-client";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldGroup } from "@/components/ui/field";
-import { totalmem } from "os";
 import { toast } from "sonner";
 
 type CreateOrganizationViewProps = {
@@ -69,7 +68,7 @@ export const CreateOrganizationView = ({
     },
     onSubmit: async ({ value }) => {
       setLoading(true);
-      createOrganization.mutate(value);
+      await createOrganization.mutateAsync(value);
     },
   });
 
@@ -122,7 +121,6 @@ export const CreateOrganizationView = ({
                 <field.Input
                   label="Name"
                   placeholder="Acme organization"
-                  disabled={loading}
                   LeftIcon={BuildingIcon}
                 />
               )}
@@ -132,15 +130,14 @@ export const CreateOrganizationView = ({
                 <field.Input
                   label="Slug URL"
                   placeholder="acme-organization"
-                  disabled={loading}
                   LeftIcon={Link2Icon}
                 />
               )}
             </form.AppField>
             <Field>
-              <Button type="submit" disabled={loading}>
-                Create Organization
-              </Button>
+              <form.AppForm>
+                <form.SubmitButton label="Create organization" />
+              </form.AppForm>
               <p className="text-xs text-center text-muted-foreground">
                 By creating an organization, you agree to our Terms of Service
                 and Privacy Policy.
