@@ -69,7 +69,6 @@ export const SessionCard = ({ session }: SessionCardProps) => {
           {!session.current && (
             <Button variant="destructive" size="sm">
               <Trash2Icon />
-              Revoke Session
             </Button>
           )}
         </div>
