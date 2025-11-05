@@ -65,12 +65,13 @@ export const SessionCard = ({ session }: SessionCardProps) => {
                 Expires: {formatDate(session.expiresAt)}
               </p>
             </div>
-            {!session.current && (
-              <Button variant="destructive" size="sm">
-                <Trash2Icon />
-              </Button>
-            )}
           </div>
+          {!session.current && (
+            <Button variant="destructive" size="sm">
+              <Trash2Icon />
+              Revoke Session
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
