@@ -1,10 +1,11 @@
 import { type User } from "better-auth";
-import { AccountProfileCard } from "../components/account-profile-card";
-import { AccountSecurityCard } from "../components/account-security-card";
+import { ProfileSection } from "../components/profile-section";
+import { SecuritySection } from "../components/security-section";
 import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Suspense } from "react";
-import { AccountSessionsCard } from "../components/account-sessions-card";
+import { SessionsSection } from "../components/sessions-section";
+import { LinkedAccountsSection } from "../components/linked-accounts-section";
 
 type AccountViewProps = {
   user: User;
@@ -13,16 +14,20 @@ type AccountViewProps = {
 export const AccountView = async ({ user }: AccountViewProps) => {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(trpc.auth.hasPasswordAccount.queryOptions());
+  void queryClient.prefetchQuery(trpc.auth.getLinkedAccounts.queryOptions());
   void queryClient.prefetchQuery(trpc.auth.getSessions.queryOptions());
   return (
     <div className="p-4 space-y-12">
-      <AccountProfileCard user={user} />
+      <ProfileSection user={user} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense>
-          <AccountSecurityCard user={user} />
+          <SecuritySection user={user} />
         </Suspense>
         <Suspense>
-          <AccountSessionsCard />
+          <SessionsSection />
+        </Suspense>
+        <Suspense>
+          <LinkedAccountsSection />
         </Suspense>
       </HydrationBoundary>
     </div>

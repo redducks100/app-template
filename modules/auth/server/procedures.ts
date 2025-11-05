@@ -2,7 +2,7 @@ import { account, session } from "@/drizzle/auth";
 import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { headers } from "next/headers";
 
 export const authRouter = createTRPCRouter({
@@ -15,6 +15,13 @@ export const authRouter = createTRPCRouter({
     });
 
     return accounts && accounts.length > 0;
+  }),
+  getLinkedAccounts: protectedProcedure.query(async ({ ctx }) => {
+    const accounts = await auth.api.listUserAccounts({
+      headers: await headers(),
+    });
+
+    return accounts.filter((x) => x.providerId !== "credential");
   }),
   getSessions: protectedProcedure.query(async ({ ctx }) => {
     const sessions = await db.query.session.findMany({

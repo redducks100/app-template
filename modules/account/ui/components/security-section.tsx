@@ -4,15 +4,15 @@ import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { User } from "better-auth";
 import { LockIcon } from "lucide-react";
-import { AccountViewCard } from "../components/account-view-card";
+import { ViewSection } from "./view-section";
 import { ChangePasswordForm } from "./change-password-form";
 import { SendChangePasswordEmailForm } from "./send-change-password-email-form";
 
-type AccountSecurityCardProps = {
+type SecuritySectionProps = {
   user: User;
 };
 
-export const AccountSecurityCard = ({ user }: AccountSecurityCardProps) => {
+export const SecuritySection = ({ user }: SecuritySectionProps) => {
   const trpc = useTRPC();
 
   const { data: hasPasswordAccount } = useSuspenseQuery(
@@ -20,7 +20,7 @@ export const AccountSecurityCard = ({ user }: AccountSecurityCardProps) => {
   );
 
   return (
-    <AccountViewCard
+    <ViewSection
       title="Security"
       description="Keep your account secure"
       Icon={LockIcon}
@@ -30,6 +30,6 @@ export const AccountSecurityCard = ({ user }: AccountSecurityCardProps) => {
       ) : (
         <SendChangePasswordEmailForm email={user.email} />
       )}
-    </AccountViewCard>
+    </ViewSection>
   );
 };

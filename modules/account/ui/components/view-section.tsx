@@ -2,19 +2,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { type LucideIcon } from "lucide-react";
 import React from "react";
 
-type AccountViewCardProps = {
+type ViewSectionProps = {
   title: string;
   description: string;
   children: React.ReactNode | React.ReactNode[];
   Icon: LucideIcon;
 };
 
-export const AccountViewCard = ({
+export const ViewSection = ({
   title,
   description,
   Icon,
   children,
-}: AccountViewCardProps) => {
+}: ViewSectionProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 space-y-4">
       <div className="lg:col-span-1">

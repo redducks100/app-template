@@ -2,12 +2,9 @@
 
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { User } from "better-auth";
-import { KeyIcon, Loader2Icon, LockIcon } from "lucide-react";
-import { AccountViewCard } from "../components/account-view-card";
-import { ChangePasswordForm } from "./change-password-form";
-import { SendChangePasswordEmailForm } from "./send-change-password-email-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { KeyIcon, Loader2Icon } from "lucide-react";
+import { ViewSection } from "./view-section";
+import { Card, CardContent } from "@/components/ui/card";
 import { SessionCard } from "./session-card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -15,7 +12,7 @@ import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export const AccountSessionsCard = () => {
+export const SessionsSection = () => {
   const trpc = useTRPC();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,7 +25,7 @@ export const AccountSessionsCard = () => {
 
   function revokeOtherSessions() {
     setLoading(true);
-    authClient.revokeOtherSessions(undefined, {
+    return authClient.revokeOtherSessions(undefined, {
       onSuccess: () => {
         setLoading(false);
         toast.success("Successfully revoked all other sessions");
@@ -45,7 +42,7 @@ export const AccountSessionsCard = () => {
   }
 
   return (
-    <AccountViewCard
+    <ViewSection
       title="Sessions"
       description="Manage all of your sessions"
       Icon={KeyIcon}
@@ -84,6 +81,6 @@ export const AccountSessionsCard = () => {
           )}
         </div>
       </div>
-    </AccountViewCard>
+    </ViewSection>
   );
 };

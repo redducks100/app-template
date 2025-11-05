@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { LogoGoogle } from "@/components/ui/logo";
+import { GoogleIcon } from "@/components/ui/google-icon";
 import { Separator } from "@/components/ui/separator";
 import { AtSignIcon, LockIcon } from "lucide-react";
 
@@ -20,6 +20,11 @@ import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
 import Link from "next/link";
+import {
+  SUPPORTED_OATH_PROVIDER_DETAILS,
+  SUPPORTED_OAUTH_PROVIDERS,
+  SupportedOAuthProvider,
+} from "@/lib/auth/constants";
 
 export const SignInView = () => {
   const router = useRouter();
@@ -52,10 +57,10 @@ export const SignInView = () => {
     },
   });
 
-  const onGoogleSubmit = () => {
+  const onProviderSubmit = (provider: SupportedOAuthProvider) => {
     setLoading(true);
     authClient.signIn.social(
-      { provider: "google", callbackURL: "/dashboard" },
+      { provider: provider, callbackURL: "/dashboard" },
       {
         onSuccess: () => {
           router.push("/dashboard");
@@ -70,24 +75,28 @@ export const SignInView = () => {
 
   return (
     <Card>
-      <CardHeader className="space-y-1">
+      <CardHeader>
         <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
         <CardDescription>
           Sign in to your account using your preferred method
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <Button
-          variant="outline"
-          disabled={loading}
-          onClick={onGoogleSubmit}
-          className="w-full justify-between border-gray-300"
-        >
-          <div className="flex items-center">
-            <LogoGoogle />
-            Continue with Google
-          </div>
-        </Button>
+      <CardContent className="space-y-2">
+        {SUPPORTED_OAUTH_PROVIDERS.map((provider) => {
+          const Icon = SUPPORTED_OATH_PROVIDER_DETAILS[provider].Icon;
+
+          return (
+            <Button
+              variant="outline"
+              disabled={loading}
+              onClick={() => onProviderSubmit(provider)}
+              className="w-full"
+            >
+              <Icon />
+              Continue with {SUPPORTED_OATH_PROVIDER_DETAILS[provider].name}
+            </Button>
+          );
+        })}
 
         <div className="flex items-center space-x-2">
           <Separator className="flex-1" />

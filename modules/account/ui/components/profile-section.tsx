@@ -1,7 +1,7 @@
 "use client";
 
 import { AtSignIcon, UploadIcon, UserIcon } from "lucide-react";
-import { AccountViewCard } from "../components/account-view-card";
+import { ViewSection } from "./view-section";
 import { useAppForm } from "@/components/ui/form/hooks";
 import {
   Field,
@@ -17,11 +17,11 @@ import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-type AccountProfileCardProps = {
+type ProfileSectionProps = {
   user: User;
 };
 
-export const AccountProfileCard = ({ user }: AccountProfileCardProps) => {
+export const ProfileSection = ({ user }: ProfileSectionProps) => {
   const router = useRouter();
   const form = useAppForm({
     defaultValues: {
@@ -69,7 +69,7 @@ export const AccountProfileCard = ({ user }: AccountProfileCardProps) => {
     .toUpperCase()}`;
 
   return (
-    <AccountViewCard
+    <ViewSection
       title="Profile"
       description="Manage your profile details"
       Icon={UserIcon}
@@ -127,6 +127,6 @@ export const AccountProfileCard = ({ user }: AccountProfileCardProps) => {
           </Field>
         </FieldGroup>
       </form>
-    </AccountViewCard>
+    </ViewSection>
   );
 };
