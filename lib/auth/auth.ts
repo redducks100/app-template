@@ -5,6 +5,7 @@ import { nextCookies } from "better-auth/next-js";
 import { organization } from "better-auth/plugins";
 import sendForgotPasswordEmail from "../emails/send-forgot-password-email";
 import sendVerificationEmail from "../emails/send-verification-email";
+import sendAccountDeletionEmail from "../emails/send-account-deletion-email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -16,6 +17,15 @@ export const auth = betterAuth({
       sendChangeEmailVerification: async ({ user, url, newEmail }) => {
         await sendVerificationEmail({
           user: { ...user, email: newEmail },
+          url,
+        });
+      },
+    },
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({ user, url, token }) => {
+        await sendAccountDeletionEmail({
+          user,
           url,
         });
       },

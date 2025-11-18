@@ -6,6 +6,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { SessionsSection } from "../components/sessions-section";
 import { LinkedAccountsSection } from "../components/linked-accounts-section";
+import { DangerSection } from "../components/danger-section";
 
 type AccountViewProps = {
   user: User;
@@ -30,6 +31,7 @@ export const AccountView = async ({ user }: AccountViewProps) => {
           <LinkedAccountsSection />
         </Suspense>
       </HydrationBoundary>
+      <DangerSection />
     </div>
   );
 };
