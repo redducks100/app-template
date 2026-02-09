@@ -6,6 +6,7 @@ import React from "react";
 type ViewSectionProps = {
   title: string;
   description: string;
+  insideCard?: boolean;
   children: React.ReactNode | React.ReactNode[];
   Icon: LucideIcon;
 };
@@ -37,6 +38,7 @@ const iconViewSectionVariants = cva("size-5", {
 export const ViewSection = ({
   title,
   description,
+  insideCard = true,
   Icon,
   children,
   viewVariant = "default",
@@ -54,14 +56,18 @@ export const ViewSection = ({
         <p className="text-sm text-muted-foreground mt-1">{description}</p>
       </div>
       <div className="lg:col-span-2 space-y-4">
-        {React.Children.map(children, (child, index) => (
-          <Card
-            className={viewSectionVariants({ viewVariant })}
-            key={`view-card-${index}`}
-          >
-            <CardContent className="space-y-4">{child}</CardContent>
-          </Card>
-        ))}
+        {React.Children.map(children, (child, index) =>
+          insideCard ? (
+            <Card
+              className={viewSectionVariants({ viewVariant })}
+              key={`view-card-${index}`}
+            >
+              <CardContent className="space-y-4">{child}</CardContent>
+            </Card>
+          ) : (
+            child
+          )
+        )}
       </div>
     </div>
   );

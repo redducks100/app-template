@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { type LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 export function DashboardNavSecondary({
   items,
@@ -27,12 +28,15 @@ export function DashboardNavSecondary({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
+              <SidebarMenuButton
+                tooltip={item.title}
+                render={
+                  <Link href={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
+                }
+              ></SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>

@@ -69,7 +69,7 @@ export const ResetPasswordView = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button className="w-full" asChild>
+          <Button className="w-full">
             <Link href="/sign-in" className="text-primary">
               Back to Sign in
             </Link>

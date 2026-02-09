@@ -51,9 +51,11 @@ export const DashboardNavbar = () => {
                   {index === breadcrumbs.length - 1 ? (
                     <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink asChild>
-                      <Link href={breadcrumb.href}>{breadcrumb.label}</Link>
-                    </BreadcrumbLink>
+                    <BreadcrumbLink
+                      render={
+                        <Link href={breadcrumb.href}>{breadcrumb.label}</Link>
+                      }
+                    ></BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
               </React.Fragment>

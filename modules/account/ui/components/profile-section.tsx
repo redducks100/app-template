@@ -1,6 +1,6 @@
 "use client";
 
-import { AtSignIcon, UploadIcon, UserIcon } from "lucide-react";
+import { MailIcon, UploadIcon, UserIcon } from "lucide-react";
 import { ViewSection } from "./view-section";
 import { useAppForm } from "@/components/ui/form/hooks";
 import {
@@ -115,7 +115,7 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
                 label="Email"
                 description="Update your email address. You will need to verify the new address."
                 placeholder="you@example.com"
-                LeftIcon={AtSignIcon}
+                LeftIcon={MailIcon}
               />
             )}
           </form.AppField>

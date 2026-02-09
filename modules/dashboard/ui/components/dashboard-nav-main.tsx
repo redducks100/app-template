@@ -26,12 +26,15 @@ export const DashboardNavMain = ({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title} asChild>
-                <Link href={item.url}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
+              <SidebarMenuButton
+                tooltip={item.title}
+                render={
+                  <Link href={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </Link>
+                }
+              ></SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>

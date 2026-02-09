@@ -44,6 +44,7 @@ export const SessionsSection = () => {
   return (
     <ViewSection
       title="Sessions"
+      insideCard={false}
       description="Manage all of your sessions"
       Icon={KeyIcon}
     >

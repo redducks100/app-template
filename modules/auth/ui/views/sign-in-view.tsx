@@ -8,7 +8,6 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { GoogleIcon } from "@/components/ui/google-icon";
 import { Separator } from "@/components/ui/separator";
 import { AtSignIcon, LockIcon } from "lucide-react";
 
@@ -91,6 +90,7 @@ export const SignInView = () => {
               disabled={loading}
               onClick={() => onProviderSubmit(provider)}
               className="w-full"
+              key={provider}
             >
               <Icon />
               Continue with {SUPPORTED_OATH_PROVIDER_DETAILS[provider].name}
