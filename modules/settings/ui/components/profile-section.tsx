@@ -41,7 +41,7 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
       if (value.email !== user.email) {
         authClient.changeEmail({
           newEmail: value.email,
-          callbackURL: "/dashboard/account",
+          callbackURL: "/dashboard/settings/profile",
         });
       }
 

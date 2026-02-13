@@ -1,9 +1,3 @@
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
@@ -31,23 +25,30 @@ export const SendDeleteAccountEmailForm = () => {
         form.handleSubmit();
       }}
     >
-      <FieldGroup>
-        <Field>
-          <FieldLabel>Delete account</FieldLabel>
-          <FieldDescription>
-            We will send you a delete account email to confirm your request.
-          </FieldDescription>
-          <form.AppForm>
-            <form.SubmitButton
-              className="md:max-w-fit"
-              timer={30}
-              label="Delete"
-              variant="destructive"
-              dontStartOnRender={true}
-            />
-          </form.AppForm>
-        </Field>
-      </FieldGroup>
+      <section>
+        <h3 className="text-base font-semibold text-destructive mb-4">
+          Danger Zone
+        </h3>
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5">
+          <div className="flex items-center justify-between p-6">
+            <div>
+              <p className="font-medium">Delete account</p>
+              <p className="text-sm text-muted-foreground">
+                Permanently delete your account and all associated data. This
+                action is irreversible.
+              </p>
+            </div>
+            <form.AppForm>
+              <form.SubmitButton
+                timer={30}
+                label="Delete"
+                variant="destructive"
+                dontStartOnRender={true}
+              />
+            </form.AppForm>
+          </div>
+        </div>
+      </section>
     </form>
   );
 };

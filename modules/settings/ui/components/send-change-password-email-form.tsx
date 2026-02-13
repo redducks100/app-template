@@ -1,9 +1,3 @@
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { authClient } from "@/lib/auth/auth-client";
 import { forgotPasswordSchema } from "@/modules/schemas/forgot-password-schema";
@@ -27,7 +21,7 @@ export const SendChangePasswordEmailForm = ({
       await authClient.forgetPassword(
         {
           email: value.email,
-          redirectTo: "/dashboard/account",
+          redirectTo: "/reset-password",
         },
         {
           onError: (error) => {
@@ -50,22 +44,28 @@ export const SendChangePasswordEmailForm = ({
         form.handleSubmit();
       }}
     >
-      <FieldGroup>
-        <Field>
-          <FieldLabel>Set Password</FieldLabel>
-          <FieldDescription>
-            We will send you a password reset email to set up a password.
-          </FieldDescription>
-          <form.AppForm>
-            <form.SubmitButton
-              className="md:max-w-fit"
-              timer={30}
-              label="Send"
-              dontStartOnRender={true}
-            />
-          </form.AppForm>
-        </Field>
-      </FieldGroup>
+      <section>
+        <h3 className="text-base font-semibold text-foreground mb-4">
+          Password
+        </h3>
+        <div className="rounded-xl border border-border bg-card">
+          <div className="flex items-center justify-between p-6">
+            <div>
+              <p className="font-medium">Set Password</p>
+              <p className="text-sm text-muted-foreground">
+                We will send you a password reset email to set up a password.
+              </p>
+            </div>
+            <form.AppForm>
+              <form.SubmitButton
+                timer={30}
+                label="Send"
+                dontStartOnRender={true}
+              />
+            </form.AppForm>
+          </div>
+        </div>
+      </section>
     </form>
   );
 };

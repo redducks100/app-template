@@ -2,9 +2,7 @@
 
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { KeyIcon, Loader2Icon } from "lucide-react";
-import { ViewSection } from "./view-section";
-import { Card, CardContent } from "@/components/ui/card";
+import { Loader2Icon } from "lucide-react";
 import { SessionCard } from "./session-card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -42,46 +40,45 @@ export const SessionsSection = () => {
   }
 
   return (
-    <ViewSection
-      title="Sessions"
-      insideCard={false}
-      description="Manage all of your sessions"
-      Icon={KeyIcon}
-    >
-      <div className="space-y-4">
+    <div className="space-y-7">
+      <section>
+        <h3 className="text-base font-semibold text-foreground mb-4">
+          Current Session
+        </h3>
         {currentSession && <SessionCard session={currentSession} />}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">Other Active Sessions</h3>
-            {otherSessions.length > 0 && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={revokeOtherSessions}
-              >
-                {loading ? (
-                  <Loader2Icon className="size-4 animate-spin" />
-                ) : (
-                  "Revoke other sessions"
-                )}
-              </Button>
-            )}
-          </div>
-          {otherSessions.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                No other active sessions
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {otherSessions.map((session) => (
-                <SessionCard key={session.id} session={session} />
-              ))}
-            </div>
+      </section>
+
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-foreground">
+            Other Active Sessions
+          </h3>
+          {otherSessions.length > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={revokeOtherSessions}
+            >
+              {loading ? (
+                <Loader2Icon className="size-4 animate-spin" />
+              ) : (
+                "Revoke all"
+              )}
+            </Button>
           )}
         </div>
-      </div>
-    </ViewSection>
+        {otherSessions.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card py-8 text-center text-muted-foreground">
+            No other active sessions
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {otherSessions.map((session) => (
+              <SessionCard key={session.id} session={session} />
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
   );
 };

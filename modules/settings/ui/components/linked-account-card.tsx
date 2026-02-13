@@ -57,12 +57,12 @@ export const LinkedAccountCard = ({
     authClient.linkSocial(
       {
         provider: provider,
-        callbackURL: "/dashboard/account",
+        callbackURL: "/dashboard/settings/integrations",
       },
       {
         onSuccess: () => {
           setLoading(false);
-          toast.success("Account was unlinked succesfully");
+          toast.success("Account was linked successfully");
         },
         onError: (error) => {
           toast.error(
@@ -74,7 +74,7 @@ export const LinkedAccountCard = ({
     );
   }
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between p-5">
       <div className="flex items-center space-x-3">
         {<providerDetails.Icon className="size-5" />}
         <div>

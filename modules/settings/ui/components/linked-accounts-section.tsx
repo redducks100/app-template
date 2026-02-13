@@ -1,9 +1,8 @@
 "use client";
 
+import { Separator } from "@/components/ui/separator";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { LinkIcon } from "lucide-react";
-import { ViewSection } from "./view-section";
 import { SUPPORTED_OAUTH_PROVIDERS } from "@/lib/auth/constants";
 import {
   LinkedAccountCard,
@@ -31,19 +30,24 @@ export const LinkedAccountsSection = () => {
       }) as LinkedAccountCardProps,
   );
 
+  const allProviders = currentProviders.concat(supportedProvider);
+
   return (
-    <ViewSection
-      title="Integrations"
-      description="Link OAuth providers for easier sign-in"
-      Icon={LinkIcon}
-    >
-      {currentProviders.concat(supportedProvider).map((provider) => (
-        <LinkedAccountCard
-          key={provider.provider}
-          account={provider.account}
-          provider={provider.provider}
-        />
-      ))}
-    </ViewSection>
+    <section>
+      <h3 className="text-base font-semibold text-foreground mb-4">
+        Linked Accounts
+      </h3>
+      <div className="rounded-xl border border-border bg-card">
+        {allProviders.map((provider, index) => (
+          <div key={provider.provider}>
+            {index > 0 && <Separator orientation="horizontal" />}
+            <LinkedAccountCard
+              account={provider.account}
+              provider={provider.provider}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 };
