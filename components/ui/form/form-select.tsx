@@ -13,7 +13,7 @@ export function FormSelect({
   return (
     <FormBase {...props}>
       <Select
-        onValueChange={(e) => field.handleChange(e)}
+        onValueChange={(e) => field.handleChange(e ?? "")}
         value={field.state.value}
       >
         <SelectTrigger

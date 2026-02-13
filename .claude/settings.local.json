@@ -5,7 +5,10 @@
       "Bash(cat:*)",
       "Bash(timeout 5 powershell -NoProfile -ExecutionPolicy Bypass -Command \"echo ''{\"\"model\"\":{\"\"display_name\"\":\"\"test\"\"},\"\"workspace\"\":{\"\"current_dir\"\":\"\"C:\\\\Users\\\\devsi\"\"}}'' | powershell -NoProfile -ExecutionPolicy Bypass -File C:\\\\Users\\\\devsi\\\\.claude\\\\statusline.ps1\")",
       "Bash(echo:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "WebSearch",
+      "WebFetch(domain:www.better-auth.com)",
+      "Bash(pnpm build:*)"
     ]
   }
 }
