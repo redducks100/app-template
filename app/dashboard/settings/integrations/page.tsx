@@ -1,4 +1,5 @@
 import { protectRoute, verifySession } from "@/lib/auth/route-helpers";
+import { SettingsIntegrationsView } from "@/modules/settings/ui/views/settings-integrations-view";
 
 const Page = async () => {
   const session = await verifySession();
@@ -8,10 +9,8 @@ const Page = async () => {
   );
 
   return (
-    <div className="px-8 py-8 md:px-12 md:py-10">
-      <div className="max-w-3xl">
-        <p>integrations</p>
-      </div>
+    <div className="py-8 md:py-10">
+      <SettingsIntegrationsView />
     </div>
   );
 };

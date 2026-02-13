@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(head:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(timeout 5 powershell -NoProfile -ExecutionPolicy Bypass -Command \"echo ''{\"\"model\"\":{\"\"display_name\"\":\"\"test\"\"},\"\"workspace\"\":{\"\"current_dir\"\":\"\"C:\\\\Users\\\\devsi\"\"}}'' | powershell -NoProfile -ExecutionPolicy Bypass -File C:\\\\Users\\\\devsi\\\\.claude\\\\statusline.ps1\")",
+      "Bash(echo:*)",
+      "Bash(powershell:*)"
     ]
   }
 }
