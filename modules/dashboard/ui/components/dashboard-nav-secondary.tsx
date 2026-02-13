@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { type LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function DashboardNavSecondary({
   items,
@@ -22,6 +23,10 @@ export function DashboardNavSecondary({
     icon: LucideIcon;
   }[];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  const path = usePathname();
+  const paths = path.toLowerCase().split("/");
+  const lastPath = paths[paths.length - 1];
+
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
@@ -30,6 +35,7 @@ export function DashboardNavSecondary({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 tooltip={item.title}
+                isActive={lastPath.includes(item.title.toLowerCase())}
                 render={
                   <Link href={item.url}>
                     <item.icon />

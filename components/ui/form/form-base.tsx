@@ -12,6 +12,7 @@ export type FormControlProps = {
   label: string;
   description?: string;
   labelRight?: ReactNode;
+  row?: boolean;
 };
 
 type FormBaseProps = FormControlProps & {
@@ -27,42 +28,71 @@ export function FormBase({
   description,
   horizontal,
   controlFirst,
+  row,
 }: FormBaseProps) {
   const field = useFieldContext();
+
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-  const labelElement = (
+
+  const LabelBlock = (
     <>
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
         {labelRight}
       </div>
       {description && <FieldDescription>{description}</FieldDescription>}
     </>
   );
-  const errorElem = isInvalid && (
+
+  const ErrorBlock = isInvalid ? (
     <FieldError errors={field.state.meta.errors} />
+  ) : null;
+
+  const DefaultLayout = (
+    <>
+      <FieldContent>{LabelBlock}</FieldContent>
+      {children}
+      {ErrorBlock}
+    </>
   );
+
+  const ControlFirstLayout = (
+    <>
+      {children}
+      <FieldContent>
+        {LabelBlock}
+        {ErrorBlock}
+      </FieldContent>
+    </>
+  );
+
+  const RowLayout = (
+    <div className="flex items-start justify-between gap-6 p-6">
+      <FieldContent className="max-w-sm">{LabelBlock}</FieldContent>
+
+      <div className="flex-1 flex-col gap-2 max-w-64">
+        {children}
+        {ErrorBlock}
+      </div>
+    </div>
+  );
+
+  let content: ReactNode;
+
+  if (row) {
+    content = RowLayout;
+  } else if (controlFirst) {
+    content = ControlFirstLayout;
+  } else {
+    content = DefaultLayout;
+  }
 
   return (
     <Field
       data-invalid={isInvalid}
       orientation={horizontal ? "horizontal" : undefined}
     >
-      {controlFirst ? (
-        <>
-          {children}
-          <FieldContent>
-            {labelElement}
-            {errorElem}
-          </FieldContent>
-        </>
-      ) : (
-        <>
-          <FieldContent>{labelElement}</FieldContent>
-          {children}
-          {errorElem}
-        </>
-      )}
+      {content}
     </Field>
   );
 }

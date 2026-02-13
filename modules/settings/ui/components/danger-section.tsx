@@ -10,7 +10,6 @@ export const DangerSection = () => {
       title="Danger zone"
       description="Irreversible actions"
       Icon={TriangleAlertIcon}
-      viewVariant="destructive"
       iconVariant="destructive"
     >
       <SendDeleteAccountEmailForm />

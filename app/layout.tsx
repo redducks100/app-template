@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono, Figtree } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
 import { TRPCReactProvider } from "@/trpc/client";
 
-const inter = Inter({
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -21,8 +29,10 @@ export default function RootLayout({
 }>) {
   return (
     <TRPCReactProvider>
-      <html lang="en">
-        <body className={`${inter.className} antialiased`}>
+      <html lang="en" className={figtree.variable}>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
           <Toaster />
           {children}
         </body>

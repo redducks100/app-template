@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { AtSignIcon } from "lucide-react";
+import { MailIcon } from "lucide-react";
 
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
@@ -32,13 +32,13 @@ export const ForgotPasswordView = () => {
         {
           onError: (error) => {
             toast.error(
-              error.error.message || "Failed to send password reset email."
+              error.error.message || "Failed to send password reset email.",
             );
           },
           onSuccess: () => {
             toast.success("Password reset email sent");
           },
-        }
+        },
       );
     },
   });
@@ -65,7 +65,7 @@ export const ForgotPasswordView = () => {
                 <field.Input
                   label="Email"
                   placeholder="you@example.com"
-                  LeftIcon={AtSignIcon}
+                  LeftIcon={MailIcon}
                 />
               )}
             </form.AppField>

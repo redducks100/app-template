@@ -27,7 +27,7 @@ export const SelectOrganizationView = async () => {
           Select organization
         </CardTitle>
         <CardDescription className="text-center">
-          Choose which organization you'd like to work with
+          Choose which organization you&apos;d like to work with
         </CardDescription>
       </CardHeader>
       <CardContent>

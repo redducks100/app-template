@@ -30,11 +30,11 @@ export const DashboardOrganizationSwitcher = () => {
   const { isMobile } = useSidebar();
 
   const { data: activeOrganization, isLoading } = useQuery(
-    trpc.organizations.getActiveOrganization.queryOptions()
+    trpc.organizations.getActiveOrganization.queryOptions(),
   );
 
   const { data: organizations, isLoading: isOrganizationsLoading } = useQuery(
-    trpc.organizations.getMany.queryOptions()
+    trpc.organizations.getMany.queryOptions(),
   );
 
   if (isLoading || !activeOrganization) {
@@ -61,7 +61,7 @@ export const DashboardOrganizationSwitcher = () => {
     }
 
     await queryClient.invalidateQueries(
-      trpc.organizations.getActiveOrganization.queryOptions()
+      trpc.organizations.getActiveOrganization.queryOptions(),
     );
   };
 
@@ -141,7 +141,7 @@ export const DashboardOrganizationSwitcher = () => {
                   <PlusIcon className="size-4" />
                 </div>
                 <div className="text-muted-foreground font-medium">
-                  Add team
+                  Add organization
                 </div>
               </DropdownMenuItem>
             </DropdownMenuGroup>

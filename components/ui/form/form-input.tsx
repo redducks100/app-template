@@ -1,8 +1,7 @@
 import type { LucideIcon } from "lucide-react";
-import { Input } from "../input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "../input-group";
 import { FormBase, FormControlProps } from "./form-base";
-import { useFieldContext, useFormContext } from "./hooks";
+import { useFieldContext } from "./hooks";
 import { HTMLInputTypeAttribute } from "react";
 
 export function FormInput({

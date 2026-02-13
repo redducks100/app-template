@@ -8,10 +8,12 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
+  BuildingIcon,
   ChartBarIcon,
   CogIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
+  MailsIcon,
   UsersIcon,
 } from "lucide-react";
 import { DashboardUserButton } from "./dashboard-user-button";
@@ -19,28 +21,47 @@ import { DashboardOrganizationSwitcher } from "./dashboard-organization-switcher
 import { DashboardNavMain } from "./dashboard-nav-main";
 import { DashboardNavSecondary } from "./dashboard-nav-secondary";
 
-const navMain = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Users",
-    url: "#",
-    icon: UsersIcon,
-  },
-  {
-    title: "Analytics",
-    url: "#",
-    icon: ChartBarIcon,
-  },
-];
+const navMain = {
+  items: [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboardIcon,
+    },
+    {
+      title: "Analytics",
+      url: "#",
+      icon: ChartBarIcon,
+    },
+  ],
+  sectionTitle: "Dashboard",
+};
 
-const navSecondary = [
+const navSecondary = {
+  items: [
+    {
+      title: "Organization",
+      url: "/dashboard/organization",
+      icon: BuildingIcon,
+    },
+    {
+      title: "Invitations",
+      url: "#",
+      icon: MailsIcon,
+    },
+    {
+      title: "Users",
+      url: "#",
+      icon: UsersIcon,
+    },
+  ],
+  sectionTitle: "Organization",
+};
+
+const navFooter = [
   {
     title: "Settings",
-    url: "/settings",
+    url: "/dashboard/settings",
     icon: CogIcon,
   },
   {
@@ -54,18 +75,24 @@ export const DashboardSidebar = ({
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
         <DashboardOrganizationSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <DashboardNavMain items={navMain} />
-        <DashboardNavSecondary items={navSecondary} className="mt-auto" />
+        <DashboardNavMain
+          items={navMain.items}
+          sectionTitle={navMain.sectionTitle}
+        />
+        <DashboardNavMain
+          items={navSecondary.items}
+          sectionTitle={navSecondary.sectionTitle}
+        />
+        <DashboardNavSecondary items={navFooter} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <DashboardUserButton />
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 };

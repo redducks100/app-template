@@ -8,17 +8,17 @@ import { SessionsSection } from "../components/sessions-section";
 import { LinkedAccountsSection } from "../components/linked-accounts-section";
 import { DangerSection } from "../components/danger-section";
 
-type AccountViewProps = {
+type SettingViewProps = {
   user: User;
 };
 
-export const AccountView = async ({ user }: AccountViewProps) => {
+export const SettingView = async ({ user }: SettingViewProps) => {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(trpc.auth.hasPasswordAccount.queryOptions());
   void queryClient.prefetchQuery(trpc.auth.getLinkedAccounts.queryOptions());
   void queryClient.prefetchQuery(trpc.auth.getSessions.queryOptions());
   return (
-    <div className="p-4 space-y-12">
+    <div className="p-4 space-y-6">
       <ProfileSection user={user} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense>

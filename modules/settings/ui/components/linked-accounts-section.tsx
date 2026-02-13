@@ -13,7 +13,7 @@ import {
 export const LinkedAccountsSection = () => {
   const trpc = useTRPC();
   const { data: currentAccounts } = useSuspenseQuery(
-    trpc.auth.getLinkedAccounts.queryOptions()
+    trpc.auth.getLinkedAccounts.queryOptions(),
   );
 
   const currentProviders = currentAccounts.map((account) => ({
@@ -22,19 +22,19 @@ export const LinkedAccountsSection = () => {
   })) as LinkedAccountCardProps[];
   const supportedProvider = SUPPORTED_OAUTH_PROVIDERS.filter(
     (provider) =>
-      !currentAccounts.find((account) => account.providerId === provider)
+      !currentAccounts.find((account) => account.providerId === provider),
   ).map(
     (provider) =>
       ({
         provider: provider as string,
         account: undefined,
-      }) as LinkedAccountCardProps
+      }) as LinkedAccountCardProps,
   );
 
   return (
     <ViewSection
       title="Integrations"
-      description="LInk OAth providers for easier sign-in"
+      description="Link OAuth providers for easier sign-in"
       Icon={LinkIcon}
     >
       {currentProviders.concat(supportedProvider).map((provider) => (

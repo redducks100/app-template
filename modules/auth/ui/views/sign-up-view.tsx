@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { AtSignIcon, LockIcon, UserIcon } from "lucide-react";
+import { LockIcon, MailIcon, UserIcon } from "lucide-react";
 
 import { authClient } from "@/lib/auth/auth-client";
 import { useState } from "react";
@@ -52,7 +52,7 @@ export const SignUpView = () => {
           onError: ({ error }) => {
             toast.error(error.message || "Failed to sign up");
           },
-        }
+        },
       );
     },
   });
@@ -69,7 +69,7 @@ export const SignUpView = () => {
           setLoading(false);
           toast.error(error.message);
         },
-      }
+      },
     );
   };
 
@@ -125,7 +125,7 @@ export const SignUpView = () => {
                 <field.Input
                   label="Email"
                   placeholder="you@example.com"
-                  LeftIcon={AtSignIcon}
+                  LeftIcon={MailIcon}
                 />
               )}
             </form.AppField>

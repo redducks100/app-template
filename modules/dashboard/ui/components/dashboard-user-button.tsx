@@ -104,10 +104,10 @@ export const DashboardUserButton = () => {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onClick={() => router.push("/dashboard/account")}
+                onClick={() => router.push("/dashboard/settings/profile")}
               >
                 <BadgeCheckIcon />
-                Account
+                Profile
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCardIcon />

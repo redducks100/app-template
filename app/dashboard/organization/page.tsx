@@ -1,6 +1,6 @@
 import { protectRoute, verifySession } from "@/lib/auth/route-helpers";
 import { DashboardNavbar } from "@/modules/dashboard/ui/components/dashboard-navbar";
-import { DashboardView } from "@/modules/dashboard/ui/views/dashboard-view";
+import { OrganizationView } from "@/modules/organizations/ui/views/organization-view";
 
 const Page = async () => {
   const session = await verifySession();
@@ -13,7 +13,11 @@ const Page = async () => {
     <>
       <DashboardNavbar />
       <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <DashboardView />
+        <div className="h-full flex justify-center">
+          <div className="w-full max-w-6xl">
+            <OrganizationView />
+          </div>
+        </div>
       </main>
     </>
   );
