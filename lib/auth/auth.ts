@@ -6,6 +6,7 @@ import { organization } from "better-auth/plugins";
 import sendForgotPasswordEmail from "../emails/send-forgot-password-email";
 import sendVerificationEmail from "../emails/send-verification-email";
 import sendAccountDeletionEmail from "../emails/send-account-deletion-email";
+import sendInvitationEmail from "../emails/send-invitation-email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -57,5 +58,19 @@ export const auth = betterAuth({
       await sendVerificationEmail({ user, url });
     },
   },
-  plugins: [organization(), nextCookies()],
+  plugins: [
+    organization({
+      async sendInvitationEmail(data) {
+        const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/accept-invitation/${data.id}`;
+        await sendInvitationEmail({
+          email: data.email,
+          inviterName: data.inviter.user.name,
+          organizationName: data.organization.name,
+          role: data.role,
+          inviteUrl: inviteLink,
+        });
+      },
+    }),
+    nextCookies(),
+  ],
 });

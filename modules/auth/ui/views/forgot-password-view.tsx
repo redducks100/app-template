@@ -14,8 +14,11 @@ import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { forgotPasswordSchema } from "@/modules/schemas/forgot-password-schema";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export const ForgotPasswordView = () => {
+  const t = useTranslations("auth.forgot_password");
+
   const form = useAppForm({
     defaultValues: {
       email: "",
@@ -31,12 +34,10 @@ export const ForgotPasswordView = () => {
         },
         {
           onError: (error) => {
-            toast.error(
-              error.error.message || "Failed to send password reset email.",
-            );
+            toast.error(error.error.message || t("error"));
           },
           onSuccess: () => {
-            toast.success("Password reset email sent");
+            toast.success(t("success"));
           },
         },
       );
@@ -46,11 +47,8 @@ export const ForgotPasswordView = () => {
   return (
     <Card>
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Forgot password?</CardTitle>
-        <CardDescription>
-          Don't worry! Fill in your email and we'll send you a link to reset
-          your password.
-        </CardDescription>
+        <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form
@@ -63,8 +61,8 @@ export const ForgotPasswordView = () => {
             <form.AppField name="email">
               {(field) => (
                 <field.Input
-                  label="Email"
-                  placeholder="you@example.com"
+                  label={t("email")}
+                  placeholder={t("emailPlaceholder")}
                   LeftIcon={MailIcon}
                 />
               )}
@@ -72,11 +70,11 @@ export const ForgotPasswordView = () => {
 
             <Field>
               <form.AppForm>
-                <form.SubmitButton label="Send email" />
+                <form.SubmitButton label={t("submit")} />
               </form.AppForm>
 
               <FieldDescription className="text-center">
-                <a href="/sign-in">Back to Sign in</a>
+                <a href="/sign-in">{t("backToSignIn")}</a>
               </FieldDescription>
             </Field>
           </FieldGroup>

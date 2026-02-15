@@ -16,6 +16,7 @@ import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { useTranslations } from "next-intl";
 
 type ProfileSectionProps = {
   user: User;
@@ -23,6 +24,8 @@ type ProfileSectionProps = {
 
 export const ProfileSection = ({ user }: ProfileSectionProps) => {
   const router = useRouter();
+  const t = useTranslations("settings.profile");
+  const tCommon = useTranslations("common");
   const form = useAppForm({
     defaultValues: {
       email: user.email,
@@ -52,13 +55,13 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
 
       if (updateUserResult.error) {
         toast.error(
-          updateUserResult.error.message || "Failed to update profile",
+          updateUserResult.error.message || t("updateProfileError"),
         );
       } else if (emailResult.error) {
-        toast.error(emailResult.error.message || "Failed to change email");
+        toast.error(emailResult.error.message || t("changeEmailError"));
       } else {
         if (value.email !== user.email) {
-          toast.success("Verify your new email address to complete the change");
+          toast.success(t("verifyNewEmail"));
         }
         router.refresh();
       }
@@ -78,7 +81,7 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
       <FieldGroup>
         <section>
           <h3 className="text-base font-semibold text-foreground mb-4">
-            Display
+            {t("display")}
           </h3>
           <div className="rounded-xl border border-border bg-card">
             <Field>
@@ -91,13 +94,13 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <FieldLabel>Profile picture</FieldLabel>
-                    <FieldDescription>JPG, PNG up to 5MB</FieldDescription>
+                    <FieldLabel>{t("profilePicture")}</FieldLabel>
+                    <FieldDescription>{t("profilePictureDescription")}</FieldDescription>
                   </div>
                 </div>
                 <Button variant="outline" size="sm" className="flex gap-2">
                   <Upload className="size-4" />
-                  Upload
+                  {tCommon("upload")}
                 </Button>
               </div>
             </Field>
@@ -108,9 +111,9 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
             <form.AppField name="name">
               {(field) => (
                 <field.Input
-                  label="Name"
-                  description="Used for display purposes only."
-                  placeholder="John Smith"
+                  label={t("name")}
+                  description={t("nameDescription")}
+                  placeholder={t("namePlaceholder")}
                   LeftIcon={UserIcon}
                   row
                 />
@@ -121,15 +124,15 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
 
         <section>
           <h3 className="text-base font-semibold text-foreground mb-4">
-            Contact
+            {t("contact")}
           </h3>
           <div className="rounded-xl border border-border bg-card">
             <form.AppField name="email">
               {(field) => (
                 <field.Input
-                  label="Email"
-                  description="You will need to verify the new address."
-                  placeholder="you@example.com"
+                  label={t("email")}
+                  description={t("emailDescription")}
+                  placeholder={t("emailPlaceholder")}
                   LeftIcon={MailIcon}
                   row
                 />
@@ -141,7 +144,7 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
         <Field>
           <form.AppForm>
             <div className="flex justify-end">
-              <form.SubmitButton label="Update" />
+              <form.SubmitButton label={tCommon("update")} />
             </div>
           </form.AppForm>
         </Field>

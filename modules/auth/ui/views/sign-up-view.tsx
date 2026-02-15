@@ -24,10 +24,13 @@ import {
   SUPPORTED_OAUTH_PROVIDERS,
   SupportedOAuthProvider,
 } from "@/lib/auth/constants";
+import { useTranslations } from "next-intl";
 
 export const SignUpView = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("auth.sign_up");
+  const tCommon = useTranslations("common");
 
   const form = useAppForm({
     defaultValues: {
@@ -50,7 +53,7 @@ export const SignUpView = () => {
             router.push("/dashboard");
           },
           onError: ({ error }) => {
-            toast.error(error.message || "Failed to sign up");
+            toast.error(error.message || t("error"));
           },
         },
       );
@@ -76,10 +79,8 @@ export const SignUpView = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-        <CardDescription>
-          Sign up to get started with our service
-        </CardDescription>
+        <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
         {SUPPORTED_OAUTH_PROVIDERS.map((provider) => {
@@ -94,14 +95,16 @@ export const SignUpView = () => {
               key={provider}
             >
               <Icon />
-              Continue with {SUPPORTED_OATH_PROVIDER_DETAILS[provider].name}
+              {tCommon("continueWith", {
+                provider: SUPPORTED_OATH_PROVIDER_DETAILS[provider].name,
+              })}
             </Button>
           );
         })}
 
         <div className="flex items-center space-x-2">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">OR</span>
+          <span className="text-xs text-muted-foreground">{tCommon("or")}</span>
           <Separator className="flex-1" />
         </div>
         <form
@@ -114,8 +117,8 @@ export const SignUpView = () => {
             <form.AppField name="name">
               {(field) => (
                 <field.Input
-                  label="Name"
-                  placeholder="John Smith"
+                  label={t("name")}
+                  placeholder={t("namePlaceholder")}
                   LeftIcon={UserIcon}
                 />
               )}
@@ -123,8 +126,8 @@ export const SignUpView = () => {
             <form.AppField name="email">
               {(field) => (
                 <field.Input
-                  label="Email"
-                  placeholder="you@example.com"
+                  label={t("email")}
+                  placeholder={t("emailPlaceholder")}
                   LeftIcon={MailIcon}
                 />
               )}
@@ -132,9 +135,9 @@ export const SignUpView = () => {
             <form.AppField name="password">
               {(field) => (
                 <field.Input
-                  label="Password"
+                  label={t("password")}
                   type="password"
-                  description="Must be at least 8 characters long."
+                  description={t("passwordDescription")}
                   LeftIcon={LockIcon}
                 />
               )}
@@ -142,23 +145,22 @@ export const SignUpView = () => {
             <form.AppField name="confirmPassword">
               {(field) => (
                 <field.Input
-                  label="Confirm Password"
+                  label={t("confirmPassword")}
                   type="password"
-                  description="Please confirm your password."
+                  description={t("confirmPasswordDescription")}
                   LeftIcon={LockIcon}
                 />
               )}
             </form.AppField>
             <Field>
               <form.AppForm>
-                <form.SubmitButton label="Create account" />
+                <form.SubmitButton label={t("submit")} />
               </form.AppForm>
               <p className="text-xs text-center text-muted-foreground">
-                By signing up, you agree to our Terms of Service and Privacy
-                Policy.
+                {t("terms")}
               </p>
               <FieldDescription className="px-6 text-center">
-                Already have an account? <Link href="/sign-in">Sign in</Link>
+                {t("hasAccount")} <Link href="/sign-in">{t("signIn")}</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

@@ -24,10 +24,13 @@ import {
   SUPPORTED_OAUTH_PROVIDERS,
   SupportedOAuthProvider,
 } from "@/lib/auth/constants";
+import { useTranslations } from "next-intl";
 
 export const SignInView = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const t = useTranslations("auth.sign_in");
+  const tCommon = useTranslations("common");
 
   const form = useAppForm({
     defaultValues: {
@@ -75,10 +78,8 @@ export const SignInView = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-        <CardDescription>
-          Sign in to your account using your preferred method
-        </CardDescription>
+        <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
         {SUPPORTED_OAUTH_PROVIDERS.map((provider) => {
@@ -93,14 +94,16 @@ export const SignInView = () => {
               key={provider}
             >
               <Icon />
-              Continue with {SUPPORTED_OATH_PROVIDER_DETAILS[provider].name}
+              {tCommon("continueWith", {
+                provider: SUPPORTED_OATH_PROVIDER_DETAILS[provider].name,
+              })}
             </Button>
           );
         })}
 
         <div className="flex items-center space-x-2">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">OR</span>
+          <span className="text-xs text-muted-foreground">{tCommon("or")}</span>
           <Separator className="flex-1" />
         </div>
         <form
@@ -113,8 +116,8 @@ export const SignInView = () => {
             <form.AppField name="email">
               {(field) => (
                 <field.Input
-                  label="Email"
-                  placeholder="you@example.com"
+                  label={t("email")}
+                  placeholder={t("emailPlaceholder")}
                   LeftIcon={MailIcon}
                 />
               )}
@@ -123,7 +126,7 @@ export const SignInView = () => {
             <form.AppField name="password">
               {(field) => (
                 <field.Input
-                  label="Password"
+                  label={t("password")}
                   type="password"
                   LeftIcon={LockIcon}
                   labelRight={
@@ -131,7 +134,7 @@ export const SignInView = () => {
                       href="/forgot-password"
                       className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                     >
-                      Forgot your password?
+                      {t("forgotPassword")}
                     </Link>
                   }
                 />
@@ -140,14 +143,13 @@ export const SignInView = () => {
 
             <Field>
               <form.AppForm>
-                <form.SubmitButton label="Sign in" />
+                <form.SubmitButton label={t("submit")} />
               </form.AppForm>
               <p className="text-center text-xs text-muted-foreground">
-                By continuing, you agree to our Terms of Service and Privacy
-                Policy.
+                {t("terms")}
               </p>
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
+                {t("noAccount")} <Link href="/sign-up">{t("signUp")}</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

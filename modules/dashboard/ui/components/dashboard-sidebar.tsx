@@ -20,60 +20,64 @@ import { DashboardUserButton } from "./dashboard-user-button";
 import { DashboardOrganizationSwitcher } from "./dashboard-organization-switcher";
 import { DashboardNavMain } from "./dashboard-nav-main";
 import { DashboardNavSecondary } from "./dashboard-nav-secondary";
-
-const navMain = {
-  items: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboardIcon,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: ChartBarIcon,
-    },
-  ],
-  sectionTitle: "Dashboard",
-};
-
-const navSecondary = {
-  items: [
-    {
-      title: "Organization",
-      url: "/dashboard/organization",
-      icon: BuildingIcon,
-    },
-    {
-      title: "Invitations",
-      url: "#",
-      icon: MailsIcon,
-    },
-    {
-      title: "Users",
-      url: "#",
-      icon: UsersIcon,
-    },
-  ],
-  sectionTitle: "Organization",
-};
-
-const navFooter = [
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: CogIcon,
-  },
-  {
-    title: "Get Help",
-    url: "#",
-    icon: HelpCircleIcon,
-  },
-];
+import { useTranslations } from "next-intl";
 
 export const DashboardSidebar = ({
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
+  const t = useTranslations("dashboard.sidebar");
+  const tCommon = useTranslations("common");
+
+  const navMain = {
+    items: [
+      {
+        title: t("dashboard"),
+        url: "/dashboard",
+        icon: LayoutDashboardIcon,
+      },
+      {
+        title: t("analytics"),
+        url: "#",
+        icon: ChartBarIcon,
+      },
+    ],
+    sectionTitle: t("dashboardSection"),
+  };
+
+  const navSecondary = {
+    items: [
+      {
+        title: t("organization"),
+        url: "/dashboard/organization",
+        icon: BuildingIcon,
+      },
+      {
+        title: t("invitations"),
+        url: "/dashboard/invitations",
+        icon: MailsIcon,
+      },
+      {
+        title: t("users"),
+        url: "#",
+        icon: UsersIcon,
+      },
+    ],
+    sectionTitle: t("organizationSection"),
+  };
+
+  const navFooter = [
+    {
+      title: tCommon("settings"),
+      url: "/dashboard/settings",
+      icon: CogIcon,
+    },
+    {
+      title: tCommon("getHelp"),
+      url: "#",
+      icon: HelpCircleIcon,
+    },
+  ];
+
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>

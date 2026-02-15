@@ -8,11 +8,13 @@ export function FormInput({
   placeholder,
   type,
   LeftIcon,
+  disabled,
   ...props
 }: FormControlProps & {
   LeftIcon?: LucideIcon;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
+  disabled?: boolean;
 }) {
   const field = useFieldContext<string>();
 
@@ -30,6 +32,7 @@ export function FormInput({
           onBlur={field.handleBlur}
           onChange={(e) => field.handleChange(e.target.value)}
           aria-invalid={isInvalid}
+          disabled={disabled}
         />
         {LeftIcon && (
           <InputGroupAddon>

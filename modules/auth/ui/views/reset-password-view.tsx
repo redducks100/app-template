@@ -18,12 +18,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export const ResetPasswordView = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const error = searchParams.get("error");
+  const t = useTranslations("auth.reset_password");
 
   const form = useAppForm({
     defaultValues: {
@@ -42,11 +44,11 @@ export const ResetPasswordView = () => {
         },
         {
           onError: (error) => {
-            toast.error(error.error.message || "Failed to reset password.");
+            toast.error(error.error.message || t("error"));
           },
           onSuccess: () => {
-            toast.success("Password reset successful", {
-              description: "Redirecting to login...",
+            toast.success(t("success"), {
+              description: t("successDescription"),
             });
             setTimeout(() => {
               router.push("/sign-in");
@@ -62,16 +64,14 @@ export const ResetPasswordView = () => {
       <Card>
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">
-            Invalid Reset Link
+            {t("invalidTitle")}
           </CardTitle>
-          <CardDescription>
-            The password reset link is invalid or has expired.
-          </CardDescription>
+          <CardDescription>{t("invalidDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button className="w-full">
             <Link href="/sign-in" className="text-primary">
-              Back to Sign in
+              {t("backToSignIn")}
             </Link>
           </Button>
         </CardContent>
@@ -82,16 +82,14 @@ export const ResetPasswordView = () => {
   return (
     <Card>
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">
-          Reset your password
-        </CardTitle>
-        <CardDescription>Set a new password for your account.</CardDescription>
+        <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
           <Alert variant="destructive">
             <AlertCircleIcon />
-            <AlertTitle>Your token is invalid or expired.</AlertTitle>
+            <AlertTitle>{t("tokenError")}</AlertTitle>
           </Alert>
         )}
         <form
@@ -104,9 +102,9 @@ export const ResetPasswordView = () => {
             <form.AppField name="password">
               {(field) => (
                 <field.Input
-                  label="Password"
+                  label={t("password")}
                   type="password"
-                  description="Your new password must be at least 8 characters long."
+                  description={t("passwordDescription")}
                   LeftIcon={LockIcon}
                 />
               )}
@@ -115,7 +113,7 @@ export const ResetPasswordView = () => {
             <form.AppField name="confirmPassword">
               {(field) => (
                 <field.Input
-                  label="Re-enter Password"
+                  label={t("confirmPassword")}
                   type="password"
                   LeftIcon={LockIcon}
                 />
@@ -124,7 +122,7 @@ export const ResetPasswordView = () => {
 
             <Field>
               <form.AppForm>
-                <form.SubmitButton label="Save" />
+                <form.SubmitButton label={t("submit")} />
               </form.AppForm>
             </Field>
           </FieldGroup>

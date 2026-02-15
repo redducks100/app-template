@@ -5,14 +5,21 @@ import { Select, SelectContent, SelectTrigger, SelectValue } from "../select";
 
 export function FormSelect({
   children,
+  placeholder,
+  items,
   ...props
-}: FormControlProps & { children: ReactNode }) {
+}: FormControlProps & {
+  children: ReactNode;
+  placeholder?: string;
+  items?: Array<{ value: string; label: string }>;
+}) {
   const field = useFieldContext<string>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
   return (
     <FormBase {...props}>
       <Select
+        items={items}
         onValueChange={(e) => field.handleChange(e ?? "")}
         value={field.state.value}
       >
@@ -20,8 +27,9 @@ export function FormSelect({
           onBlur={field.handleBlur}
           aria-invalid={isInvalid}
           id={field.name}
+          className="w-full"
         >
-          <SelectValue />
+          <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>{children}</SelectContent>
       </Select>

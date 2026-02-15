@@ -21,6 +21,7 @@ export const user = pgTable("user", {
   updatedAt: timestamp("updated_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
+  locale: text("locale").default("en"),
 });
 
 export const session = pgTable("session", {
@@ -106,6 +107,17 @@ export const invitation = pgTable("invitation", {
 export const memberRelations = relations(member, ({ one }) => ({
   organization: one(organization, {
     fields: [member.organizationId],
+    references: [organization.id],
+  }),
+}));
+
+export const invitationRelations = relations(invitation, ({ one }) => ({
+  inviter: one(user, {
+    fields: [invitation.inviterId],
+    references: [user.id],
+  }),
+  organization: one(organization, {
+    fields: [invitation.organizationId],
     references: [organization.id],
   }),
 }));

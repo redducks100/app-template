@@ -20,9 +20,21 @@ import { SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { settingsNavigation } from "../constants/settings-navigation";
+import { useTranslations } from "next-intl";
+
+const itemTranslationKeys: Record<string, string> = {
+  profile: "profile",
+  security: "security",
+  sessions: "sessions",
+  integrations: "oauthProviders",
+  preferences: "preferences",
+  danger: "dangerZone",
+};
 
 export function SettingsSidebar() {
   const path = usePathname();
+  const t = useTranslations("settings.navigation");
+  const tCommon = useTranslations("common");
   const items = settingsNavigation.flatMap((x) => x.items);
   const selectedItem = items.find((x) => path.includes(x.value)) || items[0];
   const selectedValue = selectedItem.value;
@@ -36,9 +48,9 @@ export function SettingsSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex flex-col gap-2 p-2">
-              <h1 className="font-semibold">Settings</h1>
+              <h1 className="font-semibold">{tCommon("settings")}</h1>
               <InputGroup>
-                <InputGroupInput placeholder="Search" />
+                <InputGroupInput placeholder={tCommon("search")} />
                 <InputGroupAddon>
                   <SearchIcon />
                 </InputGroupAddon>
@@ -50,12 +62,13 @@ export function SettingsSidebar() {
       </SidebarHeader>
       <SidebarContent>
         {settingsNavigation.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+          <SidebarGroup key={group.key}>
+            <SidebarGroupLabel>{t(group.key)}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => {
                   const isActive = selectedValue === item.value;
+                  const translationKey = itemTranslationKeys[item.value];
                   return (
                     <SidebarMenuItem key={item.value}>
                       <SidebarMenuButton
@@ -63,7 +76,7 @@ export function SettingsSidebar() {
                         render={
                           <Link href={`/dashboard/settings/${item.value}`}>
                             {item.icon && <item.icon />}
-                            <span>{item.label}</span>
+                            <span>{translationKey ? t(translationKey) : item.label}</span>
                           </Link>
                         }
                       />

@@ -8,7 +8,15 @@
       "Bash(powershell:*)",
       "WebSearch",
       "WebFetch(domain:www.better-auth.com)",
-      "Bash(pnpm build:*)"
+      "Bash(pnpm build:*)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm dlx:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:base-ui.com)",
+      "WebFetch(domain:www.premieroctet.com)"
     ]
   }
 }

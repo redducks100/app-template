@@ -11,11 +11,23 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname, useRouter } from "next/navigation";
 import { settingsNavigation } from "../constants/settings-navigation";
+import { useTranslations } from "next-intl";
+
+const itemTranslationKeys: Record<string, string> = {
+  profile: "profile",
+  security: "security",
+  sessions: "sessions",
+  integrations: "oauthProviders",
+  preferences: "preferences",
+  danger: "dangerZone",
+};
 
 export const SettingsNavbar = () => {
   const navigationItems = settingsNavigation.flatMap((x) => x.items);
   const path = usePathname();
   const router = useRouter();
+  const t = useTranslations("settings.navigation");
+  const tCommon = useTranslations("common");
   const selectedItem =
     navigationItems.find((x) => path.includes(x.value)) || navigationItems[0];
   const selectedValue = selectedItem.value;
@@ -33,7 +45,7 @@ export const SettingsNavbar = () => {
           className="lg:hidden mr-2 data-[orientation=vertical]:h-4"
         />
         <div className="lg:hidden flex flex-1 flex-row items-center gap-4">
-          <p>Settings</p>
+          <p>{tCommon("settings")}</p>
           <Separator
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
@@ -50,7 +62,9 @@ export const SettingsNavbar = () => {
                     value={x.value}
                     onClick={() => onNavigationItemClick(x.value)}
                   >
-                    {x.label}
+                    {itemTranslationKeys[x.value]
+                      ? t(itemTranslationKeys[x.value])
+                      : x.label}
                   </SelectItem>
                 ))}
               </SelectGroup>
