@@ -60,7 +60,7 @@ export const invitationsRouter = createTRPCRouter({
       const response = await auth.api.createInvitation({
         body: {
           email: input.email,
-          role: input.role,
+          role: input.role as "admin" | "member" | "owner",
           organizationId,
         },
         headers: await headers(),

@@ -18,6 +18,7 @@
       "analytics": "Analiză",
       "organization": "Organizație",
       "invitations": "Invitații",
+      "roles": "Roluri",
       "users": "Utilizatori",
       "dashboardSection": "Panou",
       "organizationSection": "Organizație"
@@ -105,6 +106,35 @@
     "accountCreated": "Cont creat! Verifică-ți emailul pentru a-ți verifica contul.",
     "userExists": "Un cont cu acest email există deja. Te rugăm să te conectezi.",
     "alreadyHaveAccount": "Ai deja un cont?"
+  },
+  "roles": {
+    "title": "Roluri",
+    "createRole": "Creează rol",
+    "editRole": "Editează rol",
+    "deleteRole": "Șterge rol",
+    "roleName": "Numele rolului",
+    "roleNamePlaceholder": "ex. Editor",
+    "permissions": "Permisiuni",
+    "organization": "Organizație",
+    "members": "Membri",
+    "invitations": "Invitații",
+    "read": "Citire",
+    "create": "Creare",
+    "update": "Actualizare",
+    "delete": "Ștergere",
+    "cancel": "Anulare",
+    "default": "Implicit",
+    "save": "Salvează",
+    "createSuccess": "Rolul a fost creat cu succes",
+    "updateSuccess": "Rolul a fost actualizat cu succes",
+    "deleteSuccess": "Rolul a fost șters cu succes",
+    "deleteConfirmTitle": "Șterge rolul",
+    "deleteConfirm": "Ești sigur că vrei să ștergi acest rol?",
+    "noCustomRoles": "Nu există roluri personalizate încă.",
+    "allRoles": "Toate rolurile",
+    "roleNameDescription": "Numele rolului personalizat.",
+    "permissionsDescription": "Selectează permisiunile pentru acest rol.",
+    "selectPermissions": "Selectează permisiuni..."
   },
   "auth": {
     "sign_in": {

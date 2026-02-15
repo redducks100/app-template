@@ -18,6 +18,7 @@
       "analytics": "Analytics",
       "organization": "Organization",
       "invitations": "Invitations",
+      "roles": "Roles",
       "users": "Users",
       "dashboardSection": "Dashboard",
       "organizationSection": "Organization"
@@ -105,6 +106,35 @@
     "accountCreated": "Account created! Check your email to verify your account.",
     "userExists": "An account with this email already exists. Please sign in instead.",
     "alreadyHaveAccount": "Already have an account?"
+  },
+  "roles": {
+    "title": "Roles",
+    "createRole": "Create Role",
+    "editRole": "Edit Role",
+    "deleteRole": "Delete Role",
+    "roleName": "Role Name",
+    "roleNamePlaceholder": "e.g. Editor",
+    "permissions": "Permissions",
+    "organization": "Organization",
+    "members": "Members",
+    "invitations": "Invitations",
+    "read": "Read",
+    "create": "Create",
+    "update": "Update",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "default": "Default",
+    "save": "Save",
+    "createSuccess": "Role created successfully",
+    "updateSuccess": "Role updated successfully",
+    "deleteSuccess": "Role deleted successfully",
+    "deleteConfirmTitle": "Delete Role",
+    "deleteConfirm": "Are you sure you want to delete this role?",
+    "noCustomRoles": "No custom roles yet.",
+    "allRoles": "All Roles",
+    "roleNameDescription": "The name for the custom role.",
+    "permissionsDescription": "Select the permissions for this role.",
+    "selectPermissions": "Select permissions..."
   },
   "auth": {
     "sign_in": {

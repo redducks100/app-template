@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/lib/db";
 import { nextCookies } from "better-auth/next-js";
 import { organization } from "better-auth/plugins";
+import { ac, owner, admin, member } from "@/lib/auth/permissions";
 import sendForgotPasswordEmail from "../emails/send-forgot-password-email";
 import sendVerificationEmail from "../emails/send-verification-email";
 import sendAccountDeletionEmail from "../emails/send-account-deletion-email";
@@ -60,6 +61,9 @@ export const auth = betterAuth({
   },
   plugins: [
     organization({
+      ac,
+      roles: { owner, admin, member },
+      dynamicAccessControl: { enabled: true },
       async sendInvitationEmail(data) {
         const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/accept-invitation/${data.id}`;
         await sendInvitationEmail({

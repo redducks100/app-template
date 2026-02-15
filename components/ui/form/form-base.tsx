@@ -70,7 +70,7 @@ export function FormBase({
     <div className="flex items-start justify-between gap-6 p-6">
       <FieldContent className="max-w-sm">{LabelBlock}</FieldContent>
 
-      <div className="flex-1 flex-col gap-2 max-w-64">
+      <div className="flex-1 flex-col gap-2 max-w-sm">
         {children}
         {ErrorBlock}
       </div>

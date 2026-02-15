@@ -14,6 +14,7 @@ import {
   HelpCircleIcon,
   LayoutDashboardIcon,
   MailsIcon,
+  ShieldIcon,
   UsersIcon,
 } from "lucide-react";
 import { DashboardUserButton } from "./dashboard-user-button";
@@ -55,6 +56,11 @@ export const DashboardSidebar = ({
         title: t("invitations"),
         url: "/dashboard/invitations",
         icon: MailsIcon,
+      },
+      {
+        title: t("roles"),
+        url: "/dashboard/roles",
+        icon: ShieldIcon,
       },
       {
         title: t("users"),

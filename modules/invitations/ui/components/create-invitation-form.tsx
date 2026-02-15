@@ -6,8 +6,8 @@ import { SelectItem } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { createInvitationSchema } from "@/modules/schemas/create-invitation-schema";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MailIcon, ShieldIcon } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { MailIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -15,6 +15,10 @@ export const CreateInvitationForm = () => {
   const t = useTranslations("invitations");
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const { data: roles } = useQuery(trpc.roles.getMany.queryOptions());
+
+  const assignableRoles = (roles ?? []).filter((r) => r.role !== "owner");
 
   const createInvitation = useMutation(
     trpc.invitations.create.mutationOptions({
@@ -34,7 +38,7 @@ export const CreateInvitationForm = () => {
   const form = useAppForm({
     defaultValues: {
       email: "",
-      role: "member" as "admin" | "member",
+      role: "member",
     },
     validators: {
       onSubmit: createInvitationSchema,
@@ -72,14 +76,17 @@ export const CreateInvitationForm = () => {
               <field.Select
                 label={t("role")}
                 description={t("roleDescription")}
-                items={[
-                  { value: "member", label: t("member") },
-                  { value: "admin", label: t("admin") },
-                ]}
+                items={assignableRoles.map((r) => ({
+                  value: r.role,
+                  label: r.role.charAt(0).toUpperCase() + r.role.slice(1),
+                }))}
                 row
               >
-                <SelectItem value="member">{t("member")}</SelectItem>
-                <SelectItem value="admin">{t("admin")}</SelectItem>
+                {assignableRoles.map((r) => (
+                  <SelectItem key={r.role} value={r.role}>
+                    {r.role.charAt(0).toUpperCase() + r.role.slice(1)}
+                  </SelectItem>
+                ))}
               </field.Select>
             )}
           </form.AppField>
