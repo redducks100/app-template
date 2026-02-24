@@ -1,0 +1,18 @@
+{
+  "name": "@app/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schemas/*": "./src/schemas/*.ts",
+    "./types/*": "./src/types/*.ts",
+    "./permissions": "./src/permissions.ts"
+  },
+  "dependencies": {
+    "better-auth": "^1.3.34",
+    "zod": "^3.25.51"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

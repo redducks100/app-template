@@ -1,9 +1,11 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 .claude/
-nul
 
 # dependencies
-/node_modules
+node_modules/
+dist/
+.tanstack
+routeTree.gen.ts
 /.pnp
 .pnp.*
 .yarn/*
