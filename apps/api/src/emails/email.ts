@@ -1,6 +1,13 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend: Resend;
+
+function getResend() {
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 type SendEmailProps = {
   to: string;
@@ -9,7 +16,7 @@ type SendEmailProps = {
 };
 
 export default function sendEmail({ to, subject, react }: SendEmailProps) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: "EnomiSoft <noreply@noreply.enomisoft.com>",
     to: to,
     subject: subject,

@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @app/web dev",
-    "build": "pnpm --filter @app/web build",
-    "start": "pnpm --filter @app/web start",
-    "lint": "pnpm --filter @app/web lint",
+    "dev": "pnpm --filter @app/app dev",
+    "dev:home": "pnpm --filter @app/home dev",
+    "build": "pnpm --filter @app/app build",
+    "build:home": "pnpm --filter @app/home build",
+    "deploy:app": "pnpm --filter @app/app deploy:cf",
+    "deploy:home": "pnpm --filter @app/home deploy:cf",
     "db:push": "pnpm --filter @app/api db:push",
     "db:generate": "pnpm --filter @app/api db:generate",
     "db:migrate": "pnpm --filter @app/api db:migrate",
@@ -16,6 +18,12 @@
     "typescript": "^5"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "msw",
+      "sharp",
+      "workerd"
+    ],
     "overrides": {
       "@types/react": "19.2.13",
       "@types/react-dom": "19.2.3"

@@ -3,8 +3,8 @@ import { zValidator } from "@hono/zod-validator";
 import { and, eq } from "drizzle-orm";
 import { setCookie } from "hono/cookie";
 import { account, session, user } from "../db/schema.js";
-import { auth } from "../lib/auth.js";
-import { db } from "../lib/db.js";
+import { getAuth } from "../lib/auth.js";
+import { getDb } from "../lib/db.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { updateLanguageSchema } from "@app/shared/schemas/update-language-schema";
 
@@ -17,7 +17,7 @@ export const userRoutes = new Hono()
       const sessionData = c.get("session");
       const input = c.req.valid("json");
 
-      await db
+      await getDb()
         .update(user)
         .set({ locale: input.locale })
         .where(eq(user.id, sessionData.userId));
@@ -33,7 +33,7 @@ export const userRoutes = new Hono()
   )
   .get("/has-password", async (c) => {
     const sessionData = c.get("session");
-    const accounts = await db.query.account.findMany({
+    const accounts = await getDb().query.account.findMany({
       where: and(
         eq(account.userId, sessionData.userId),
         eq(account.providerId, "credential")
@@ -43,7 +43,7 @@ export const userRoutes = new Hono()
     return c.json(accounts && accounts.length > 0);
   })
   .get("/linked-accounts", async (c) => {
-    const accounts = await auth.api.listUserAccounts({
+    const accounts = await getAuth().api.listUserAccounts({
       headers: c.req.raw.headers,
     });
 
@@ -52,7 +52,7 @@ export const userRoutes = new Hono()
   })
   .get("/sessions", async (c) => {
     const sessionData = c.get("session");
-    const sessions = await db.query.session.findMany({
+    const sessions = await getDb().query.session.findMany({
       where: eq(session.userId, sessionData.userId),
     });
 

@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
 import { invitation } from "../db/schema.js";
-import { auth } from "../lib/auth.js";
-import { db } from "../lib/db.js";
+import { getAuth } from "../lib/auth.js";
+import { getDb } from "../lib/db.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
 import { z } from "zod";
@@ -14,7 +14,7 @@ export const invitationRoutes = new Hono()
     zValidator("param", z.object({ id: z.string() })),
     async (c) => {
       const { id } = c.req.valid("param");
-      const result = await db.query.invitation.findFirst({
+      const result = await getDb().query.invitation.findFirst({
         where: eq(invitation.id, id),
         with: { inviter: true, organization: true },
       });
@@ -38,7 +38,7 @@ export const invitationRoutes = new Hono()
       );
     }
 
-    const response = await auth.api.listInvitations({
+    const response = await getAuth().api.listInvitations({
       query: { organizationId },
       headers: c.req.raw.headers,
     });
@@ -60,7 +60,7 @@ export const invitationRoutes = new Hono()
         );
       }
 
-      const response = await auth.api.createInvitation({
+      const response = await getAuth().api.createInvitation({
         body: {
           email: input.email,
           role: input.role as "admin" | "member" | "owner",
@@ -88,7 +88,7 @@ export const invitationRoutes = new Hono()
     async (c) => {
       const { invitationId } = c.req.valid("json");
 
-      const response = await auth.api.cancelInvitation({
+      const response = await getAuth().api.cancelInvitation({
         body: { invitationId },
         headers: c.req.raw.headers,
       });

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { auth } from "../lib/auth.js";
+import { getAuth } from "../lib/auth.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { z } from "zod";
 
@@ -11,13 +11,10 @@ export const memberRoutes = new Hono()
     const organizationId = session.activeOrganizationId;
 
     if (!organizationId) {
-      return c.json(
-        { error: "No active organization selected." },
-        400
-      );
+      return c.json({ error: "No active organization selected." }, 400);
     }
 
-    const response = await auth.api.listMembers({
+    const response = await getAuth().api.listMembers({
       query: { organizationId },
       headers: c.req.raw.headers,
     });
@@ -28,14 +25,14 @@ export const memberRoutes = new Hono()
     const headers = c.req.raw.headers;
 
     const [canUpdate, canDelete] = await Promise.all([
-      auth.api
-        .hasPermission({
+      getAuth()
+        .api.hasPermission({
           headers,
           body: { permissions: { member: ["update"] } },
         })
         .then((r) => r.success),
-      auth.api
-        .hasPermission({
+      getAuth()
+        .api.hasPermission({
           headers,
           body: { permissions: { member: ["delete"] } },
         })
@@ -46,23 +43,17 @@ export const memberRoutes = new Hono()
   })
   .post(
     "/update-role",
-    zValidator(
-      "json",
-      z.object({ memberId: z.string(), role: z.string() })
-    ),
+    zValidator("json", z.object({ memberId: z.string(), role: z.string() })),
     async (c) => {
       const session = c.get("session");
       const input = c.req.valid("json");
       const organizationId = session.activeOrganizationId;
 
       if (!organizationId) {
-        return c.json(
-          { error: "No active organization selected." },
-          400
-        );
+        return c.json({ error: "No active organization selected." }, 400);
       }
 
-      const response = await auth.api.updateMemberRole({
+      const response = await getAuth().api.updateMemberRole({
         body: {
           memberId: input.memberId,
           role: input.role,
@@ -76,27 +67,21 @@ export const memberRoutes = new Hono()
       }
 
       return c.json(response);
-    }
+    },
   )
   .post(
     "/remove",
-    zValidator(
-      "json",
-      z.object({ memberIdOrEmail: z.string() })
-    ),
+    zValidator("json", z.object({ memberIdOrEmail: z.string() })),
     async (c) => {
       const session = c.get("session");
       const input = c.req.valid("json");
       const organizationId = session.activeOrganizationId;
 
       if (!organizationId) {
-        return c.json(
-          { error: "No active organization selected." },
-          400
-        );
+        return c.json({ error: "No active organization selected." }, 400);
       }
 
-      const response = await auth.api.removeMember({
+      const response = await getAuth().api.removeMember({
         body: {
           memberIdOrEmail: input.memberIdOrEmail,
           organizationId,
@@ -109,5 +94,5 @@ export const memberRoutes = new Hono()
       }
 
       return c.json(response);
-    }
+    },
   );

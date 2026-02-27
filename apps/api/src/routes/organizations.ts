@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { and, eq } from "drizzle-orm";
 import { member } from "../db/schema.js";
-import { auth } from "../lib/auth.js";
-import { db } from "../lib/db.js";
+import { getAuth } from "../lib/auth.js";
+import { getDb } from "../lib/db.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { createOrganizationSchema } from "@app/shared/schemas/create-organization-schema";
 import { updateOrganizationSchema } from "@app/shared/schemas/update-organization-schema";
@@ -12,7 +12,7 @@ export const organizationRoutes = new Hono()
   .use(authMiddleware)
   .get("/list", async (c) => {
     const session = c.get("session");
-    const userMembers = await db.query.member.findMany({
+    const userMembers = await getDb().query.member.findMany({
       where: eq(member.userId, session.userId),
       with: { organization: true },
     });
@@ -31,7 +31,7 @@ export const organizationRoutes = new Hono()
       const user = c.get("user");
 
       try {
-        await auth.api.checkOrganizationSlug({ body: { slug } });
+        await getAuth().api.checkOrganizationSlug({ body: { slug } });
       } catch {
         return c.json(
           { error: "Organization slug is already taken." },
@@ -39,7 +39,7 @@ export const organizationRoutes = new Hono()
         );
       }
 
-      const response = await auth.api.createOrganization({
+      const response = await getAuth().api.createOrganization({
         body: { name, slug, userId: user.id },
       });
 
@@ -63,7 +63,7 @@ export const organizationRoutes = new Hono()
       const { name, slug, organizationId } = c.req.valid("json");
       const session = c.get("session");
 
-      const currentMember = await db.query.member.findFirst({
+      const currentMember = await getDb().query.member.findFirst({
         where: and(
           eq(member.userId, session.userId),
           eq(member.organizationId, organizationId)
@@ -77,7 +77,7 @@ export const organizationRoutes = new Hono()
 
       if (slug !== currentMember.organization.slug) {
         try {
-          await auth.api.checkOrganizationSlug({ body: { slug } });
+          await getAuth().api.checkOrganizationSlug({ body: { slug } });
         } catch {
           return c.json(
             { error: "Organization slug is already taken." },
@@ -86,7 +86,7 @@ export const organizationRoutes = new Hono()
         }
       }
 
-      const response = await auth.api.updateOrganization({
+      const response = await getAuth().api.updateOrganization({
         body: { data: { name, slug }, organizationId },
         headers: c.req.raw.headers,
       });
@@ -106,7 +106,7 @@ export const organizationRoutes = new Hono()
   )
   .get("/active", async (c) => {
     const session = c.get("session");
-    const userMember = await db.query.member.findFirst({
+    const userMember = await getDb().query.member.findFirst({
       where: and(
         eq(member.userId, session.userId),
         eq(

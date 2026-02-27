@@ -44,7 +44,16 @@
       "WebFetch(domain:nx.dev)",
       "WebFetch(domain:deepwiki.com)",
       "Bash(cd:*)",
-      "Bash(cd \"E:/Projects/app-template\" && pnpm lint 2>&1)"
+      "Bash(cd \"E:/Projects/app-template\" && pnpm lint 2>&1)",
+      "WebFetch(domain:sigh.dev)",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "Bash(pnpm ls:*)",
+      "Bash(cd /e/Projects/app-template && rm -f pnpm-lock.yaml && pnpm install 2>&1)",
+      "Bash(true:*)",
+      "WebFetch(domain:orm.drizzle.team)",
+      "WebFetch(domain:neon.tech)",
+      "WebFetch(domain:neon.com)",
+      "WebFetch(domain:hono-website.pages.dev)"
     ]
   }
 }

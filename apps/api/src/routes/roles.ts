@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { auth } from "../lib/auth.js";
+import { getAuth } from "../lib/auth.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { owner, admin, member } from "@app/shared/permissions";
 import {
@@ -42,7 +42,7 @@ export const roleRoutes = new Hono()
     }
 
     try {
-      const dynamicRoles = await auth.api.listOrgRoles({
+      const dynamicRoles = await getAuth().api.listOrgRoles({
         query: { organizationId },
         headers: c.req.raw.headers,
       });
@@ -76,7 +76,7 @@ export const roleRoutes = new Hono()
         );
       }
 
-      const response = await auth.api.createOrgRole({
+      const response = await getAuth().api.createOrgRole({
         body: {
           role: input.name,
           permission: input.permission,
@@ -107,7 +107,7 @@ export const roleRoutes = new Hono()
         );
       }
 
-      const response = await auth.api.updateOrgRole({
+      const response = await getAuth().api.updateOrgRole({
         body: {
           roleId: input.roleId,
           organizationId,
@@ -138,7 +138,7 @@ export const roleRoutes = new Hono()
         );
       }
 
-      const response = await auth.api.deleteOrgRole({
+      const response = await getAuth().api.deleteOrgRole({
         body: { roleId: input.roleId, organizationId },
         headers: c.req.raw.headers,
       });

@@ -1,7 +1,7 @@
 import { createMiddleware } from "hono/factory";
-import { auth } from "../lib/auth.js";
+import { getAuth } from "../lib/auth.js";
 
-type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>;
+type AuthSession = Awaited<ReturnType<ReturnType<typeof getAuth>["api"]["getSession"]>>;
 
 type AuthEnv = {
   Variables: {
@@ -11,7 +11,7 @@ type AuthEnv = {
 };
 
 export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
-  const session = await auth.api.getSession({
+  const session = await getAuth().api.getSession({
     headers: c.req.raw.headers,
   });
 
