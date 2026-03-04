@@ -23,7 +23,7 @@ export const invitationRoutes = new Hono()
         return c.json({ error: "Invitation not found" }, 404);
       }
 
-      return c.json(result);
+      return c.json(result, 200);
     }
   )
   .use(authMiddleware)
@@ -43,7 +43,7 @@ export const invitationRoutes = new Hono()
       headers: c.req.raw.headers,
     });
 
-    return c.json(response);
+    return c.json(response, 200);
   })
   .post(
     "/create",
@@ -103,6 +103,6 @@ export const invitationRoutes = new Hono()
         );
       }
 
-      return c.json(response);
+      return c.json(response, 200);
     }
   );

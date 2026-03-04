@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { and, eq } from "drizzle-orm";
 import { setCookie } from "hono/cookie";
-import { account, session, user } from "../db/schema.js";
+import { account, user } from "../db/schema.js";
 import { getAuth } from "../lib/auth.js";
 import { getDb } from "../lib/db.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -28,7 +29,7 @@ export const userRoutes = new Hono()
         sameSite: "Lax",
       });
 
-      return c.json({ success: true, locale: input.locale });
+      return c.json({ success: true, locale: input.locale }, 200);
     }
   )
   .get("/has-password", async (c) => {
@@ -40,7 +41,7 @@ export const userRoutes = new Hono()
       ),
     });
 
-    return c.json(accounts && accounts.length > 0);
+    return c.json(accounts && accounts.length > 0, 200);
   })
   .get("/linked-accounts", async (c) => {
     const accounts = await getAuth().api.listUserAccounts({
@@ -48,12 +49,12 @@ export const userRoutes = new Hono()
     });
 
     const filtered = accounts.filter((x) => x.providerId !== "credential");
-    return c.json(filtered);
+    return c.json(filtered, 200);
   })
   .get("/sessions", async (c) => {
     const sessionData = c.get("session");
-    const sessions = await getDb().query.session.findMany({
-      where: eq(session.userId, sessionData.userId),
+    const sessions = await getAuth().api.listSessions({
+      headers: c.req.raw.headers,
     });
 
     const result = sessions.map((s) => ({
@@ -61,5 +62,23 @@ export const userRoutes = new Hono()
       current: sessionData.token === s.token,
     }));
 
-    return c.json(result);
+    return c.json(result, 200);
+  })
+  .post(
+    "/sessions/revoke",
+    zValidator("json", z.object({ token: z.string() })),
+    async (c) => {
+      const { token } = c.req.valid("json");
+      await getAuth().api.revokeSession({
+        body: { token },
+        headers: c.req.raw.headers,
+      });
+      return c.json({ success: true }, 200);
+    }
+  )
+  .post("/sessions/revoke-others", async (c) => {
+    await getAuth().api.revokeOtherSessions({
+      headers: c.req.raw.headers,
+    });
+    return c.json({ success: true }, 200);
   });

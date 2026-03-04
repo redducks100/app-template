@@ -4,11 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- **Dev server (app)**: `pnpm dev` (runs TanStack Start dev server on port 3000)
+- **Dev server (app)**: `pnpm dev` (runs Vite SPA dev server on port 3000)
+- **Dev server (api)**: `pnpm dev:api` (runs Hono API worker on port 8787)
 - **Dev server (home)**: `pnpm dev:home` (runs landing page dev server on port 3001)
 - **Build (app)**: `pnpm build`
 - **Build (home)**: `pnpm build:home`
-- **Deploy (app)**: `pnpm deploy:app` (builds + deploys to Cloudflare Workers)
+- **Deploy (app)**: `pnpm deploy:app` (builds + deploys to Cloudflare Pages)
+- **Deploy (api)**: `pnpm deploy:api` (deploys API to Cloudflare Workers)
 - **Deploy (home)**: `pnpm deploy:home`
 - **DB push**: `pnpm db:push`
 - **DB generate migration**: `pnpm db:generate`
@@ -19,16 +21,15 @@ No test framework is configured.
 
 ## Tech Stack
 
-- **TanStack Start** full-stack React framework with SSR
-- **Hono** API framework with RPC for type-safe API
-- **TanStack Router** (file-based routing) with TanStack Start SSR
-- **Vite** for bundling with `@vitejs/plugin-react`
-- **Cloudflare Workers** for deployment (`@cloudflare/vite-plugin` + `wrangler`)
+- **TanStack Router** (file-based routing) as a client-only SPA
+- **Hono** API framework with RPC for type-safe API, deployed as a standalone Cloudflare Worker
+- **Vite** for bundling with `@vitejs/plugin-react` + `@tanstack/router-plugin`
+- **Cloudflare Pages** for SPA deployment (static), **Cloudflare Workers** for API deployment
 - **React 19** with TypeScript
 - **Base UI** (`@base-ui/react`) + **shadcn** for components (style: `base-maia`)
 - **Tailwind CSS 4** with oklch color variables and `tw-animate-css`
 - **TanStack React Query** for data fetching with Hono RPC client
-- **Better Auth** for authentication (email/password + Google OAuth, organizations plugin)
+- **Better Auth** for authentication (email/password + Google OAuth, organizations plugin) with cross-subdomain cookies
 - **Drizzle ORM** with PostgreSQL
 - **TanStack React Form** + Zod for form handling
 - **Resend** for transactional email via React Email templates
@@ -40,9 +41,9 @@ No test framework is configured.
 ```
 app-template/
 ├── apps/
-│   ├── api/          # @app/api — Hono API app (mounted inside apps/app at /api)
-│   ├── app/          # @app/app — TanStack Start dashboard app → app.domain.com
-│   └── home/         # @app/home — TanStack Start landing page → domain.com
+│   ├── api/          # @app/api — Standalone Hono API worker → api.enomisoft.com
+│   ├── app/          # @app/app — TanStack Router SPA → app.enomisoft.com (Cloudflare Pages)
+│   └── home/         # @app/home — TanStack Start landing page → enomisoft.com
 ├── packages/
 │   └── shared/       # @app/shared — Zod schemas, types, permissions
 ├── pnpm-workspace.yaml
@@ -52,15 +53,18 @@ app-template/
 
 ## API App (`apps/api`)
 
-Pure Hono app exported from `src/app.ts`. Routes are nested under `/api` prefix.
+Standalone Hono app deployed as a Cloudflare Worker. Routes are nested under `/api` prefix.
 
+- `src/worker.ts` — Worker entry point (exports `apiApp`)
 - `src/app.ts` — Hono app composition, exports `apiApp` (with `/api` prefix) and `AppType` (route-level types without `/api` for RPC client)
 - `src/routes/` — Hono RPC routes (organizations, invitations, members, roles, user)
 - `src/middleware/auth.ts` — Session auth middleware using `c.req.raw.headers`
-- `src/lib/auth.ts` — Better Auth server config with Drizzle adapter
+- `src/lib/auth.ts` — Better Auth server config with Drizzle adapter, cross-subdomain cookies
 - `src/lib/db.ts` — Drizzle connection
 - `src/db/schema.ts` — Drizzle schema
 - `src/emails/` — React Email templates sent via Resend
+- `wrangler.jsonc` — Cloudflare Workers config
+- `.dev.vars` — Local dev secrets (gitignored)
 
 ### Hono Route Pattern
 
@@ -73,20 +77,21 @@ export const roleRoutes = new Hono()
 
 ## Dashboard App (`apps/app`)
 
-TanStack Start app that serves the dashboard at `app.domain.com`. Mounts the Hono API at `/api` via a catch-all server route.
+Client-only SPA using TanStack Router, deployed to Cloudflare Pages as static files. Communicates with the API at a separate subdomain via Hono RPC client with `credentials: "include"`.
 
-- `vite.config.ts` — TanStack Start + Cloudflare Workers + Tailwind CSS
-- `wrangler.jsonc` — Cloudflare Workers config
-- `src/router.tsx` — `getRouter()` factory (TanStack Start convention)
+- `index.html` — SPA entry point
+- `src/main.tsx` — React bootstrap
+- `vite.config.ts` — Vite + TanStack Router plugin + Tailwind CSS
+- `src/router.tsx` — `getRouter()` factory
 - `src/routes/` — TanStack Router file-based routes
-- `src/routes/api/$.ts` — Catch-all server route that forwards to Hono API
 - `src/components/ui/` — shadcn + form system
-- `src/lib/api-client.ts` — Hono RPC client (`hc<AppType>`) with dynamic base URL
-- `src/lib/auth-client.ts` — Better Auth client
-- `src/lib/query-options.ts` — TanStack Query option factories (accept `cookie` param for SSR)
+- `src/lib/api-client.ts` — Hono RPC client (`hc<AppType>`) pointing to `VITE_API_URL`
+- `src/lib/auth-client.ts` — Better Auth client pointing to `VITE_API_URL`
+- `src/lib/query-options.ts` — TanStack Query option factories
 - `src/lib/mutations.ts` — Mutation functions using Hono RPC
 - `src/lib/i18n.ts` — i18next configuration
 - `src/locales/` — Translation files (en.json, ro.json)
+- `public/_redirects` — Cloudflare Pages SPA routing
 
 ### Feature Component Pattern
 
@@ -110,22 +115,22 @@ src/routes/_app/
 
 ### Routing
 
-- `_auth` layout — centered card wrapper for sign-in, sign-up, forgot/reset password, verify email, accept-invitation (provides `cookie` from `getRequestHeaders()`)
-- `_protected` layout — auth guard only (no sidebar), redirects to `/sign-in` if no session. Used for `/create-org` and `/select-org`
-- `_app` layout — auth guard + org guard + sidebar layout. All dashboard routes at root level
+- `__root` — fetches auth session once via `authClient.getSession()`, passes `authData` through context
+- `_auth` layout — centered card wrapper for sign-in, sign-up, forgot/reset password, verify email, accept-invitation
+- `_protected` layout — auth guard only (no sidebar), reads `context.authData`, redirects to `/sign-in` if no session. Used for `/create-org` and `/select-org`
+- `_app` layout — auth guard + org guard + sidebar layout. Reads `context.authData`. All dashboard routes at root level
 - `_app/users` — member list + `$memberId` detail
 - `_app/roles` — role list + `create` + `$roleId` detail
 - `_app/settings` layout — settings sidebar + header
-- Route guards use `beforeLoad` hooks with `getRequestHeaders()` from `@tanstack/react-start/server` for SSR cookie forwarding
 
 ### Data Fetching Pattern
 
 ```tsx
 // Query options (src/lib/query-options.ts)
-export const rolesListOptions = (cookie?: string) => queryOptions({
+export const rolesListOptions = () => queryOptions({
   queryKey: ['roles', 'list'],
   queryFn: async () => {
-    const res = await apiClient.roles.list.$get({}, cookieHeaders(cookie));
+    const res = await apiClient.roles.list.$get();
     return res.json();
   },
 });
@@ -133,23 +138,14 @@ export const rolesListOptions = (cookie?: string) => queryOptions({
 // In route files — loader + component
 export const Route = createFileRoute('/_app/roles/')({
   loader: ({ context }) =>
-    context.queryClient.ensureQueryData(rolesListOptions(context.cookie)),
+    context.queryClient.ensureQueryData(rolesListOptions()),
   component: RolesPage,
 });
 ```
 
-### SSR Cookie Forwarding
+### Auth Pattern
 
-Layouts use `getRequestHeaders()` from `@tanstack/react-start/server` to get cookies during SSR, then pass `cookie` through route context:
-
-```tsx
-beforeLoad: async () => {
-  const headers = getRequestHeaders();
-  const cookie = headers?.get("cookie") ?? undefined;
-  // ... use cookie for auth checks and pass in context
-  return { cookie, user, session };
-}
-```
+Auth session is fetched once at the root route's `beforeLoad`. Layout guards read `context.authData` synchronously — no additional API calls during navigation. The `cookieCache` (5 min TTL) on the server makes the root fetch cheap.
 
 ### Shared Components (`apps/app/src/components/ui/`)
 
@@ -159,7 +155,7 @@ Built on Base UI + shadcn. Key subsystem:
 
 ## Home App (`apps/home`)
 
-Simple TanStack Start landing page deployed to `domain.com`. Minimal setup with Tailwind CSS.
+Simple TanStack Start landing page deployed to `enomisoft.com`. Minimal setup with Tailwind CSS.
 
 ## Shared Package (`packages/shared`)
 
@@ -174,5 +170,14 @@ Simple TanStack Start landing page deployed to `domain.com`. Minimal setup with 
 
 ## Environment Variables
 
-Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`.
-Optional: `APP_URL` (defaults to `http://localhost:3000`, used for SSR API client base URL).
+### API Worker (wrangler vars/secrets)
+Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `COOKIE_DOMAIN`.
+
+### SPA (Cloudflare Pages, build-time)
+Required: `VITE_API_URL` (baked into bundle, e.g. `https://api.enomisoft.com`).
+
+### Local Development
+- API runs on `localhost:8787` (via `wrangler dev`)
+- SPA runs on `localhost:3000` (via `vite dev`)
+- SPA defaults `VITE_API_URL` to `http://localhost:8787`
+- Cross-origin cookies work on localhost because same-site (port doesn't matter)

@@ -38,7 +38,7 @@ export const roleRoutes = new Hono()
     const organizationId = session.activeOrganizationId;
 
     if (!organizationId) {
-      return c.json(staticRoles);
+      return c.json(staticRoles, 200);
     }
 
     try {
@@ -56,9 +56,9 @@ export const roleRoutes = new Hono()
         createdAt: r.createdAt,
       }));
 
-      return c.json([...staticRoles, ...dynamicRoleData]);
+      return c.json([...staticRoles, ...dynamicRoleData], 200);
     } catch {
-      return c.json(staticRoles);
+      return c.json(staticRoles, 200);
     }
   })
   .post(
@@ -120,7 +120,7 @@ export const roleRoutes = new Hono()
         return c.json({ error: "Failed to update role." }, 500);
       }
 
-      return c.json(response);
+      return c.json(response, 200);
     }
   )
   .post(
@@ -147,6 +147,6 @@ export const roleRoutes = new Hono()
         return c.json({ error: "Failed to delete role." }, 500);
       }
 
-      return c.json(response);
+      return c.json(response, 200);
     }
   );

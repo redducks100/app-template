@@ -8,6 +8,8 @@
     "./lib/auth": "./src/lib/auth.ts"
   },
   "scripts": {
+    "dev": "wrangler dev",
+    "deploy:cf": "wrangler deploy",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -31,6 +33,7 @@
     "@types/react": "19.2.13",
     "@types/react-dom": "19.2.3",
     "drizzle-kit": "^0.31.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.0.0"
   }
 }

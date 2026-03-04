@@ -1,8 +1,10 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Invitation } from "@app/shared/schemas/response-schemas";
+import type { InferResponseType } from "hono/client";
+import type { apiClient } from "@/lib/api-client";
 import { createColumnHelper } from "@tanstack/react-table";
+
+type Invitation = InferResponseType<(typeof apiClient)["invitations"]["list"]["$get"], 200>[number];
 
 const columnHelper = createColumnHelper<Invitation>();
 
@@ -55,7 +57,7 @@ export function createInvitationColumns(
       cell: (info) => {
         const value = info.getValue();
         if (!value) return <span className="text-muted-foreground">-</span>;
-        return dateFormatter.format(value);
+        return dateFormatter.format(new Date(value));
       },
     }),
     columnHelper.display({

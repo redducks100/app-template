@@ -20,7 +20,7 @@ export const organizationRoutes = new Hono()
       ...x.organization,
       role: x.role,
     }));
-    return c.json(result);
+    return c.json(result, 200);
   })
   .post(
     "/create",
@@ -101,7 +101,7 @@ export const organizationRoutes = new Hono()
         );
       }
 
-      return c.json(response);
+      return c.json(response, 200);
     }
   )
   .get("/active", async (c) => {
@@ -117,7 +117,7 @@ export const organizationRoutes = new Hono()
       with: { organization: true },
     });
 
-    if (!userMember) return c.json(null);
+    if (!userMember) return c.json(null, 200);
 
-    return c.json({ ...userMember.organization, role: userMember.role });
+    return c.json({ ...userMember.organization, role: userMember.role }, 200);
   });

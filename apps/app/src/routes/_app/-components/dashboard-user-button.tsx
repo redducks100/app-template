@@ -23,17 +23,23 @@ import {
   LogOutIcon,
   SparklesIcon,
 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { sessionOptions } from "@/lib/query-options";
 
 export const DashboardUserButton = () => {
   const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   const { data, isPending } = authClient.useSession();
 
   const onLogout = () => {
     authClient.signOut({
       fetchOptions: {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+          await router.invalidate();
           navigate({ to: "/sign-in" });
         },
       },

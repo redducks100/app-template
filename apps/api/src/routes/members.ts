@@ -19,7 +19,7 @@ export const memberRoutes = new Hono()
       headers: c.req.raw.headers,
     });
 
-    return c.json(response);
+    return c.json(response, 200);
   })
   .get("/permissions", async (c) => {
     const headers = c.req.raw.headers;
@@ -39,7 +39,7 @@ export const memberRoutes = new Hono()
         .then((r) => r.success),
     ]);
 
-    return c.json({ canUpdate, canDelete });
+    return c.json({ canUpdate, canDelete }, 200);
   })
   .post(
     "/update-role",
@@ -66,7 +66,7 @@ export const memberRoutes = new Hono()
         return c.json({ error: "Failed to update member role." }, 500);
       }
 
-      return c.json(response);
+      return c.json(response, 200);
     },
   )
   .post(
@@ -93,6 +93,6 @@ export const memberRoutes = new Hono()
         return c.json({ error: "Failed to remove member." }, 500);
       }
 
-      return c.json(response);
+      return c.json(response, 200);
     },
   );

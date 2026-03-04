@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "hono-cloudflare": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "computedHash": "370908a19c58edc71fa299db9380b164b2557b13f5bf73848ad8a9e3b10be8fc"
+    },
+    "hono-rpc": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "computedHash": "ee3e9892bcdbb38c1d75f667c1b9c569301cc63189c9e46ba4da52b8e1713929"
+    },
+    "tanstack-router-best-practices": {
+      "source": "deckardger/tanstack-agent-skills",
+      "sourceType": "github",
+      "computedHash": "090ae367732367c6a9a693dde029072e0eda8463e2a1047da76a4ec9b7d58b63"
+    }
+  }
+}

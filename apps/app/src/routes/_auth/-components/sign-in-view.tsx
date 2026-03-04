@@ -10,7 +10,11 @@ import { Separator } from "@/components/ui/separator";
 import { LockIcon, MailIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { getRouteApi, useNavigate, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { sessionOptions } from "@/lib/query-options";
+
+const routeApi = getRouteApi("/_auth/sign-in");
 import { signInSchema } from "@app/shared/schemas/sign-in-schema";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
@@ -24,6 +28,9 @@ import {
 import { useTranslation } from "react-i18next";
 export const SignInView = () => {
   const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { callbackURL } = routeApi.useSearch();
   const [loading, setLoading] = useState<boolean>(false);
   const { t } = useTranslation("auth");
   const { t: tCommon } = useTranslation("common");
@@ -41,11 +48,13 @@ export const SignInView = () => {
         {
           email: value.email,
           password: value.password,
-          callbackURL: "/",
+          callbackURL,
         },
         {
-          onSuccess: () => {
-            navigate({ to: "/" });
+          onSuccess: async () => {
+            await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+            await router.invalidate();
+            navigate({ to: callbackURL });
           },
           onError: ({ error }) => {
             toast.error(error.message);
@@ -58,10 +67,12 @@ export const SignInView = () => {
   const onProviderSubmit = (provider: SupportedOAuthProvider) => {
     setLoading(true);
     authClient.signIn.social(
-      { provider: provider, callbackURL: "/" },
+      { provider: provider, callbackURL: new URL(callbackURL, window.location.origin).href },
       {
-        onSuccess: () => {
-          navigate({ to: "/" });
+        onSuccess: async () => {
+          await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+          await router.invalidate();
+          navigate({ to: callbackURL });
         },
         onError: ({ error }) => {
           setLoading(false);
@@ -74,7 +85,9 @@ export const SignInView = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">{t("sign_in.title")}</CardTitle>
+        <CardTitle className="text-2xl font-bold">
+          {t("sign_in.title")}
+        </CardTitle>
         <CardDescription>{t("sign_in.description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -145,7 +158,8 @@ export const SignInView = () => {
                 {t("sign_in.terms")}
               </p>
               <FieldDescription className="text-center">
-                {t("sign_in.noAccount")} <Link to="/sign-up">{t("sign_in.signUp")}</Link>
+                {t("sign_in.noAccount")}{" "}
+                <Link to="/sign-up">{t("sign_in.signUp")}</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

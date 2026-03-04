@@ -2,7 +2,6 @@ import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getDb } from "./db.js";
 import { customSession, organization } from "better-auth/plugins";
-import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { ac, owner, admin, member } from "@app/shared/permissions";
 import { hashPassword, verifyPassword } from "./password.js";
 import { member as memberTable, user as userTable } from "../db/schema.js";
@@ -13,9 +12,9 @@ export type auth = ReturnType<typeof createAuth>;
 let _auth: ReturnType<typeof createAuth>;
 
 function createAuth() {
-  const t0 = Date.now();
+  const isSecure = process.env.APP_URL?.startsWith("https://");
   const options = {
-    baseURL: process.env.APP_URL,
+    baseURL: process.env.BETTER_AUTH_URL || process.env.APP_URL,
     trustedOrigins: [process.env.APP_URL!],
     database: drizzleAdapter(getDb(), {
       provider: "pg",
@@ -75,6 +74,16 @@ function createAuth() {
         await sendVerificationEmail({ user, url });
       },
     },
+    advanced: {
+      crossSubDomainCookies: {
+        enabled: true,
+        domain: process.env.COOKIE_DOMAIN || ".enomisoft.com",
+      },
+      defaultCookieAttributes: {
+        sameSite: isSecure ? "none" : "lax",
+        secure: isSecure,
+      },
+    },
     plugins: [
       organization({
         ac,
@@ -120,10 +129,8 @@ function createAuth() {
           session,
         };
       }, options),
-      tanstackStartCookies(),
     ],
   });
-  console.log(`auth:init ${Date.now() - t0}ms`);
   return result;
 }
 

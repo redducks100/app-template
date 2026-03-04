@@ -1,25 +1,22 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { getSession } from "@/lib/server-fns";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_protected")({
-  beforeLoad: async () => {
-    const data = await getSession();
-
-    if (!data) {
+  beforeLoad: ({ context }) => {
+    if (!context.authData) {
       throw redirect({ to: "/sign-in" });
     }
 
-    if (!data.user.emailVerified) {
+    if (!context.authData.user.emailVerified) {
       throw redirect({ to: "/verify-email" });
     }
 
     return {
-      user: data.user,
-      session: data.session,
-      hasMembership: data.user.hasMembership,
-      locale: data.user.locale ?? "en",
+      user: context.authData.user,
+      session: context.authData.session,
+      hasMembership: context.authData.user.hasMembership,
+      locale: context.authData.user.locale ?? "en",
     };
   },
   component: ProtectedLayout,

@@ -14,7 +14,7 @@ export type LinkedAccountCardProps = {
   account?: {
     accountId: string;
     providerId: string;
-    createdAt: Date;
+    createdAt: string;
   };
 };
 
@@ -90,7 +90,7 @@ export const LinkedAccountCard = ({
             </p>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Linked on {account.createdAt.toLocaleDateString()}
+              Linked on {new Date(account.createdAt).toLocaleDateString()}
             </p>
           )}
         </div>

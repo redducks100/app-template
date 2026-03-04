@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter @app/app dev",
+    "dev:api": "pnpm --filter @app/api dev",
     "dev:home": "pnpm --filter @app/home dev",
     "build": "pnpm --filter @app/app build",
     "build:home": "pnpm --filter @app/home build",
+    "deploy:api": "pnpm --filter @app/api deploy:cf",
     "deploy:app": "pnpm --filter @app/app deploy:cf",
     "deploy:home": "pnpm --filter @app/home deploy:cf",
     "db:push": "pnpm --filter @app/api db:push",

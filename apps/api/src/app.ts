@@ -18,7 +18,7 @@ const app = new Hono()
   .use(
     "*",
     cors({
-      origin: (origin) => origin,
+      origin: process.env.APP_URL || "http://localhost:3000",
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"],
       exposeHeaders: ["Content-Length"],
@@ -27,9 +27,7 @@ const app = new Hono()
     }),
   )
   .on(["POST", "GET"], "/api/auth/*", async (c) => {
-    const t0 = Date.now();
     const res = await getAuth().handler(c.req.raw);
-    console.log(`auth:handler ${Date.now() - t0}ms`);
     return res;
   })
   .route("/api", routes);

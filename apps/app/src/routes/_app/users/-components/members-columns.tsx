@@ -1,7 +1,10 @@
-
 import { Badge } from "@/components/ui/badge";
-import type { Member } from "@app/shared/schemas/response-schemas";
+import type { InferResponseType } from "hono/client";
+import type { apiClient } from "@/lib/api-client";
 import { createColumnHelper } from "@tanstack/react-table";
+
+type MembersResponse = InferResponseType<(typeof apiClient)["members"]["list"]["$get"], 200>;
+type Member = MembersResponse["members"][number];
 
 const columnHelper = createColumnHelper<Member>();
 
@@ -53,7 +56,7 @@ export function createMemberColumns(
       cell: (info) => {
         const value = info.getValue();
         if (!value) return <span className="text-muted-foreground">-</span>;
-        return dateFormatter.format(value);
+        return dateFormatter.format(new Date(value));
       },
     }),
   ];

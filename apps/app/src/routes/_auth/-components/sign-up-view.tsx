@@ -10,7 +10,9 @@ import { Separator } from "@/components/ui/separator";
 import { LockIcon, MailIcon, UserIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { sessionOptions } from "@/lib/query-options";
 import { signUpSchema } from "@app/shared/schemas/sign-up-schema";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
@@ -24,6 +26,8 @@ import {
 import { useTranslation } from "react-i18next";
 export const SignUpView = () => {
   const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation("auth");
   const { t: tCommon } = useTranslation("common");
@@ -45,7 +49,9 @@ export const SignUpView = () => {
           callbackURL: "/",
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
+            await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+            await router.invalidate();
             navigate({ to: "/" });
           },
           onError: ({ error }) => {
@@ -59,9 +65,11 @@ export const SignUpView = () => {
   const onProviderSubmit = (provider: SupportedOAuthProvider) => {
     setLoading(true);
     authClient.signIn.social(
-      { provider: provider, callbackURL: "/" },
+      { provider: provider, callbackURL: new URL("/", window.location.origin).href },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+          await router.invalidate();
           navigate({ to: "/" });
         },
         onError: ({ error }) => {

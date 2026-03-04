@@ -10,7 +10,7 @@ function HomePage() {
       <h1 className="text-4xl font-bold">App Template</h1>
       <p className="text-lg text-gray-600">Welcome to the landing page.</p>
       <a
-        href="https://app.domain.com"
+        href="https://app.enomisoft.com"
         className="px-6 py-3 text-white bg-black rounded-lg hover:bg-gray-800 transition-colors"
       >
         Go to App

@@ -17,15 +17,17 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, Loader2Icon, PlusIcon } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   activeOrganizationOptions,
   organizationsListOptions,
+  sessionOptions,
 } from "@/lib/query-options";
 
 export const DashboardOrganizationSwitcher = () => {
   const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { isMobile } = useSidebar();
 
@@ -63,6 +65,9 @@ export const DashboardOrganizationSwitcher = () => {
     await queryClient.invalidateQueries({
       queryKey: ["organizations", "active"],
     });
+
+    await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+    await router.invalidate();
   };
 
   if (!activeOrganization) {

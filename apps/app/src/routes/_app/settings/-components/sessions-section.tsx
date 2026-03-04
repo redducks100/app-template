@@ -3,7 +3,7 @@ import { Loader2Icon } from "lucide-react";
 import { SessionCard } from "./session-card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import { revokeOtherSessions as revokeOtherSessionsMutation } from "@/lib/mutations";
 import { toast } from "sonner";
 import { sessionsOptions } from "@/lib/query-options";
 
@@ -15,22 +15,17 @@ export const SessionsSection = () => {
   const currentSession = sessions.find((x) => x.current);
   const otherSessions = sessions.filter((x) => !x.current);
 
-  function revokeOtherSessions() {
+  async function revokeOtherSessions() {
     setLoading(true);
-    return authClient.revokeOtherSessions(undefined, {
-      onSuccess: () => {
-        setLoading(false);
-        toast.success("Successfully revoked all other sessions");
-        queryClient.invalidateQueries({ queryKey: ["user", "sessions"] });
-      },
-      onError: (error) => {
-        setLoading(false);
-        toast.error(
-          error.error.message ||
-            "An error occured while revoking other sessions",
-        );
-      },
-    });
+    try {
+      await revokeOtherSessionsMutation();
+      toast.success("Successfully revoked all other sessions");
+      queryClient.invalidateQueries({ queryKey: ["user", "sessions"] });
+    } catch {
+      toast.error("An error occurred while revoking other sessions");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

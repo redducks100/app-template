@@ -9,7 +9,7 @@ import {
 import z from "zod";
 import { ArrowLeftIcon, BuildingIcon, Link2Icon } from "lucide-react";
 import { createOrganizationSchema } from "@app/shared/schemas/create-organization-schema";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
@@ -17,6 +17,7 @@ import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
 import { createOrganization as createOrganizationMutation } from "@/lib/mutations";
+import { sessionOptions } from "@/lib/query-options";
 
 type CreateOrganizationViewProps = {
   canGoBack: boolean;
@@ -28,6 +29,7 @@ export const CreateOrganizationView = ({
   canGoBack,
 }: CreateOrganizationViewProps) => {
   const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState<boolean>();
 
@@ -45,6 +47,9 @@ export const CreateOrganizationView = ({
       await queryClient.invalidateQueries({
         queryKey: ["organizations", "active"],
       });
+
+      await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+      await router.invalidate();
 
       navigate({ to: "/" });
     },
@@ -69,7 +74,7 @@ export const CreateOrganizationView = ({
   });
 
   const handleBack = () => {
-    window.history.back();
+    router.history.back();
   };
 
   return (

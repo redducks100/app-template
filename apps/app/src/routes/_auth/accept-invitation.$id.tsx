@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AcceptInvitationView } from "./-components/accept-invitation-view";
 import { invitationGetOptions } from "@/lib/query-options";
 import { Suspense } from "react";
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_auth/accept-invitation/$id")({
@@ -30,7 +30,6 @@ function AcceptInvitationPage() {
 
 function AcceptInvitationError() {
   const { t } = useTranslation("invitations");
-  const navigate = useNavigate();
   return (
     <Card>
       <CardHeader>
@@ -40,12 +39,9 @@ function AcceptInvitationError() {
         <CardDescription>{t("notFoundDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <Button
-          className="w-full"
-          onClick={() => navigate({ to: "/sign-in" })}
-        >
+        <Link to="/sign-in" className={buttonVariants({ className: "w-full" })}>
           {t("goToSignIn")}
-        </Button>
+        </Link>
       </CardContent>
     </Card>
   );

@@ -1,17 +1,15 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { VerifyEmailView } from "./-components/verify-email-view";
-import { getSession } from "@/lib/server-fns";
 
 export const Route = createFileRoute("/_auth/verify-email")({
-  beforeLoad: async () => {
-    const data = await getSession();
-    if (!data) {
+  beforeLoad: ({ context }) => {
+    if (!context.authData) {
       throw redirect({ to: "/sign-in" });
     }
-    if (data.user.emailVerified) {
+    if (context.authData.user.emailVerified) {
       throw redirect({ to: "/" });
     }
-    return { email: data.user.email };
+    return { email: context.authData.user.email };
   },
   component: VerifyEmailPage,
 });

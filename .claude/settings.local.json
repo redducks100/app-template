@@ -53,7 +53,11 @@
       "WebFetch(domain:orm.drizzle.team)",
       "WebFetch(domain:neon.tech)",
       "WebFetch(domain:neon.com)",
-      "WebFetch(domain:hono-website.pages.dev)"
+      "WebFetch(domain:hono-website.pages.dev)",
+      "WebFetch(domain:better-auth.com)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_network_requests",
+      "mcp__playwright__browser_take_screenshot"
     ]
   }
 }

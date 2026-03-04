@@ -1,4 +1,5 @@
-import { Session } from "better-auth";
+import type { InferResponseType } from "hono/client";
+import type { apiClient } from "@/lib/api-client";
 import {
   Loader2Icon,
   MonitorIcon,
@@ -9,13 +10,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UAParser } from "ua-parser-js";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { revokeSession as revokeSessionMutation } from "@/lib/mutations";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+type SessionData = InferResponseType<
+  (typeof apiClient)["user"]["sessions"]["$get"],
+  200
+>[number];
+
 type SessionCardProps = {
-  session: Session & { current: boolean };
+  session: SessionData;
 };
 
 export const SessionCard = ({ session }: SessionCardProps) => {
@@ -41,26 +47,17 @@ export const SessionCard = ({ session }: SessionCardProps) => {
     }).format(date);
   }
 
-  function revokeSession() {
+  async function revokeSession() {
     setLoading(true);
-    authClient.revokeSession(
-      {
-        token: session.token,
-      },
-      {
-        onSuccess: () => {
-          setLoading(false);
-          toast.success("Session successfully revoked");
-          queryClient.invalidateQueries({ queryKey: ["user", "sessions"] });
-        },
-        onError: (error) => {
-          setLoading(false);
-          toast.error(
-            error.error.message ?? "An error occured while revoking session",
-          );
-        },
-      },
-    );
+    try {
+      await revokeSessionMutation({ token: session.token });
+      toast.success("Session successfully revoked");
+      queryClient.invalidateQueries({ queryKey: ["user", "sessions"] });
+    } catch {
+      toast.error("An error occurred while revoking session");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -79,10 +76,10 @@ export const SessionCard = ({ session }: SessionCardProps) => {
             )}
             <div>
               <p className="text-sm text-muted-foreground">
-                Created: {formatDate(session.createdAt)}
+                Created: {formatDate(new Date(session.createdAt))}
               </p>
               <p className="text-sm text-muted-foreground">
-                Expires: {formatDate(session.expiresAt)}
+                Expires: {formatDate(new Date(session.expiresAt))}
               </p>
             </div>
           </div>

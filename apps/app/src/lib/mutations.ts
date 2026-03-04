@@ -1,16 +1,17 @@
-import { getApiClient } from "./api-client";
+import { apiClient } from "./api-client";
+
+async function extractError(res: Response, fallback: string): Promise<never> {
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  throw new Error("error" in body ? String(body.error) : fallback);
+}
 
 // Organization mutations
-export async function createOrganization(data: { name: string; slug: string }) {
-  const res = await getApiClient().organizations.create.$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to create organization",
-    );
-  }
+export async function createOrganization(data: {
+  name: string;
+  slug: string;
+}) {
+  const res = await apiClient.organizations.create.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to create organization");
   return res.json();
 }
 
@@ -19,42 +20,24 @@ export async function updateOrganization(data: {
   name: string;
   slug: string;
 }) {
-  const res = await getApiClient().organizations.update.$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to update organization",
-    );
-  }
+  const res = await apiClient.organizations.update.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to update organization");
   return res.json();
 }
 
 // Invitation mutations
-export async function createInvitation(data: { email: string; role: string }) {
-  const res = await getApiClient().invitations.create.$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to create invitation",
-    );
-  }
+export async function createInvitation(data: {
+  email: string;
+  role: string;
+}) {
+  const res = await apiClient.invitations.create.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to create invitation");
   return res.json();
 }
 
 export async function cancelInvitation(data: { invitationId: string }) {
-  const res = await getApiClient().invitations.cancel.$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to cancel invitation",
-    );
-  }
+  const res = await apiClient.invitations.cancel.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to cancel invitation");
   return res.json();
 }
 
@@ -63,28 +46,14 @@ export async function updateMemberRole(data: {
   memberId: string;
   role: string;
 }) {
-  const res = await getApiClient().members["update-role"].$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to update member role",
-    );
-  }
+  const res = await apiClient.members["update-role"].$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to update member role");
   return res.json();
 }
 
 export async function removeMember(data: { memberIdOrEmail: string }) {
-  const res = await getApiClient().members.remove.$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to remove member",
-    );
-  }
+  const res = await apiClient.members.remove.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to remove member");
   return res.json();
 }
 
@@ -93,15 +62,8 @@ export async function createRole(data: {
   name: string;
   permission: Record<string, string[]>;
 }) {
-  const res = await getApiClient().roles.create.$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to create role",
-    );
-  }
+  const res = await apiClient.roles.create.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to create role");
   return res.json();
 }
 
@@ -112,43 +74,33 @@ export async function updateRole(data: {
     permission?: Record<string, string[]>;
   };
 }) {
-  const res = await getApiClient().roles.update.$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to update role",
-    );
-  }
+  const res = await apiClient.roles.update.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to update role");
   return res.json();
 }
 
 export async function deleteRole(data: { roleId: string }) {
-  const res = await getApiClient().roles.delete.$post({ json: data });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to delete role",
-    );
-  }
+  const res = await apiClient.roles.delete.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to delete role");
+  return res.json();
+}
+
+// Session mutations
+export async function revokeSession(data: { token: string }) {
+  const res = await apiClient.user.sessions.revoke.$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to revoke session");
+  return res.json();
+}
+
+export async function revokeOtherSessions() {
+  const res = await apiClient.user.sessions["revoke-others"].$post();
+  if (!res.ok) return extractError(res, "Failed to revoke other sessions");
   return res.json();
 }
 
 // User mutations
 export async function updateLanguage(data: { locale: "en" | "ro" }) {
-  const res = await getApiClient().user["update-language"].$post({
-    json: data,
-  });
-  if (!res.ok) {
-    const body = await res.json();
-    throw new Error(
-      "error" in body
-        ? (body as { error: string }).error
-        : "Failed to update language",
-    );
-  }
+  const res = await apiClient.user["update-language"].$post({ json: data });
+  if (!res.ok) return extractError(res, "Failed to update language");
   return res.json();
 }

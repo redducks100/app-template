@@ -1,6 +1,13 @@
 export type RolePermissions = Record<string, string[]>;
 
-export type { RoleData } from "../schemas/response-schemas";
+export type RoleData = {
+  id: string;
+  role: string;
+  permission: Record<string, string[]>;
+  isDefault: boolean;
+  organizationId?: string;
+  createdAt?: Date | string;
+};
 
 export const PERMISSION_MAP: Record<string, string[]> = {
   organization: ["read", "update", "delete"],

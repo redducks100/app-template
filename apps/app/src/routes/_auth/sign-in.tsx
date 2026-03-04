@@ -1,15 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { SignInView } from "./-components/sign-in-view";
+import { z } from "zod";
 
-type SignInSearch = {
-  callbackURL?: string | undefined;
-};
+const searchSchema = z.object({
+  callbackURL: z.string().catch("/"),
+});
 
 export const Route = createFileRoute("/_auth/sign-in")({
-  component: SignInView,
-  validateSearch: (search: Record<string, unknown>): SignInSearch => {
-    return {
-      callbackURL: (search?.callbackUrl as string) || undefined,
-    };
+  validateSearch: searchSchema,
+  beforeLoad: ({ context }) => {
+    if (context.authData) throw redirect({ to: "/" });
   },
+  component: SignInView,
 });

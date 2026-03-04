@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
@@ -10,16 +10,16 @@ import { PlusIcon } from "lucide-react";
 import {
   organizationsListOptions,
   activeOrganizationOptions,
+  sessionOptions,
 } from "@/lib/query-options";
 
 export const SelectOrganizationContent = () => {
   const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { data: organizations } = useSuspenseQuery(
-    organizationsListOptions(),
-  );
+  const { data: organizations } = useSuspenseQuery(organizationsListOptions());
 
   const { data: activeOrganization } = useSuspenseQuery(
     activeOrganizationOptions(),
@@ -49,12 +49,15 @@ export const SelectOrganizationContent = () => {
       queryKey: ["organizations", "active"],
     });
 
+    await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+    await router.invalidate();
+
     navigate({ to: "/" });
   };
 
   return (
     <>
-      <ScrollArea className="max-h-[200px] rounded-md p-4">
+      <ScrollArea className="max-h-50 rounded-md p-4">
         <div className="space-y-2">
           {organizations.map((org) => {
             return (

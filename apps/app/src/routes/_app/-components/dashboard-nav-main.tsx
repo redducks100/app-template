@@ -7,7 +7,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 
 export const DashboardNavMain = ({
   items,
@@ -20,9 +20,7 @@ export const DashboardNavMain = ({
   }[];
   sectionTitle: string;
 }) => {
-  const { pathname } = useLocation();
-  const paths = pathname.toLowerCase().split("/");
-  const lastPath = paths[paths.length - 1];
+  const matchRoute = useMatchRoute();
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{sectionTitle}</SidebarGroupLabel>
@@ -32,7 +30,7 @@ export const DashboardNavMain = ({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 tooltip={item.title}
-                isActive={lastPath.includes(item.title.toLowerCase())}
+                isActive={!!matchRoute({ to: item.url, fuzzy: true })}
                 render={
                   <Link to={item.url}>
                     {item.icon && <item.icon />}

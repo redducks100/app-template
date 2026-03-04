@@ -5,10 +5,10 @@ import { customSessionClient } from "better-auth/client/plugins";
 import type { auth } from "@app/api/lib/auth";
 
 export const authClient = createAuthClient({
-  baseURL:
-    typeof window === "undefined"
-      ? process.env.APP_URL!
-      : window.location.origin,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8787",
+  fetchOptions: {
+    credentials: "include" as RequestCredentials,
+  },
   plugins: [
     organizationClient({
       ac,

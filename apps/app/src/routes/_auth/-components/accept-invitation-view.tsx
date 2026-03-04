@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { signUpSchema } from "@app/shared/schemas/sign-up-schema";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
@@ -27,9 +27,9 @@ import {
   SUPPORTED_OAUTH_PROVIDERS,
   SupportedOAuthProvider,
 } from "@/lib/constants";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { invitationGetOptions } from "@/lib/query-options";
+import { invitationGetOptions, sessionOptions } from "@/lib/query-options";
 
 type AcceptInvitationViewProps = {
   invitationId: string;
@@ -39,14 +39,13 @@ export const AcceptInvitationView = ({
   invitationId,
 }: AcceptInvitationViewProps) => {
   const { t } = useTranslation("invitations");
-  const navigate = useNavigate();
   const { data: session } = authClient.useSession();
 
   const { data: invitation } = useSuspenseQuery(
     invitationGetOptions(invitationId),
   );
 
-  const isExpired = invitation.expiresAt < new Date();
+  const isExpired = new Date(invitation.expiresAt) < new Date();
   const isInvalid =
     invitation.status === "canceled" ||
     invitation.status === "rejected" ||
@@ -64,12 +63,9 @@ export const AcceptInvitationView = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button
-            className="w-full"
-            onClick={() => navigate({ to: "/sign-in" })}
-          >
+          <Link to="/sign-in" className={buttonVariants({ className: "w-full" })}>
             {t("goToSignIn")}
-          </Button>
+          </Link>
         </CardContent>
       </Card>
     );
@@ -124,6 +120,8 @@ export const AcceptInvitationView = ({
 function AuthenticatedActions({ invitationId }: { invitationId: string }) {
   const { t } = useTranslation("invitations");
   const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [accepting, setAccepting] = useState(false);
   const [declining, setDeclining] = useState(false);
 
@@ -132,7 +130,9 @@ function AuthenticatedActions({ invitationId }: { invitationId: string }) {
     await authClient.organization.acceptInvitation(
       { invitationId },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
+          await router.invalidate();
           toast.success(t("accepted"));
           navigate({ to: "/" });
         },

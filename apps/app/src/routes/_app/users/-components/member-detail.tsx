@@ -147,7 +147,7 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
             {member.createdAt && (
               <p className="text-sm text-muted-foreground mt-0.5">
                 {t("joinedDate")}{" "}
-                {dateFormatter.format(member.createdAt)}
+                {dateFormatter.format(new Date(member.createdAt))}
               </p>
             )}
           </div>

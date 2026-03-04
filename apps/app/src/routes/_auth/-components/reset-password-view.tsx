@@ -11,16 +11,16 @@ import { Field, FieldGroup } from "@/components/ui/field";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { resetPasswordSchema } from "@app/shared/schemas/reset-password-schema";
-import { useNavigate, useSearch, Link } from "@tanstack/react-router";
+import { getRouteApi, Link, useNavigate } from "@tanstack/react-router";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+
+const routeApi = getRouteApi("/_auth/reset-password");
 
 export const ResetPasswordView = () => {
   const navigate = useNavigate();
-  const search = useSearch({ strict: false }) as { token?: string; error?: string };
-  const token = search.token;
-  const error = search.error;
+  const { token, error } = routeApi.useSearch();
   const { t } = useTranslation("auth");
 
   const form = useAppForm({
@@ -65,11 +65,9 @@ export const ResetPasswordView = () => {
           <CardDescription>{t("reset_password.invalidDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button className="w-full">
-            <Link to="/sign-in" className="text-primary">
-              {t("reset_password.backToSignIn")}
-            </Link>
-          </Button>
+          <Link to="/sign-in" className={buttonVariants({ className: "w-full" })}>
+            {t("reset_password.backToSignIn")}
+          </Link>
         </CardContent>
       </Card>
     );
