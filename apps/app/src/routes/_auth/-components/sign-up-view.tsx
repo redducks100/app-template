@@ -1,11 +1,4 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { LockIcon, MailIcon, UserIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -81,12 +74,13 @@ export const SignUpView = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">{t("sign_up.title")}</CardTitle>
-        <CardDescription>{t("sign_up.description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <div className="animate-in-stagger">
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight">{t("sign_up.title")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("sign_up.description")}</p>
+      </div>
+
+      <div className="space-y-3">
         {SUPPORTED_OAUTH_PROVIDERS.map((provider) => {
           const Icon = SUPPORTED_OATH_PROVIDER_DETAILS[provider].Icon;
 
@@ -95,7 +89,7 @@ export const SignUpView = () => {
               variant="outline"
               disabled={loading}
               onClick={() => onProviderSubmit(provider)}
-              className="w-full"
+              className="w-full h-11"
               key={provider}
             >
               <Icon />
@@ -106,11 +100,12 @@ export const SignUpView = () => {
           );
         })}
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-3 py-1">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">{tCommon("or")}</span>
+          <span className="text-xs text-muted-foreground/60 uppercase tracking-wider font-medium">{tCommon("or")}</span>
           <Separator className="flex-1" />
         </div>
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -164,12 +159,12 @@ export const SignUpView = () => {
                 {t("sign_up.terms")}
               </p>
               <FieldDescription className="px-6 text-center">
-                {t("sign_up.hasAccount")} <Link to="/sign-in">{t("sign_up.signIn")}</Link>
+                {t("sign_up.hasAccount")} <Link to="/sign-in" className="text-primary hover:underline underline-offset-4">{t("sign_up.signIn")}</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

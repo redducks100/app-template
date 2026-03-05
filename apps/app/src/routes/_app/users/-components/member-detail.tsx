@@ -96,14 +96,14 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
 
   if (!member) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">{t("emptyState")}</p>
-        <Link
-          to="/users"
-          className="text-primary hover:underline mt-2 inline-block"
-        >
-          {t("backToUsers")}
-        </Link>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <p className="text-muted-foreground mb-4">{t("emptyState")}</p>
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/users">
+            <ArrowLeftIcon className="size-4" />
+            {t("backToUsers")}
+          </Link>
+        </Button>
       </div>
     );
   }
@@ -120,10 +120,12 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
         {t("backToUsers")}
       </Link>
 
+      <h1 className="text-lg font-semibold">{t("memberDetails")}</h1>
+
       {/* Profile header card */}
       <div className="rounded-xl border border-border bg-card">
         <div className="flex items-center gap-4 p-5">
-          <Avatar className="size-14" size="lg">
+          <Avatar className="size-16" size="lg">
             <AvatarImage src={member.user.image ?? undefined} />
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
@@ -213,7 +215,7 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
             {t("dangerZone")}
           </h3>
           <div className="rounded-xl border border-destructive/30 bg-destructive/5">
-            <div className="flex items-center justify-between p-6">
+            <div className="flex items-center justify-between p-5">
               <div>
                 <p className="font-medium">{t("removeMember")}</p>
                 <p className="text-sm text-muted-foreground">

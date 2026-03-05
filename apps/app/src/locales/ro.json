@@ -10,7 +10,15 @@
     "or": "SAU",
     "continueWith": "Continuă cu {{provider}}",
     "getHelp": "Ajutor",
-    "change": "Schimbă"
+    "change": "Schimbă",
+    "searchPlaceholder": "Caută...",
+    "noResults": "Niciun rezultat găsit.",
+    "pagination": {
+      "showing": "{{from}}–{{to}} din {{total}}",
+      "previous": "Pagina anterioară",
+      "next": "Pagina următoare",
+      "page": "Pagina {{page}} din {{total}}"
+    }
   },
   "dashboard": {
     "sidebar": {
@@ -22,9 +30,27 @@
       "users": "Utilizatori",
       "dashboardSection": "Panou",
       "organizationSection": "Organizație"
+    },
+    "welcome": "Bine ai revenit",
+    "stats": {
+      "members": "Membri",
+      "roles": "Roluri",
+      "pendingInvitations": "Invitații în așteptare"
+    },
+    "quickActions": "Acțiuni rapide",
+    "actions": {
+      "inviteMember": "Invită membru",
+      "createRole": "Creează rol",
+      "settings": "Setări"
+    },
+    "activity": {
+      "title": "Activitate recentă",
+      "description": "Fluxul de activitate va fi disponibil în curând. Vei vedea schimbările și evenimentele recente aici."
     }
   },
   "settings": {
+    "title": "Setări",
+    "description": "Gestionează setările contului și preferințele tale.",
     "navigation": {
       "account": "Cont",
       "integrations": "Integrări",
@@ -70,6 +96,7 @@
     "roleDescription": "Rolul pe care îl va avea membrul invitat.",
     "member": "Membru",
     "admin": "Administrator",
+    "inviteDescription": "Introdu emailul și rolul noului membru.",
     "sendInvitation": "Trimite invitația",
     "sentSuccess": "Invitația a fost trimisă cu succes",
     "allInvitations": "Toate invitațiile",
@@ -79,7 +106,8 @@
     "expiresColumn": "Expiră",
     "cancel": "Anulează",
     "canceled": "Invitația a fost anulată",
-    "emptyState": "Nu există invitații încă. Folosește formularul de mai sus pentru a invita membri.",
+    "invitationsDescription": "Gestionează invitațiile în așteptare și anterioare.",
+    "emptyState": "Nu există invitații încă.",
     "notFoundTitle": "Invitație negăsită",
     "notFoundDescription": "Această invitație nu există sau linkul este invalid.",
     "goToSignIn": "Mergi la Conectare",
@@ -153,6 +181,7 @@
     "emailColumn": "Email",
     "roleColumn": "Rol",
     "joinedColumn": "Înscris",
+    "membersDescription": "Vizualizează și gestionează toți membrii organizației tale.",
     "emptyState": "Nu au fost găsiți membri.",
     "backToUsers": "Înapoi la Utilizatori",
     "removeMember": "Elimină membru",
@@ -167,8 +196,20 @@
     "saveChanges": "Salvează modificările",
     "you": "Tu",
     "joinedDate": "Înscris",
+    "email": "Email",
+    "status": "Status",
+    "active": "Activ",
+    "memberDetails": "Detalii membru",
     "dangerZone": "Zonă periculoasă",
     "removeDescription": "Acest membru va pierde accesul la această organizație. Această acțiune nu poate fi anulată."
+  },
+  "selectOrg": {
+    "title": "Selectează organizația",
+    "description": "Alege organizația cu care dorești să lucrezi",
+    "createNew": "Creează organizație nouă",
+    "alreadyActive": "Această organizație este deja activă",
+    "loadingOrgs": "Se încarcă organizațiile...",
+    "loadError": "Nu s-au putut încărca organizațiile"
   },
   "auth": {
     "sign_in": {

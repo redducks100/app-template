@@ -1,3 +1,33 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+catalog:
+  # Runtime
+  react: 19.2.4
+  react-dom: 19.2.4
+  better-auth: ^1.3.34
+  hono: ^4.7.0
+  zod: ^3.25.51
+  # Dev
+  typescript: ^5
+  "@types/react": 19.2.13
+  "@types/react-dom": 19.2.3
+  "@types/node": ^20
+  wrangler: ^4.0.0
+  vite: ^7.0.0
+  "@vitejs/plugin-react": ^4.5.0
+  tailwindcss: ^4
+  "@tailwindcss/vite": ^4
+  vite-tsconfig-paths: ^4.3.0
+
+overrides:
+  "@types/react": 19.2.13
+  "@types/react-dom": 19.2.3
+
+onlyBuiltDependencies:
+  - esbuild
+  - msw
+  - sharp
+  - turbo
+  - workerd

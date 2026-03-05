@@ -74,67 +74,56 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
       }}
     >
       <FieldGroup>
-        <section>
-          <h3 className="text-base font-semibold text-foreground mb-4">
-            {t("profile.display")}
-          </h3>
-          <div className="rounded-xl border border-border bg-card">
-            <Field>
-              <div className="flex items-center justify-between p-5">
-                <div className="flex items-center gap-4">
-                  <Avatar className="size-12">
-                    <AvatarImage src={user.image ?? undefined} />
-                    <AvatarFallback className="rounded-lg">
-                      {userInitials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <FieldLabel>{t("profile.profilePicture")}</FieldLabel>
-                    <FieldDescription>{t("profile.profilePictureDescription")}</FieldDescription>
-                  </div>
+        <div className="rounded-xl border border-border bg-card">
+          <Field>
+            <div className="flex items-center justify-between p-5">
+              <div className="flex items-center gap-4">
+                <Avatar className="size-12">
+                  <AvatarImage src={user.image ?? undefined} />
+                  <AvatarFallback className="rounded-lg">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <FieldLabel>{t("profile.profilePicture")}</FieldLabel>
+                  <FieldDescription>{t("profile.profilePictureDescription")}</FieldDescription>
                 </div>
-                <Button variant="outline" size="sm" className="flex gap-2">
-                  <Upload className="size-4" />
-                  {tCommon("upload")}
-                </Button>
               </div>
-            </Field>
+              <Button variant="outline" size="sm" className="flex gap-2">
+                <Upload className="size-4" />
+                {tCommon("upload")}
+              </Button>
+            </div>
+          </Field>
 
-            <Separator orientation="horizontal" />
+          <Separator orientation="horizontal" />
 
-            {/* Name row */}
-            <form.AppField name="name">
-              {(field) => (
-                <field.Input
-                  label={t("profile.name")}
-                  description={t("profile.nameDescription")}
-                  placeholder={t("profile.namePlaceholder")}
-                  LeftIcon={UserIcon}
-                  row
-                />
-              )}
-            </form.AppField>
-          </div>
-        </section>
+          <form.AppField name="name">
+            {(field) => (
+              <field.Input
+                label={t("profile.name")}
+                description={t("profile.nameDescription")}
+                placeholder={t("profile.namePlaceholder")}
+                LeftIcon={UserIcon}
+                row
+              />
+            )}
+          </form.AppField>
 
-        <section>
-          <h3 className="text-base font-semibold text-foreground mb-4">
-            {t("profile.contact")}
-          </h3>
-          <div className="rounded-xl border border-border bg-card">
-            <form.AppField name="email">
-              {(field) => (
-                <field.Input
-                  label={t("profile.email")}
-                  description={t("profile.emailDescription")}
-                  placeholder={t("profile.emailPlaceholder")}
-                  LeftIcon={MailIcon}
-                  row
-                />
-              )}
-            </form.AppField>
-          </div>
-        </section>
+          <Separator orientation="horizontal" />
+
+          <form.AppField name="email">
+            {(field) => (
+              <field.Input
+                label={t("profile.email")}
+                description={t("profile.emailDescription")}
+                placeholder={t("profile.emailPlaceholder")}
+                LeftIcon={MailIcon}
+                row
+              />
+            )}
+          </form.AppField>
+        </div>
 
         <Field>
           <form.AppForm>

@@ -2,33 +2,22 @@
   "name": "app-template",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.19.0",
   "scripts": {
-    "dev": "pnpm --filter @app/app dev",
-    "dev:api": "pnpm --filter @app/api dev",
-    "dev:home": "pnpm --filter @app/home dev",
-    "build": "pnpm --filter @app/app build",
-    "build:home": "pnpm --filter @app/home build",
-    "deploy:api": "pnpm --filter @app/api deploy:cf",
-    "deploy:app": "pnpm --filter @app/app deploy:cf",
-    "deploy:home": "pnpm --filter @app/home deploy:cf",
-    "db:push": "pnpm --filter @app/api db:push",
-    "db:generate": "pnpm --filter @app/api db:generate",
-    "db:migrate": "pnpm --filter @app/api db:migrate",
-    "db:studio": "pnpm --filter @app/api db:studio"
+    "dev": "turbo run dev",
+    "dev:app": "turbo run dev --filter=@app/app",
+    "dev:api": "turbo run dev --filter=@app/api",
+    "build": "turbo run build",
+    "deploy": "turbo run deploy:cf",
+    "deploy:api": "turbo run deploy:cf --filter=@app/api",
+    "deploy:app": "turbo run deploy:cf --filter=@app/app",
+    "db:push": "turbo run db:push --filter=@app/api",
+    "db:generate": "turbo run db:generate --filter=@app/api",
+    "db:migrate": "turbo run db:migrate --filter=@app/api",
+    "db:studio": "turbo run db:studio --filter=@app/api"
   },
   "devDependencies": {
-    "typescript": "^5"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "msw",
-      "sharp",
-      "workerd"
-    ],
-    "overrides": {
-      "@types/react": "19.2.13",
-      "@types/react-dom": "19.2.3"
-    }
+    "turbo": "^2.8.13",
+    "typescript": "catalog:"
   }
 }

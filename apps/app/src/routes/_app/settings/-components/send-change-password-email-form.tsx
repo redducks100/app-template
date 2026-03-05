@@ -44,28 +44,23 @@ export const SendChangePasswordEmailForm = ({
         form.handleSubmit();
       }}
     >
-      <section>
-        <h3 className="text-base font-semibold text-foreground mb-4">
-          Password
-        </h3>
-        <div className="rounded-xl border border-border bg-card">
-          <div className="flex items-center justify-between p-6">
-            <div>
-              <p className="font-medium">Set Password</p>
-              <p className="text-sm text-muted-foreground">
-                We will send you a password reset email to set up a password.
-              </p>
-            </div>
-            <form.AppForm>
-              <form.SubmitButton
-                timer={30}
-                label="Send"
-                dontStartOnRender={true}
-              />
-            </form.AppForm>
+      <div className="rounded-xl border border-border bg-card">
+        <div className="flex items-center justify-between p-6">
+          <div>
+            <p className="font-medium">Set Password</p>
+            <p className="text-sm text-muted-foreground">
+              We will send you a password reset email to set up a password.
+            </p>
           </div>
+          <form.AppForm>
+            <form.SubmitButton
+              timer={30}
+              label="Send"
+              dontStartOnRender={true}
+            />
+          </form.AppForm>
         </div>
-      </section>
+      </div>
     </form>
   );
 };

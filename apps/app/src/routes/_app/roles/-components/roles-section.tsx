@@ -14,11 +14,14 @@ export const RolesSection = () => {
   const isOwner = activeOrg?.role === "owner";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in-page">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-foreground">
-          {t("allRoles")}
-        </h3>
+        <div>
+          <h3 className="text-xl font-semibold tracking-tight text-foreground">
+            {t("allRoles")}
+          </h3>
+          <p className="mt-1 text-sm text-muted-foreground">{t("permissionsDescription")}</p>
+        </div>
         {isOwner && (
           <Link
             to="/roles/create"

@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { MailIcon } from "lucide-react";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
@@ -43,43 +36,42 @@ export const ForgotPasswordView = () => {
   });
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">
+    <div className="animate-in-stagger">
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight">
           {t("forgot_password.title")}
-        </CardTitle>
-        <CardDescription>{t("forgot_password.description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.AppField name="email">
-              {(field) => (
-                <field.Input
-                  label={t("forgot_password.email")}
-                  placeholder={t("forgot_password.emailPlaceholder")}
-                  LeftIcon={MailIcon}
-                />
-              )}
-            </form.AppField>
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("forgot_password.description")}</p>
+      </div>
 
-            <Field>
-              <form.AppForm>
-                <form.SubmitButton label={t("forgot_password.submit")} />
-              </form.AppForm>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
+        <FieldGroup>
+          <form.AppField name="email">
+            {(field) => (
+              <field.Input
+                label={t("forgot_password.email")}
+                placeholder={t("forgot_password.emailPlaceholder")}
+                LeftIcon={MailIcon}
+              />
+            )}
+          </form.AppField>
 
-              <FieldDescription className="text-center">
-                <Link to="/sign-in">{t("forgot_password.backToSignIn")}</Link>
-              </FieldDescription>
-            </Field>
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+          <Field>
+            <form.AppForm>
+              <form.SubmitButton label={t("forgot_password.submit")} />
+            </form.AppForm>
+
+            <FieldDescription className="text-center">
+              <Link to="/sign-in" className="text-primary hover:underline underline-offset-4">{t("forgot_password.backToSignIn")}</Link>
+            </FieldDescription>
+          </Field>
+        </FieldGroup>
+      </form>
+    </div>
   );
 };

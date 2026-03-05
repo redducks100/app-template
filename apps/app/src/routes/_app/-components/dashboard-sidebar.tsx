@@ -4,23 +4,15 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   BuildingIcon,
   ChartBarIcon,
-  ChevronRightIcon,
   CogIcon,
   LayoutDashboardIcon,
   MailsIcon,
@@ -29,9 +21,10 @@ import {
 } from "lucide-react";
 import { DashboardUserButton } from "./dashboard-user-button";
 import { DashboardOrganizationSwitcher } from "./dashboard-organization-switcher";
-import { settingsNavigation } from "../settings/-lib/settings-navigation";
 import { useTranslation } from "react-i18next";
 import { Link, useMatchRoute } from "@tanstack/react-router";
+
+const activeClass = "relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-0.5 before:rounded-full before:bg-primary";
 
 export const DashboardSidebar = ({
   ...props
@@ -42,16 +35,17 @@ export const DashboardSidebar = ({
 
   const isSettingsActive = !!matchRoute({ to: "/settings", fuzzy: true });
 
-  const navItems = [
+  const overviewItems = [
     { title: t("sidebar.dashboard"), url: "/", icon: LayoutDashboardIcon },
     { title: t("sidebar.analytics"), url: "#", icon: ChartBarIcon },
+  ];
+
+  const organizationItems = [
     { title: t("sidebar.organization"), url: "/organization", icon: BuildingIcon },
     { title: t("sidebar.invitations"), url: "/invitations", icon: MailsIcon },
     { title: t("sidebar.roles"), url: "/roles", icon: ShieldIcon },
     { title: t("sidebar.users"), url: "/users", icon: UsersIcon },
   ];
-
-  const settingsItems = settingsNavigation.flatMap((group) => group.items);
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -59,67 +53,75 @@ export const DashboardSidebar = ({
         <DashboardOrganizationSwitcher />
       </SidebarHeader>
       <SidebarContent>
+        {/* Overview group — no label */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    isActive={!!matchRoute({ to: item.url, fuzzy: true })}
-                    render={
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    }
-                  />
-                </SidebarMenuItem>
-              ))}
-              <Collapsible
-                defaultOpen={isSettingsActive}
-                className="group/collapsible"
-                render={<SidebarMenuItem />}
-              >
-                <CollapsibleTrigger
-                  render={
+              {overviewItems.map((item) => {
+                const isActive = !!matchRoute({ to: item.url, fuzzy: true });
+                return (
+                  <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
-                      tooltip={tCommon("settings")}
-                      isActive={isSettingsActive}
-                    >
-                      <CogIcon />
-                      <span>{tCommon("settings")}</span>
-                      <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </SidebarMenuButton>
-                  }
-                />
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {settingsItems.map((item) => (
-                      <SidebarMenuSubItem key={item.value}>
-                        <SidebarMenuSubButton
-                          isActive={
-                            !!matchRoute({
-                              to: `/settings/${item.value}`,
-                              fuzzy: true,
-                            })
-                          }
-                          render={
-                            <Link to={`/settings/${item.value}`}>
-                              <span>{item.label}</span>
-                            </Link>
-                          }
-                        />
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </Collapsible>
+                      tooltip={item.title}
+                      isActive={isActive}
+                      className={isActive ? activeClass : ""}
+                      render={
+                        <Link to={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      }
+                    />
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Organization group */}
+        <SidebarGroup>
+          <SidebarGroupLabel>{t("sidebar.organizationSection")}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {organizationItems.map((item) => {
+                const isActive = !!matchRoute({ to: item.url, fuzzy: true });
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      isActive={isActive}
+                      className={isActive ? activeClass : ""}
+                      render={
+                        <Link to={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      }
+                    />
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip={tCommon("settings")}
+              isActive={isSettingsActive}
+              className={isSettingsActive ? activeClass : ""}
+              render={
+                <Link to="/settings/profile">
+                  <CogIcon />
+                  <span>{tCommon("settings")}</span>
+                </Link>
+              }
+            />
+          </SidebarMenuItem>
+        </SidebarMenu>
         <DashboardUserButton />
       </SidebarFooter>
     </Sidebar>

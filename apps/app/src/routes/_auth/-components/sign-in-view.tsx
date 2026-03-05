@@ -1,11 +1,4 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { LockIcon, MailIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -83,14 +76,15 @@ export const SignInView = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">
+    <div className="animate-in-stagger">
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight">
           {t("sign_in.title")}
-        </CardTitle>
-        <CardDescription>{t("sign_in.description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("sign_in.description")}</p>
+      </div>
+
+      <div className="space-y-3">
         {SUPPORTED_OAUTH_PROVIDERS.map((provider) => {
           const Icon = SUPPORTED_OATH_PROVIDER_DETAILS[provider].Icon;
 
@@ -99,7 +93,7 @@ export const SignInView = () => {
               variant="outline"
               disabled={loading}
               onClick={() => onProviderSubmit(provider)}
-              className="w-full"
+              className="w-full h-11"
               key={provider}
             >
               <Icon />
@@ -110,11 +104,12 @@ export const SignInView = () => {
           );
         })}
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-3 py-1">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">{tCommon("or")}</span>
+          <span className="text-xs text-muted-foreground/60 uppercase tracking-wider font-medium">{tCommon("or")}</span>
           <Separator className="flex-1" />
         </div>
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -141,7 +136,7 @@ export const SignInView = () => {
                   labelRight={
                     <Link
                       to="/forgot-password"
-                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                      className="ml-auto inline-block text-sm text-primary hover:underline underline-offset-4"
                     >
                       {t("sign_in.forgotPassword")}
                     </Link>
@@ -159,12 +154,12 @@ export const SignInView = () => {
               </p>
               <FieldDescription className="text-center">
                 {t("sign_in.noAccount")}{" "}
-                <Link to="/sign-up">{t("sign_in.signUp")}</Link>
+                <Link to="/sign-up" className="text-primary hover:underline underline-offset-4">{t("sign_in.signUp")}</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

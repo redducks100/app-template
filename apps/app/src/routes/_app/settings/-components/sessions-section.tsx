@@ -29,20 +29,13 @@ export const SessionsSection = () => {
   }
 
   return (
-    <div className="space-y-7">
-      <section>
-        <h3 className="text-base font-semibold text-foreground mb-4">
-          Current Session
-        </h3>
-        {currentSession && <SessionCard session={currentSession} />}
-      </section>
+    <div className="space-y-3">
+      {currentSession && <SessionCard session={currentSession} />}
 
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-foreground">
-            Other Active Sessions
-          </h3>
-          {otherSessions.length > 0 && (
+      {otherSessions.length > 0 && (
+        <>
+          <div className="flex items-center justify-between pt-4">
+            <p className="text-sm font-medium text-muted-foreground">Other Active Sessions</p>
             <Button
               variant="destructive"
               size="sm"
@@ -54,20 +47,18 @@ export const SessionsSection = () => {
                 "Revoke all"
               )}
             </Button>
-          )}
+          </div>
+          {otherSessions.map((session) => (
+            <SessionCard key={session.id} session={session} />
+          ))}
+        </>
+      )}
+
+      {otherSessions.length === 0 && (
+        <div className="rounded-xl border border-border bg-card py-8 text-center text-muted-foreground">
+          No other active sessions
         </div>
-        {otherSessions.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card py-8 text-center text-muted-foreground">
-            No other active sessions
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {otherSessions.map((session) => (
-              <SessionCard key={session.id} session={session} />
-            ))}
-          </div>
-        )}
-      </section>
+      )}
     </div>
   );
 };

@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { authClient } from "@/lib/auth-client";
@@ -42,27 +35,26 @@ export const VerifyEmailView = ({ email }: VerifyEmailViewProps) => {
     },
   });
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">{t("verify_email.title")}</CardTitle>
-        <CardDescription>{t("verify_email.description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <Field>
-              <form.AppForm>
-                <form.SubmitButton label={t("verify_email.submit")} timer={30} />
-              </form.AppForm>
-            </Field>
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+    <div className="animate-in-page">
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight">{t("verify_email.title")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("verify_email.description")}</p>
+      </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
+        <FieldGroup>
+          <Field>
+            <form.AppForm>
+              <form.SubmitButton label={t("verify_email.submit")} timer={30} />
+            </form.AppForm>
+          </Field>
+        </FieldGroup>
+      </form>
+    </div>
   );
 };

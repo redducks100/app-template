@@ -15,7 +15,7 @@ const viewSectionVariants = cva("", {
   variants: {
     viewVariant: {
       default: "",
-      destructive: "border-destructive/30 bg-destructive/5",
+      destructive: "border-destructive/30 bg-destructive/5 dark:bg-destructive/10",
     },
   },
   defaultVariants: {

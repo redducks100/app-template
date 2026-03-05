@@ -28,21 +28,16 @@ export const LinkedAccountsSection = () => {
   const allProviders = currentProviders.concat(supportedProvider);
 
   return (
-    <section>
-      <h3 className="text-base font-semibold text-foreground mb-4">
-        Linked Accounts
-      </h3>
-      <div className="rounded-xl border border-border bg-card">
-        {allProviders.map((provider, index) => (
-          <div key={provider.provider}>
-            {index > 0 && <Separator orientation="horizontal" />}
-            <LinkedAccountCard
-              account={provider.account}
-              provider={provider.provider}
-            />
-          </div>
-        ))}
-      </div>
-    </section>
+    <div className="rounded-xl border border-border bg-card">
+      {allProviders.map((provider, index) => (
+        <div key={provider.provider}>
+          {index > 0 && <Separator orientation="horizontal" />}
+          <LinkedAccountCard
+            account={provider.account}
+            provider={provider.provider}
+          />
+        </div>
+      ))}
+    </div>
   );
 };

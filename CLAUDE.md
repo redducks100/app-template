@@ -4,14 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- **Dev server (app)**: `pnpm dev` (runs Vite SPA dev server on port 3000)
+- **Dev (all)**: `pnpm dev` (runs both app + api dev servers in parallel via Turborepo)
+- **Dev server (app)**: `pnpm dev:app` (runs Vite SPA dev server on port 3000)
 - **Dev server (api)**: `pnpm dev:api` (runs Hono API worker on port 8787)
-- **Dev server (home)**: `pnpm dev:home` (runs landing page dev server on port 3001)
-- **Build (app)**: `pnpm build`
-- **Build (home)**: `pnpm build:home`
-- **Deploy (app)**: `pnpm deploy:app` (builds + deploys to Cloudflare Pages)
-- **Deploy (api)**: `pnpm deploy:api` (deploys API to Cloudflare Workers)
-- **Deploy (home)**: `pnpm deploy:home`
+- **Build**: `pnpm build` (builds all packages with dependency ordering and caching)
+- **Deploy (all)**: `pnpm deploy` (builds + deploys both app and api to Cloudflare Workers)
+- **Deploy (app)**: `pnpm deploy:app` (builds + deploys SPA to Cloudflare Workers)
+- **Deploy (api)**: `pnpm deploy:api` (builds + deploys API to Cloudflare Workers)
 - **DB push**: `pnpm db:push`
 - **DB generate migration**: `pnpm db:generate`
 - **DB migrate**: `pnpm db:migrate`
@@ -24,7 +23,8 @@ No test framework is configured.
 - **TanStack Router** (file-based routing) as a client-only SPA
 - **Hono** API framework with RPC for type-safe API, deployed as a standalone Cloudflare Worker
 - **Vite** for bundling with `@vitejs/plugin-react` + `@tanstack/router-plugin`
-- **Cloudflare Pages** for SPA deployment (static), **Cloudflare Workers** for API deployment
+- **Cloudflare Workers** for both SPA (Static Assets) and API deployment
+- **Turborepo** for build orchestration with caching and dependency-aware task execution
 - **React 19** with TypeScript
 - **Base UI** (`@base-ui/react`) + **shadcn** for components (style: `base-maia`)
 - **Tailwind CSS 4** with oklch color variables and `tw-animate-css`
@@ -42,10 +42,10 @@ No test framework is configured.
 app-template/
 ├── apps/
 │   ├── api/          # @app/api — Standalone Hono API worker → api.enomisoft.com
-│   ├── app/          # @app/app — TanStack Router SPA → app.enomisoft.com (Cloudflare Pages)
-│   └── home/         # @app/home — TanStack Start landing page → enomisoft.com
+│   └── app/          # @app/app — TanStack Router SPA → app.enomisoft.com (Cloudflare Workers Static Assets)
 ├── packages/
 │   └── shared/       # @app/shared — Zod schemas, types, permissions
+├── turbo.json
 ├── pnpm-workspace.yaml
 ├── tsconfig.base.json
 └── package.json
@@ -77,7 +77,7 @@ export const roleRoutes = new Hono()
 
 ## Dashboard App (`apps/app`)
 
-Client-only SPA using TanStack Router, deployed to Cloudflare Pages as static files. Communicates with the API at a separate subdomain via Hono RPC client with `credentials: "include"`.
+Client-only SPA using TanStack Router, deployed to Cloudflare Workers with Static Assets. Communicates with the API at a separate subdomain via Hono RPC client with `credentials: "include"`.
 
 - `index.html` — SPA entry point
 - `src/main.tsx` — React bootstrap
@@ -91,7 +91,7 @@ Client-only SPA using TanStack Router, deployed to Cloudflare Pages as static fi
 - `src/lib/mutations.ts` — Mutation functions using Hono RPC
 - `src/lib/i18n.ts` — i18next configuration
 - `src/locales/` — Translation files (en.json, ro.json)
-- `public/_redirects` — Cloudflare Pages SPA routing
+- `wrangler.jsonc` — Cloudflare Workers config (Static Assets with SPA routing)
 
 ### Feature Component Pattern
 
@@ -153,10 +153,6 @@ Built on Base UI + shadcn. Key subsystem:
 
 **Form components** (`components/ui/form/`): `useAppForm` hook wraps TanStack React Form with pre-registered field components (`Input`, `Textarea`, `Select`, `Checkbox`) and `SubmitButton`.
 
-## Home App (`apps/home`)
-
-Simple TanStack Start landing page deployed to `enomisoft.com`. Minimal setup with Tailwind CSS.
-
 ## Shared Package (`packages/shared`)
 
 - `src/schemas/` — Zod validation schemas shared between API and web
@@ -165,15 +161,25 @@ Simple TanStack Start landing page deployed to `enomisoft.com`. Minimal setup wi
 
 ## Path Aliases
 
-- `@/*` maps to `apps/app/src/` in the app, `apps/home/src/` in home
+- `@/*` maps to `apps/app/src/`
 - `@app/api` and `@app/shared` are workspace package imports
+
+## Build System (Turborepo)
+
+Turborepo orchestrates builds, dev servers, and deploys across the monorepo. Config is in `turbo.json`.
+
+- `build` tasks are cacheable with topological dependencies (`^build`) — shared packages build first
+- `dev` tasks are persistent (long-running) and not cached
+- `deploy:cf` depends on same-package `build`, not cached
+- `@app/shared` has no `build` script — Turborepo skips it automatically
+- Cache artifacts stored in `.turbo/` (gitignored)
 
 ## Environment Variables
 
 ### API Worker (wrangler vars/secrets)
 Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `COOKIE_DOMAIN`.
 
-### SPA (Cloudflare Pages, build-time)
+### SPA (Cloudflare Workers, build-time)
 Required: `VITE_API_URL` (baked into bundle, e.g. `https://api.enomisoft.com`).
 
 ### Local Development

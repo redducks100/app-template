@@ -10,7 +10,15 @@
     "or": "OR",
     "continueWith": "Continue with {{provider}}",
     "getHelp": "Get Help",
-    "change": "Change"
+    "change": "Change",
+    "searchPlaceholder": "Search...",
+    "noResults": "No results found.",
+    "pagination": {
+      "showing": "Showing {{from}}–{{to}} of {{total}}",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {{page}} of {{total}}"
+    }
   },
   "dashboard": {
     "sidebar": {
@@ -22,9 +30,27 @@
       "users": "Users",
       "dashboardSection": "Dashboard",
       "organizationSection": "Organization"
+    },
+    "welcome": "Welcome back",
+    "stats": {
+      "members": "Members",
+      "roles": "Roles",
+      "pendingInvitations": "Pending Invitations"
+    },
+    "quickActions": "Quick Actions",
+    "actions": {
+      "inviteMember": "Invite Member",
+      "createRole": "Create Role",
+      "settings": "Settings"
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "description": "Activity feed coming soon. You'll see recent changes and events here."
     }
   },
   "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and preferences.",
     "navigation": {
       "account": "Account",
       "integrations": "Integrations",
@@ -70,16 +96,18 @@
     "roleDescription": "The role the invited member will have.",
     "member": "Member",
     "admin": "Admin",
+    "inviteDescription": "Enter the email and role for the new member.",
     "sendInvitation": "Send Invitation",
     "sentSuccess": "Invitation sent successfully",
-    "allInvitations": "All Invitations",
+    "allInvitations": "Invitations",
     "emailColumn": "Email",
     "roleColumn": "Role",
     "statusColumn": "Status",
     "expiresColumn": "Expires",
     "cancel": "Cancel",
     "canceled": "Invitation canceled",
-    "emptyState": "No invitations yet. Use the form above to invite members.",
+    "invitationsDescription": "Manage pending and past invitations.",
+    "emptyState": "No invitations yet.",
     "notFoundTitle": "Invitation Not Found",
     "notFoundDescription": "This invitation doesn't exist or the link is invalid.",
     "goToSignIn": "Go to Sign In",
@@ -131,7 +159,7 @@
     "deleteConfirmTitle": "Delete Role",
     "deleteConfirm": "Are you sure you want to delete this role?",
     "noCustomRoles": "No custom roles yet.",
-    "allRoles": "All Roles",
+    "allRoles": "Roles",
     "roleNameDescription": "The name for the custom role.",
     "permissionsDescription": "Select the permissions for this role.",
     "selectPermissions": "Select permissions...",
@@ -148,11 +176,12 @@
   },
   "members": {
     "title": "Members",
-    "allMembers": "All Members",
+    "allMembers": "Members",
     "nameColumn": "Name",
     "emailColumn": "Email",
     "roleColumn": "Role",
     "joinedColumn": "Joined",
+    "membersDescription": "View and manage all members of your organization.",
     "emptyState": "No members found.",
     "backToUsers": "Back to Users",
     "removeMember": "Remove Member",
@@ -167,8 +196,20 @@
     "saveChanges": "Save Changes",
     "you": "You",
     "joinedDate": "Joined",
+    "email": "Email",
+    "status": "Status",
+    "active": "Active",
+    "memberDetails": "Member Details",
     "dangerZone": "Danger Zone",
     "removeDescription": "This member will lose access to this organization. This action cannot be undone."
+  },
+  "selectOrg": {
+    "title": "Select organization",
+    "description": "Choose which organization you'd like to work with",
+    "createNew": "Create new organization",
+    "alreadyActive": "This organization is already active",
+    "loadingOrgs": "Loading organizations...",
+    "loadError": "Failed to load organizations"
   },
   "auth": {
     "sign_in": {

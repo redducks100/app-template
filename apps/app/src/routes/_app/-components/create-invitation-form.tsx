@@ -1,16 +1,14 @@
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { SelectItem } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MailIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { rolesListOptions } from "@/lib/query-options";
 import { createInvitation as createInvitationMutation } from "@/lib/mutations";
 
-export const CreateInvitationForm = () => {
+export const CreateInvitationForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const { t } = useTranslation("invitations");
   const queryClient = useQueryClient();
 
@@ -26,6 +24,7 @@ export const CreateInvitationForm = () => {
       });
       toast.success(t("sentSuccess"));
       form.reset();
+      onSuccess?.();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -53,41 +52,32 @@ export const CreateInvitationForm = () => {
       }}
     >
       <FieldGroup>
-        <div className="rounded-xl border border-border bg-card">
-          <form.AppField name="email">
-            {(field) => (
-              <field.Input
-                label={t("email")}
-                description={t("emailDescription")}
-                placeholder={t("emailPlaceholder")}
-                LeftIcon={MailIcon}
-                row
-              />
-            )}
-          </form.AppField>
+        <form.AppField name="email">
+          {(field) => (
+            <field.Input
+              label={t("email")}
+              placeholder={t("emailPlaceholder")}
+            />
+          )}
+        </form.AppField>
 
-          <Separator orientation="horizontal" />
-
-          <form.AppField name="role">
-            {(field) => (
-              <field.Select
-                label={t("role")}
-                description={t("roleDescription")}
-                items={assignableRoles.map((r) => ({
-                  value: r.role,
-                  label: r.role.charAt(0).toUpperCase() + r.role.slice(1),
-                }))}
-                row
-              >
-                {assignableRoles.map((r) => (
-                  <SelectItem key={r.role} value={r.role}>
-                    {r.role.charAt(0).toUpperCase() + r.role.slice(1)}
-                  </SelectItem>
-                ))}
-              </field.Select>
-            )}
-          </form.AppField>
-        </div>
+        <form.AppField name="role">
+          {(field) => (
+            <field.Select
+              label={t("role")}
+              items={assignableRoles.map((r) => ({
+                value: r.role,
+                label: r.role.charAt(0).toUpperCase() + r.role.slice(1),
+              }))}
+            >
+              {assignableRoles.map((r) => (
+                <SelectItem key={r.role} value={r.role}>
+                  {r.role.charAt(0).toUpperCase() + r.role.slice(1)}
+                </SelectItem>
+              ))}
+            </field.Select>
+          )}
+        </form.AppField>
 
         <Field>
           <form.AppForm>

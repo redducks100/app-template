@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "ee3e9892bcdbb38c1d75f667c1b9c569301cc63189c9e46ba4da52b8e1713929"
     },
+    "pnpm": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "d473204df25defd08a7d47b55c6d124b41ebde440b774995952b65223d0d8d6f"
+    },
     "tanstack-router-best-practices": {
       "source": "deckardger/tanstack-agent-skills",
       "sourceType": "github",

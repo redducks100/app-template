@@ -7,12 +7,19 @@ export const locales = ["en", "ro"] as const;
 export const defaultLocale = "en";
 export type Locale = (typeof locales)[number];
 
+function detectLocale(): Locale {
+  const browserLang = navigator.language?.split("-")[0];
+  return locales.includes(browserLang as Locale)
+    ? (browserLang as Locale)
+    : defaultLocale;
+}
+
 i18n.use(initReactI18next).init({
   resources: {
     en,
     ro,
   },
-  lng: defaultLocale,
+  lng: detectLocale(),
   fallbackLng: defaultLocale,
   defaultNS: "common",
   interpolation: {

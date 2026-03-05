@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { AlertCircleIcon, LockIcon } from "lucide-react";
 import { useAppForm } from "@/components/ui/form/hooks";
 import { Field, FieldGroup } from "@/components/ui/field";
@@ -57,71 +50,69 @@ export const ResetPasswordView = () => {
 
   if (!token || error) {
     return (
-      <Card>
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">
+      <div className="animate-in-page">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-semibold tracking-tight">
             {t("reset_password.invalidTitle")}
-          </CardTitle>
-          <CardDescription>{t("reset_password.invalidDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Link to="/sign-in" className={buttonVariants({ className: "w-full" })}>
-            {t("reset_password.backToSignIn")}
-          </Link>
-        </CardContent>
-      </Card>
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t("reset_password.invalidDescription")}</p>
+        </div>
+        <Link to="/sign-in" className={buttonVariants({ className: "w-full" })}>
+          {t("reset_password.backToSignIn")}
+        </Link>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">{t("reset_password.title")}</CardTitle>
-        <CardDescription>{t("reset_password.description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircleIcon />
-            <AlertTitle>{t("reset_password.tokenError")}</AlertTitle>
-          </Alert>
-        )}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.AppField name="password">
-              {(field) => (
-                <field.Input
-                  label={t("reset_password.password")}
-                  type="password"
-                  description={t("reset_password.passwordDescription")}
-                  LeftIcon={LockIcon}
-                />
-              )}
-            </form.AppField>
+    <div className="animate-in-stagger">
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight">{t("reset_password.title")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("reset_password.description")}</p>
+      </div>
 
-            <form.AppField name="confirmPassword">
-              {(field) => (
-                <field.Input
-                  label={t("reset_password.confirmPassword")}
-                  type="password"
-                  LeftIcon={LockIcon}
-                />
-              )}
-            </form.AppField>
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircleIcon />
+          <AlertTitle>{t("reset_password.tokenError")}</AlertTitle>
+        </Alert>
+      )}
 
-            <Field>
-              <form.AppForm>
-                <form.SubmitButton label={t("reset_password.submit")} />
-              </form.AppForm>
-            </Field>
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
+        <FieldGroup>
+          <form.AppField name="password">
+            {(field) => (
+              <field.Input
+                label={t("reset_password.password")}
+                type="password"
+                description={t("reset_password.passwordDescription")}
+                LeftIcon={LockIcon}
+              />
+            )}
+          </form.AppField>
+
+          <form.AppField name="confirmPassword">
+            {(field) => (
+              <field.Input
+                label={t("reset_password.confirmPassword")}
+                type="password"
+                LeftIcon={LockIcon}
+              />
+            )}
+          </form.AppField>
+
+          <Field>
+            <form.AppForm>
+              <form.SubmitButton label={t("reset_password.submit")} />
+            </form.AppForm>
+          </Field>
+        </FieldGroup>
+      </form>
+    </div>
   );
 };
