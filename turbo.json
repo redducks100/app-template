@@ -14,9 +14,11 @@
       "cache": false,
       "passThroughEnv": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
     },
-    "db:push": { "cache": false },
-    "db:generate": { "cache": false },
     "db:migrate": { "cache": false },
+    "db:migrate:up": { "cache": false },
+    "db:migrate:down": { "cache": false },
+    "db:migrate:make": { "cache": false },
+    "db:migrate:list": { "cache": false },
     "db:studio": { "cache": false, "persistent": true }
   }
 }

@@ -1,9 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
 import { setCookie } from "hono/cookie";
-import { account, user } from "../db/schema.js";
 import { getAuth } from "../lib/auth.js";
 import { getDb } from "../lib/db.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -19,9 +17,10 @@ export const userRoutes = new Hono()
       const input = c.req.valid("json");
 
       await getDb()
-        .update(user)
+        .updateTable("user")
         .set({ locale: input.locale })
-        .where(eq(user.id, sessionData.userId));
+        .where("id", "=", sessionData.userId)
+        .execute();
 
       setCookie(c, "NEXT_LOCALE", input.locale, {
         path: "/",
@@ -34,12 +33,12 @@ export const userRoutes = new Hono()
   )
   .get("/has-password", async (c) => {
     const sessionData = c.get("session");
-    const accounts = await getDb().query.account.findMany({
-      where: and(
-        eq(account.userId, sessionData.userId),
-        eq(account.providerId, "credential")
-      ),
-    });
+    const accounts = await getDb()
+      .selectFrom("account")
+      .selectAll()
+      .where("userId", "=", sessionData.userId)
+      .where("providerId", "=", "credential")
+      .execute();
 
     return c.json(accounts && accounts.length > 0, 200);
   })

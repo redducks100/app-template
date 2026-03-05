@@ -2,10 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import {
-  FieldDescription,
-  FieldLabel,
-} from "@/components/ui/field";
+import { FieldDescription, FieldLabel } from "@/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -66,9 +63,7 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
 
   const availableRoles = roles.filter((r) => r.role !== "owner");
 
-  const [selectedRole, setSelectedRole] = useState<string>(
-    member?.role ?? "",
-  );
+  const [selectedRole, setSelectedRole] = useState<string>(member?.role ?? "");
   const isDirty = selectedRole !== member?.role;
 
   const updateRole = useMutation({
@@ -98,12 +93,16 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <p className="text-muted-foreground mb-4">{t("emptyState")}</p>
-        <Button variant="outline" size="sm" asChild>
-          <Link to="/users">
-            <ArrowLeftIcon className="size-4" />
-            {t("backToUsers")}
-          </Link>
-        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          render={
+            <Link to="/users">
+              <ArrowLeftIcon className="size-4" />
+              {t("backToUsers")}
+            </Link>
+          }
+        ></Button>
       </div>
     );
   }

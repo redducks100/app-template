@@ -11,10 +11,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Deploy (all)**: `pnpm deploy` (builds + deploys both app and api to Cloudflare Workers)
 - **Deploy (app)**: `pnpm deploy:app` (builds + deploys SPA to Cloudflare Workers)
 - **Deploy (api)**: `pnpm deploy:api` (builds + deploys API to Cloudflare Workers)
-- **DB push**: `pnpm db:push`
-- **DB generate migration**: `pnpm db:generate`
-- **DB migrate**: `pnpm db:migrate`
-- **DB studio**: `pnpm db:studio`
+- **DB migrate (latest)**: `pnpm db:migrate` (runs all pending migrations)
+- **DB migrate up**: `pnpm db:migrate:up` (runs next pending migration)
+- **DB migrate down**: `pnpm db:migrate:down` (rolls back last migration)
+- **DB migrate make**: `pnpm db:migrate:make` (scaffolds a new migration file)
+- **DB migrate list**: `pnpm db:migrate:list` (shows migration status)
 
 No test framework is configured.
 
@@ -30,7 +31,7 @@ No test framework is configured.
 - **Tailwind CSS 4** with oklch color variables and `tw-animate-css`
 - **TanStack React Query** for data fetching with Hono RPC client
 - **Better Auth** for authentication (email/password + Google OAuth, organizations plugin) with cross-subdomain cookies
-- **Drizzle ORM** with PostgreSQL
+- **Kysely** query builder with PostgreSQL (via `kysely-neon` for Cloudflare Workers)
 - **TanStack React Form** + Zod for form handling
 - **Resend** for transactional email via React Email templates
 - **react-i18next** for internationalization
@@ -59,9 +60,10 @@ Standalone Hono app deployed as a Cloudflare Worker. Routes are nested under `/a
 - `src/app.ts` — Hono app composition, exports `apiApp` (with `/api` prefix) and `AppType` (route-level types without `/api` for RPC client)
 - `src/routes/` — Hono RPC routes (organizations, invitations, members, roles, user)
 - `src/middleware/auth.ts` — Session auth middleware using `c.req.raw.headers`
-- `src/lib/auth.ts` — Better Auth server config with Drizzle adapter, cross-subdomain cookies
-- `src/lib/db.ts` — Drizzle connection
-- `src/db/schema.ts` — Drizzle schema
+- `src/lib/auth.ts` — Better Auth server config with Kysely dialect, cross-subdomain cookies
+- `src/lib/db.ts` — Kysely connection (NeonDialect)
+- `src/db/types.ts` — Kysely Database interface (table types)
+- `src/db/migrations/` — Kysely migrations with up/down functions
 - `src/emails/` — React Email templates sent via Resend
 - `wrangler.jsonc` — Cloudflare Workers config
 - `.dev.vars` — Local dev secrets (gitignored)
