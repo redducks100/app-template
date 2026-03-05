@@ -1,24 +1,23 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { SettingsSidebar } from "./settings/-components/settings-sidebar";
-import { SettingsNavbar } from "./settings/-components/settings-navbar";
-import { SettingsHeader } from "./settings/-components/settings-header";
+import { createFileRoute, Outlet, useMatches } from "@tanstack/react-router";
+import { settingsNavigation } from "./settings/-lib/settings-navigation";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsLayout,
 });
 
 function SettingsLayout() {
+  const matches = useMatches();
+  const lastMatch = matches[matches.length - 1];
+  const segment = lastMatch?.pathname.split("/").filter(Boolean).pop() ?? "profile";
+
+  const allItems = settingsNavigation.flatMap((g) => g.items);
+  const current = allItems.find((item) => item.value === segment);
+  const title = current?.label ?? "Settings";
+
   return (
-    <div className="flex flex-1 h-screen">
-      <SettingsSidebar />
-      <SidebarInset>
-        <SettingsNavbar />
-        <div className="mx-auto w-full max-w-6xl px-8 md:px-12">
-          <SettingsHeader />
-          <Outlet />
-        </div>
-      </SidebarInset>
+    <div className="mx-auto w-full max-w-6xl px-8 md:px-12 py-6">
+      <h1 className="text-2xl font-bold tracking-tight mb-6">{title}</h1>
+      <Outlet />
     </div>
   );
 }

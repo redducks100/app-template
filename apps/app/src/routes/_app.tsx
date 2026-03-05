@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./_app/-components/dashboard-sidebar";
+import { DashboardNavbar } from "./_app/-components/dashboard-navbar";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app")({
@@ -34,6 +35,7 @@ function AppLayout() {
     <SidebarProvider>
       <DashboardSidebar />
       <SidebarInset>
+        <DashboardNavbar />
         <Outlet />
       </SidebarInset>
     </SidebarProvider>

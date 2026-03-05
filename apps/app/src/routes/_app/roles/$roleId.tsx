@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DashboardNavbar } from "../-components/dashboard-navbar";
 import { Suspense } from "react";
 import { RoleDetail } from "./-components/role-detail";
 import {
@@ -20,19 +19,16 @@ function RoleDetailPage() {
   const { roleId } = Route.useParams();
 
   return (
-    <>
-      <DashboardNavbar />
-      <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="h-full flex justify-center">
-          <div className="w-full max-w-6xl">
-            <div className="p-4 space-y-12">
-              <Suspense>
-                <RoleDetail roleId={roleId} />
-              </Suspense>
-            </div>
+    <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div className="h-full flex justify-center">
+        <div className="w-full max-w-6xl">
+          <div className="p-4 space-y-12">
+            <Suspense>
+              <RoleDetail roleId={roleId} />
+            </Suspense>
           </div>
         </div>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }

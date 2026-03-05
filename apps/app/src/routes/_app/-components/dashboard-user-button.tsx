@@ -5,7 +5,12 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -15,17 +20,26 @@ import {
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { authClient } from "@/lib/auth-client";
+import { locales } from "@/lib/i18n";
+import { updateLanguage } from "@/lib/mutations";
 import {
   BadgeCheckIcon,
   BellIcon,
   ChevronsUpDownIcon,
   CreditCardIcon,
+  GlobeIcon,
   LogOutIcon,
   SparklesIcon,
 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { sessionOptions } from "@/lib/query-options";
+import { useTranslation } from "react-i18next";
+
+const languageLabels: Record<string, string> = {
+  en: "English",
+  ro: "Română",
+};
 
 export const DashboardUserButton = () => {
   const navigate = useNavigate();
@@ -33,6 +47,14 @@ export const DashboardUserButton = () => {
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   const { data, isPending } = authClient.useSession();
+  const { i18n } = useTranslation();
+
+  const languageMutation = useMutation({
+    mutationFn: updateLanguage,
+    onSuccess: (_data, variables) => {
+      i18n.changeLanguage(variables.locale);
+    },
+  });
 
   const onLogout = () => {
     authClient.signOut({
@@ -123,6 +145,31 @@ export const DashboardUserButton = () => {
                 <BellIcon />
                 Notifications
               </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <GlobeIcon />
+                  Language
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup
+                    value={i18n.language}
+                    onValueChange={(value) =>
+                      languageMutation.mutate({
+                        locale: value as "en" | "ro",
+                      })
+                    }
+                  >
+                    {locales.map((locale) => (
+                      <DropdownMenuRadioItem key={locale} value={locale}>
+                        {languageLabels[locale]}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogout}>

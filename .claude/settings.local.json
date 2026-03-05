@@ -57,7 +57,10 @@
       "WebFetch(domain:better-auth.com)",
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_network_requests",
-      "mcp__playwright__browser_take_screenshot"
+      "mcp__playwright__browser_take_screenshot",
+      "Bash(py:*)",
+      "Bash(/c/Users/devsi/AppData/Local/Microsoft/WindowsApps/python:*)",
+      "Bash(curl:*)"
     ]
   }
 }

@@ -1,13 +1,12 @@
 import {
   AlertTriangle,
-  GlobeIcon,
   Link2,
   Monitor,
   Shield,
   User,
 } from "lucide-react";
 
-export type SettingsValue = "profile" | "security" | "sessions" | "preferences" | "integrations" | "danger";
+export type SettingsValue = "profile" | "security" | "sessions" | "integrations" | "danger";
 
 export const settingsNavigation: {
   key: string;
@@ -21,7 +20,6 @@ export const settingsNavigation: {
       { value: "profile", label: "Profile", icon: User },
       { value: "security", label: "Security", icon: Shield },
       { value: "sessions", label: "Sessions", icon: Monitor },
-      { value: "preferences", label: "Preferences", icon: GlobeIcon },
     ],
   },
   {
