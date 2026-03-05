@@ -3,7 +3,6 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "env": ["VITE_API_URL"],
       "outputs": ["dist/**"]
     },
     "dev": {

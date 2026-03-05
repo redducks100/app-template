@@ -23,5 +23,3 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
       - run: pnpm build
-        env:
-          VITE_API_URL: https://api.enomisoft.com
