@@ -1,7 +1,5 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { and, eq } from "drizzle-orm";
-import { member } from "../db/schema.js";
 import { getAuth } from "../lib/auth.js";
 import { getDb } from "../lib/db.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -12,12 +10,20 @@ export const organizationRoutes = new Hono()
   .use(authMiddleware)
   .get("/list", async (c) => {
     const session = c.get("session");
-    const userMembers = await getDb().query.member.findMany({
-      where: eq(member.userId, session.userId),
-      with: { organization: true },
-    });
+    const userMembers = await getDb()
+      .selectFrom("member")
+      .innerJoin("organization", "organization.id", "member.organizationId")
+      .selectAll("organization")
+      .select("member.role")
+      .where("member.userId", "=", session.userId)
+      .execute();
     const result = userMembers.map((x) => ({
-      ...x.organization,
+      id: x.id,
+      name: x.name,
+      slug: x.slug,
+      logo: x.logo,
+      createdAt: x.createdAt,
+      metadata: x.metadata,
       role: x.role,
     }));
     return c.json(result, 200);
@@ -63,19 +69,26 @@ export const organizationRoutes = new Hono()
       const { name, slug, organizationId } = c.req.valid("json");
       const session = c.get("session");
 
-      const currentMember = await getDb().query.member.findFirst({
-        where: and(
-          eq(member.userId, session.userId),
-          eq(member.organizationId, organizationId)
-        ),
-        with: { organization: true },
-      });
+      const currentMember = await getDb()
+        .selectFrom("member")
+        .innerJoin("organization", "organization.id", "member.organizationId")
+        .selectAll("member")
+        .select([
+          "organization.name as orgName",
+          "organization.slug as orgSlug",
+          "organization.logo as orgLogo",
+          "organization.createdAt as orgCreatedAt",
+          "organization.metadata as orgMetadata",
+        ])
+        .where("member.userId", "=", session.userId)
+        .where("member.organizationId", "=", organizationId)
+        .executeTakeFirst();
 
       if (!currentMember) {
         return c.json({ error: "Organization not found." }, 404);
       }
 
-      if (slug !== currentMember.organization.slug) {
+      if (slug !== currentMember.orgSlug) {
         try {
           await getAuth().api.checkOrganizationSlug({ body: { slug } });
         } catch {
@@ -106,18 +119,24 @@ export const organizationRoutes = new Hono()
   )
   .get("/active", async (c) => {
     const session = c.get("session");
-    const userMember = await getDb().query.member.findFirst({
-      where: and(
-        eq(member.userId, session.userId),
-        eq(
-          member.organizationId,
-          session.activeOrganizationId as string
-        )
-      ),
-      with: { organization: true },
-    });
+    const userMember = await getDb()
+      .selectFrom("member")
+      .innerJoin("organization", "organization.id", "member.organizationId")
+      .selectAll("organization")
+      .select("member.role")
+      .where("member.userId", "=", session.userId)
+      .where("member.organizationId", "=", session.activeOrganizationId as string)
+      .executeTakeFirst();
 
     if (!userMember) return c.json(null, 200);
 
-    return c.json({ ...userMember.organization, role: userMember.role }, 200);
+    return c.json({
+      id: userMember.id,
+      name: userMember.name,
+      slug: userMember.slug,
+      logo: userMember.logo,
+      createdAt: userMember.createdAt,
+      metadata: userMember.metadata,
+      role: userMember.role,
+    }, 200);
   });

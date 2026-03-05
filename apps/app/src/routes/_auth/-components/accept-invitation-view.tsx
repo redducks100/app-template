@@ -63,7 +63,10 @@ export const AcceptInvitationView = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link to="/sign-in" className={buttonVariants({ className: "w-full" })}>
+          <Link
+            to="/sign-in"
+            className={buttonVariants({ className: "w-full" })}
+          >
             {t("goToSignIn")}
           </Link>
         </CardContent>

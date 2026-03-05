@@ -79,7 +79,13 @@
       "Bash(gh auth:*)",
       "WebFetch(domain:pnpm.io)",
       "WebFetch(domain:turborepo.dev)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:kysely.dev)",
+      "WebFetch(domain:jsr.io)",
+      "WebFetch(domain:www.answeroverflow.com)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:npmpackage.info)",
+      "Bash(npm view:*)"
     ]
   }
 }
