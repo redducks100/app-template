@@ -27,5 +27,6 @@ jobs:
           VITE_API_URL: https://api.enomisoft.com
       - run: pnpm run deploy
         env:
+          VITE_API_URL: https://api.enomisoft.com
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
