@@ -12,6 +12,7 @@
     "dev:api": "turbo run dev --filter=@app/api",
     "build": "turbo run build",
     "deploy:dev": "turbo run deploy:cf:dev",
+    "deploy": "turbo run deploy:cf",
     "db:migrate": "turbo run db:migrate --filter=@app/api",
     "db:migrate:up": "turbo run db:migrate:up --filter=@app/api",
     "db:migrate:down": "turbo run db:migrate:down --filter=@app/api",
