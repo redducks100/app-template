@@ -21,10 +21,10 @@
       "cache": false,
       "passThroughEnv": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
     },
-    "db:migrate": { "cache": false },
-    "db:migrate:up": { "cache": false },
-    "db:migrate:down": { "cache": false },
+    "db:migrate": { "cache": false, "passThroughEnv": ["DATABASE_URL"] },
+    "db:migrate:up": { "cache": false, "passThroughEnv": ["DATABASE_URL"] },
+    "db:migrate:down": { "cache": false, "passThroughEnv": ["DATABASE_URL"] },
     "db:migrate:make": { "cache": false },
-    "db:migrate:list": { "cache": false }
+    "db:migrate:list": { "cache": false, "passThroughEnv": ["DATABASE_URL"] }
   }
 }
