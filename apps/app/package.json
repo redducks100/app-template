@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build --mode production",
     "preview": "vite preview",
-    "deploy:cf": "wrangler deploy",
-    "deploy:cf:dev": "vite build && wrangler deploy --env dev"
+    "deploy:cf": "wrangler deploy"
   },
   "dependencies": {
     "@app/api": "workspace:*",

@@ -11,7 +11,6 @@
     "build": "wrangler deploy --dry-run --outdir=dist",
     "dev": "wrangler dev --remote",
     "deploy:cf": "wrangler deploy",
-    "deploy:cf:dev": "wrangler deploy --env dev",
     "db:migrate": "kysely migrate:latest",
     "db:migrate:up": "kysely migrate:up",
     "db:migrate:down": "kysely migrate:down",

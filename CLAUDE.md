@@ -8,8 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Dev server (app)**: `pnpm dev:app` (runs Vite SPA dev server on port 3000)
 - **Dev server (api)**: `pnpm dev:api` (runs Hono API worker on port 8787)
 - **Build**: `pnpm build` (builds all packages with dependency ordering and caching)
-- **Deploy dev**: `pnpm deploy:dev` (deploys both app and api to dev Cloudflare Workers)
-- **Deploy prod**: CI-only — push/merge to `main` triggers `.github/workflows/deploy.yml`
+- **Deploy**: CI-only — push/merge to `main` triggers `.github/workflows/deploy.yml`
 - **DB migrate (latest)**: `pnpm db:migrate` (runs all pending migrations)
 - **DB migrate up**: `pnpm db:migrate:up` (runs next pending migration)
 - **DB migrate down**: `pnpm db:migrate:down` (rolls back last migration)
@@ -185,8 +184,8 @@ Optional: `SENTRY_DSN` (enables Sentry error tracking in production; omit for lo
 Required: `VITE_API_URL` (baked into bundle, e.g. `https://api.enomisoft.com`).
 
 ### CI / GitHub Secrets
-Required: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` (prod Neon connection string), `DATABASE_URL_DEV` (dev Neon connection string).
-CI deploy workflows run `pnpm db:migrate` before deploying, using the appropriate `DATABASE_URL` secret.
+Required: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` (prod Neon connection string).
+CI deploy workflow runs `pnpm db:migrate` before deploying.
 
 ### Local Development
 - API runs on `localhost:8787` (via `wrangler dev`)
@@ -194,13 +193,10 @@ CI deploy workflows run `pnpm db:migrate` before deploying, using the appropriat
 - SPA defaults `VITE_API_URL` to `http://localhost:8787`
 - Cross-origin cookies work on localhost because same-site (port doesn't matter)
 
-## Environments (Dev / Prod)
+## Deployment
 
-Two deployment environments via Wrangler `env` configs:
+Single production environment. Push/merge to `main` triggers CI deploy.
 
-- **Production** (`main` branch): Workers `api` + `app` → `api.enomisoft.com` / `app.enomisoft.com`
-- **Dev** (`dev` branch): Workers `api-dev` + `app-dev` → `api-dev.enomisoft.com` / `app-dev.enomisoft.com`
-
-Push to `dev` triggers `.github/workflows/deploy-dev.yml` which runs `pnpm deploy:dev`. CI passes `VITE_API_URL` explicitly as an environment variable for both dev and prod deploys (no `.env.staging` file needed).
-
-CI runs on PRs to both `main` and `dev`.
+- **Production**: Workers `api` + `app` → `api.enomisoft.com` / `app.enomisoft.com`
+- CI passes `VITE_API_URL` explicitly as an environment variable for deploys
+- CI runs on PRs to `main`

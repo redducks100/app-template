@@ -34,6 +34,21 @@ const app = new Hono<{ Bindings: CloudflareBindings }>()
     const res = await getAuth(c.env.R2).handler(c.req.raw);
     return res;
   })
+  .get("/api/assets/:key{.+}", async (c) => {
+    const key = c.req.param("key");
+    const object = await c.env.R2.get(key);
+
+    if (!object) {
+      return c.notFound();
+    }
+
+    const headers = new Headers();
+    object.writeHttpMetadata(headers);
+    headers.set("ETag", object.httpEtag);
+    headers.set("Cache-Control", "public, max-age=31536000, immutable");
+
+    return new Response(object.body, { headers });
+  })
   .route("/api", routes);
 
 export type AppType = typeof routes;
