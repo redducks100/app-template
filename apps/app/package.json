@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "deploy:cf": "wrangler deploy",
-    "deploy:cf:dev": "vite build --mode staging && wrangler deploy --env dev"
+    "deploy:cf:dev": "vite build && wrangler deploy --env dev"
   },
   "dependencies": {
     "@app/api": "workspace:*",

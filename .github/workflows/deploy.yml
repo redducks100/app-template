@@ -25,6 +25,8 @@ jobs:
       - name: Lint
         run: pnpm lint
       - run: pnpm run build
+        env:
+          VITE_API_URL: https://api.enomisoft.com
       - name: Run database migrations
         run: pnpm db:migrate
         env:
