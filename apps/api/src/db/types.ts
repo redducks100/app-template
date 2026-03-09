@@ -73,6 +73,7 @@ export interface InvitationTable {
   status: Generated<string>;
   expiresAt: Date;
   inviterId: string;
+  createdAt: Generated<Date>;
 }
 
 export interface OrganizationRoleTable {
@@ -84,6 +85,13 @@ export interface OrganizationRoleTable {
   updatedAt: Generated<Date | null>;
 }
 
+export interface RateLimitTable {
+  id: string;
+  key: string;
+  count: number;
+  lastRequest: number;
+}
+
 export interface Database {
   user: UserTable;
   session: SessionTable;
@@ -93,4 +101,5 @@ export interface Database {
   member: MemberTable;
   invitation: InvitationTable;
   organizationRole: OrganizationRoleTable;
+  rateLimit: RateLimitTable;
 }

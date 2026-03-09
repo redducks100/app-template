@@ -11,13 +11,8 @@ export const createRoleFormSchema = z.object({
 });
 
 export const updateRoleSchema = z.object({
-  roleId: z.string().min(1),
   data: z.object({
     roleName: z.string().min(1).optional(),
     permission: z.record(z.array(z.string())).optional(),
   }),
-});
-
-export const deleteRoleSchema = z.object({
-  roleId: z.string().min(1),
 });

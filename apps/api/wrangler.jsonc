@@ -8,9 +8,16 @@
   "observability": {
     "enabled": true,
   },
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "app-storage"
+    }
+  ],
   "vars": {
     "APP_URL": "https://app.enomisoft.com",
     "BETTER_AUTH_URL": "https://api.enomisoft.com",
     "COOKIE_DOMAIN": ".enomisoft.com",
+    "ASSETS_URL": "https://assets.enomisoft.com"
   },
 }

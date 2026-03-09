@@ -22,4 +22,6 @@ jobs:
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-turbo-
+      - name: Lint
+        run: pnpm lint
       - run: pnpm build

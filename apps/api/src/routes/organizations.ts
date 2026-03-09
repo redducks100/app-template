@@ -1,14 +1,17 @@
 import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 import { getAuth } from "../lib/auth.js";
 import { getDb } from "../lib/db.js";
 import { authMiddleware } from "../middleware/auth.js";
+import { ok } from "../lib/result.js";
+import { zv } from "../lib/validation.js";
 import { createOrganizationSchema } from "@app/shared/schemas/create-organization-schema";
 import { updateOrganizationSchema } from "@app/shared/schemas/update-organization-schema";
 
 export const organizationRoutes = new Hono()
   .use(authMiddleware)
-  .get("/list", async (c) => {
+  .get("/", async (c) => {
     const session = c.get("session");
     const userMembers = await getDb()
       .selectFrom("member")
@@ -26,47 +29,37 @@ export const organizationRoutes = new Hono()
       metadata: x.metadata,
       role: x.role,
     }));
-    return c.json(result, 200);
+    return ok(c, result);
   })
-  .post(
-    "/create",
-    zValidator("json", createOrganizationSchema),
-    async (c) => {
-      const { name, slug } = c.req.valid("json");
-      const session = c.get("session");
-      const user = c.get("user");
+  .post("/", zv("json", createOrganizationSchema), async (c) => {
+    const { name, slug } = c.req.valid("json");
+    const user = c.get("user");
 
-      try {
-        await getAuth().api.checkOrganizationSlug({ body: { slug } });
-      } catch {
-        return c.json(
-          { error: "Organization slug is already taken." },
-          400
-        );
-      }
-
-      const response = await getAuth().api.createOrganization({
-        body: { name, slug, userId: user.id },
-      });
-
-      if (!response) {
-        return c.json(
-          {
-            error:
-              "Something went wrong while creating an organization",
-          },
-          500
-        );
-      }
-
-      return c.json(response, 201);
+    try {
+      await getAuth(c.env.R2).api.checkOrganizationSlug({ body: { slug } });
+    } catch {
+      throw new HTTPException(400, { message: "Organization slug is already taken." });
     }
-  )
-  .post(
-    "/update",
-    zValidator("json", updateOrganizationSchema),
+
+    const response = await getAuth(c.env.R2).api.createOrganization({
+      body: { name, slug, userId: user.id },
+    });
+
+    if (!response) {
+      throw new HTTPException(500, {
+        message: "Something went wrong while creating an organization",
+      });
+    }
+
+    return ok(c, response, 201);
+  })
+  .patch(
+    "/:id",
+    zv("param", z.object({ id: z.string() })),
+    zv("json", updateOrganizationSchema),
     async (c) => {
-      const { name, slug, organizationId } = c.req.valid("json");
+      const { id: organizationId } = c.req.valid("param");
+      const { name, slug } = c.req.valid("json");
       const session = c.get("session");
 
       const currentMember = await getDb()
@@ -85,37 +78,32 @@ export const organizationRoutes = new Hono()
         .executeTakeFirst();
 
       if (!currentMember) {
-        return c.json({ error: "Organization not found." }, 404);
+        throw new HTTPException(404, { message: "Organization not found." });
       }
 
       if (slug !== currentMember.orgSlug) {
         try {
-          await getAuth().api.checkOrganizationSlug({ body: { slug } });
+          await getAuth(c.env.R2).api.checkOrganizationSlug({
+            body: { slug },
+          });
         } catch {
-          return c.json(
-            { error: "Organization slug is already taken." },
-            400
-          );
+          throw new HTTPException(400, { message: "Organization slug is already taken." });
         }
       }
 
-      const response = await getAuth().api.updateOrganization({
+      const response = await getAuth(c.env.R2).api.updateOrganization({
         body: { data: { name, slug }, organizationId },
         headers: c.req.raw.headers,
       });
 
       if (!response) {
-        return c.json(
-          {
-            error:
-              "Something went wrong while updating the organization.",
-          },
-          500
-        );
+        throw new HTTPException(500, {
+          message: "Something went wrong while updating the organization.",
+        });
       }
 
-      return c.json(response, 200);
-    }
+      return ok(c, response);
+    },
   )
   .get("/active", async (c) => {
     const session = c.get("session");
@@ -125,18 +113,24 @@ export const organizationRoutes = new Hono()
       .selectAll("organization")
       .select("member.role")
       .where("member.userId", "=", session.userId)
-      .where("member.organizationId", "=", session.activeOrganizationId as string)
+      .where(
+        "member.organizationId",
+        "=",
+        session.activeOrganizationId as string,
+      )
       .executeTakeFirst();
 
-    if (!userMember) return c.json(null, 200);
+    const data = userMember
+      ? {
+          id: userMember.id,
+          name: userMember.name,
+          slug: userMember.slug,
+          logo: userMember.logo,
+          createdAt: userMember.createdAt,
+          metadata: userMember.metadata,
+          role: userMember.role,
+        }
+      : null;
 
-    return c.json({
-      id: userMember.id,
-      name: userMember.name,
-      slug: userMember.slug,
-      logo: userMember.logo,
-      createdAt: userMember.createdAt,
-      metadata: userMember.metadata,
-      role: userMember.role,
-    }, 200);
+    return ok(c, data);
   });

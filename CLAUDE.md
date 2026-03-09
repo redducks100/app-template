@@ -100,7 +100,7 @@ Client-only SPA using TanStack Router, deployed to Cloudflare Workers with Stati
 Feature-specific components are co-located with their route files using TanStack Router's `-components/` convention:
 
 ```
-src/routes/_app/
+src/routes/_dashboard/
 ├── roles/
 │   ├── index.tsx              # /roles route
 │   ├── create.tsx             # /roles/create route
@@ -118,12 +118,12 @@ src/routes/_app/
 ### Routing
 
 - `__root` — fetches auth session once via `authClient.getSession()`, passes `authData` through context
-- `_auth` layout — centered card wrapper for sign-in, sign-up, forgot/reset password, verify email, accept-invitation
-- `_protected` layout — auth guard only (no sidebar), reads `context.authData`, redirects to `/sign-in` if no session. Used for `/create-org` and `/select-org`
-- `_app` layout — auth guard + org guard + sidebar layout. Reads `context.authData`. All dashboard routes at root level
-- `_app/users` — member list + `$memberId` detail
-- `_app/roles` — role list + `create` + `$roleId` detail
-- `_app/settings` layout — settings sidebar + header
+- `_guest` layout — centered card wrapper for sign-in, sign-up, forgot/reset password, verify email, accept-invitation
+- `_onboarding` layout — auth guard only (no sidebar), reads `context.authData`, redirects to `/sign-in` if no session. Used for `/create-org` and `/select-org`
+- `_dashboard` layout — auth guard + org guard + sidebar layout. Reads `context.authData`. All dashboard routes at root level
+- `_dashboard/users` — member list + `$memberId` detail
+- `_dashboard/roles` — role list + `create` + `$roleId` detail
+- `_dashboard/settings` layout — settings sidebar + header
 
 ### Data Fetching Pattern
 
@@ -138,7 +138,7 @@ export const rolesListOptions = () => queryOptions({
 });
 
 // In route files — loader + component
-export const Route = createFileRoute('/_app/roles/')({
+export const Route = createFileRoute('/_dashboard/roles/')({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData(rolesListOptions()),
   component: RolesPage,

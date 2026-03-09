@@ -85,7 +85,14 @@
       "WebFetch(domain:www.answeroverflow.com)",
       "WebFetch(domain:dev.to)",
       "WebFetch(domain:npmpackage.info)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "WebFetch(domain:blog.cloudflare.com)",
+      "Bash(xargs sed:*)",
+      "Bash(for f in \"apps/app/src/routes/_dashboard/-components/dashboard-organization-switcher.tsx\" \"apps/app/src/routes/_dashboard/-components/dashboard-view.tsx\" \"apps/app/src/routes/_dashboard/index.tsx\" \"apps/app/src/routes/_dashboard/roles/$roleId.tsx\" \"apps/app/src/routes/_dashboard/roles/-components/role-detail.tsx\" \"apps/app/src/routes/_dashboard/roles/index.tsx\" \"apps/app/src/routes/_dashboard/users/$memberId.tsx\" \"apps/app/src/routes/_dashboard/users/-components/member-detail.tsx\" \"apps/app/src/routes/_onboarding/-components/select-organization-content.tsx\" \"apps/app/src/routes/_onboarding/select-org.tsx\")",
+      "Bash(do)",
+      "Read(//e/Projects/app-template/**)",
+      "Bash(done)",
+      "WebFetch(domain:oxc.rs)"
     ]
   }
 }

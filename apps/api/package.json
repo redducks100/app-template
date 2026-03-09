@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "wrangler deploy --dry-run --outdir=dist",
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --remote",
     "deploy:cf": "wrangler deploy",
     "db:migrate": "kysely migrate:latest",
     "db:migrate:up": "kysely migrate:up",
@@ -20,18 +20,19 @@
   "dependencies": {
     "@app/shared": "workspace:*",
     "@hono/zod-validator": "^0.5.0",
+    "@neondatabase/serverless": "^1.0.0",
     "@react-email/components": "^0.5.7",
     "better-auth": "catalog:",
+    "hono": "catalog:",
     "kysely": "^0.28.11",
     "kysely-neon": "^2.0.2",
-    "hono": "catalog:",
-    "@neondatabase/serverless": "^1.0.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "resend": "^6.3.0",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260305.1",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

@@ -1,37 +1,39 @@
 import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 import { getAuth } from "../lib/auth.js";
 import { authMiddleware } from "../middleware/auth.js";
-import { z } from "zod";
+import { ok } from "../lib/result.js";
+import { zv } from "../lib/validation.js";
 
 export const memberRoutes = new Hono()
   .use(authMiddleware)
-  .get("/list", async (c) => {
+  .get("/", async (c) => {
     const session = c.get("session");
     const organizationId = session.activeOrganizationId;
 
     if (!organizationId) {
-      return c.json({ error: "No active organization selected." }, 400);
+      throw new HTTPException(400, { message: "No active organization selected." });
     }
 
-    const response = await getAuth().api.listMembers({
+    const response = await getAuth(c.env.R2).api.listMembers({
       query: { organizationId },
       headers: c.req.raw.headers,
     });
 
-    return c.json(response, 200);
+    return ok(c, response);
   })
   .get("/permissions", async (c) => {
     const headers = c.req.raw.headers;
 
     const [canUpdate, canDelete] = await Promise.all([
-      getAuth()
+      getAuth(c.env.R2)
         .api.hasPermission({
           headers,
           body: { permissions: { member: ["update"] } },
         })
         .then((r) => r.success),
-      getAuth()
+      getAuth(c.env.R2)
         .api.hasPermission({
           headers,
           body: { permissions: { member: ["delete"] } },
@@ -39,60 +41,62 @@ export const memberRoutes = new Hono()
         .then((r) => r.success),
     ]);
 
-    return c.json({ canUpdate, canDelete }, 200);
+    return ok(c, { canUpdate, canDelete });
   })
-  .post(
-    "/update-role",
-    zValidator("json", z.object({ memberId: z.string(), role: z.string() })),
+  .patch(
+    "/:id/role",
+    zv("param", z.object({ id: z.string() })),
+    zv("json", z.object({ role: z.string() })),
     async (c) => {
       const session = c.get("session");
-      const input = c.req.valid("json");
+      const { id: memberId } = c.req.valid("param");
+      const { role } = c.req.valid("json");
       const organizationId = session.activeOrganizationId;
 
       if (!organizationId) {
-        return c.json({ error: "No active organization selected." }, 400);
+        throw new HTTPException(400, { message: "No active organization selected." });
       }
 
-      const response = await getAuth().api.updateMemberRole({
+      const response = await getAuth(c.env.R2).api.updateMemberRole({
         body: {
-          memberId: input.memberId,
-          role: input.role,
+          memberId,
+          role,
           organizationId,
         },
         headers: c.req.raw.headers,
       });
 
       if (!response) {
-        return c.json({ error: "Failed to update member role." }, 500);
+        throw new HTTPException(500, { message: "Failed to update member role." });
       }
 
-      return c.json(response, 200);
+      return ok(c, response);
     },
   )
-  .post(
-    "/remove",
-    zValidator("json", z.object({ memberIdOrEmail: z.string() })),
+  .delete(
+    "/:id",
+    zv("param", z.object({ id: z.string() })),
     async (c) => {
       const session = c.get("session");
-      const input = c.req.valid("json");
+      const { id: memberIdOrEmail } = c.req.valid("param");
       const organizationId = session.activeOrganizationId;
 
       if (!organizationId) {
-        return c.json({ error: "No active organization selected." }, 400);
+        throw new HTTPException(400, { message: "No active organization selected." });
       }
 
-      const response = await getAuth().api.removeMember({
+      const response = await getAuth(c.env.R2).api.removeMember({
         body: {
-          memberIdOrEmail: input.memberIdOrEmail,
+          memberIdOrEmail,
           organizationId,
         },
         headers: c.req.raw.headers,
       });
 
       if (!response) {
-        return c.json({ error: "Failed to remove member." }, 500);
+        throw new HTTPException(500, { message: "Failed to remove member." });
       }
 
-      return c.json(response, 200);
+      return ok(c, response);
     },
   );

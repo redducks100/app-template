@@ -4,6 +4,7 @@
     "composite": true,
     "noEmit": true,
     "rootDir": ".",
+    "types": ["@cloudflare/workers-types"],
     "paths": {
       "@/*": ["./*"]
     }
