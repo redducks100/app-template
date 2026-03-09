@@ -21,8 +21,6 @@ type CreateOrganizationViewProps = {
   canGoBack: boolean;
 };
 
-type FormData = z.infer<typeof createOrganizationSchema>;
-
 export const CreateOrganizationView = ({
   canGoBack,
 }: CreateOrganizationViewProps) => {
