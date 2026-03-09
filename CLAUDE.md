@@ -201,6 +201,6 @@ Two deployment environments via Wrangler `env` configs:
 - **Production** (`main` branch): Workers `api` + `app` → `api.enomisoft.com` / `app.enomisoft.com`
 - **Dev** (`dev` branch): Workers `api-dev` + `app-dev` → `api-dev.enomisoft.com` / `app-dev.enomisoft.com`
 
-Push to `dev` triggers `.github/workflows/deploy-dev.yml` which runs `pnpm deploy:dev`. The SPA dev build uses `--mode staging` to pick up `.env.staging` (`VITE_API_URL=https://api-dev.enomisoft.com`).
+Push to `dev` triggers `.github/workflows/deploy-dev.yml` which runs `pnpm deploy:dev`. CI passes `VITE_API_URL` explicitly as an environment variable for both dev and prod deploys (no `.env.staging` file needed).
 
 CI runs on PRs to both `main` and `dev`.
