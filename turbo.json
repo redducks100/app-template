@@ -1,8 +1,10 @@
 {
   "$schema": "https://turborepo.dev/schema.v2.json",
   "tasks": {
+    "//#lint": {},
+    "//#lint:fix": {},
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "//#lint:fix"],
       "outputs": ["dist/**"]
     },
     "dev": {
@@ -14,9 +16,15 @@
       "cache": false,
       "passThroughEnv": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
     },
-    "db:push": { "cache": false },
-    "db:generate": { "cache": false },
+    "deploy:cf:dev": {
+      "dependsOn": ["//#lint:fix"],
+      "cache": false,
+      "passThroughEnv": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
+    },
     "db:migrate": { "cache": false },
-    "db:studio": { "cache": false, "persistent": true }
+    "db:migrate:up": { "cache": false },
+    "db:migrate:down": { "cache": false },
+    "db:migrate:make": { "cache": false },
+    "db:migrate:list": { "cache": false }
   }
 }

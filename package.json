@@ -4,19 +4,23 @@
   "private": true,
   "packageManager": "pnpm@10.19.0",
   "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "prepare": "husky",
     "dev": "turbo run dev",
     "dev:app": "turbo run dev --filter=@app/app",
     "dev:api": "turbo run dev --filter=@app/api",
     "build": "turbo run build",
-    "deploy": "turbo run deploy:cf",
-    "deploy:api": "turbo run deploy:cf --filter=@app/api",
-    "deploy:app": "turbo run deploy:cf --filter=@app/app",
-    "db:push": "turbo run db:push --filter=@app/api",
-    "db:generate": "turbo run db:generate --filter=@app/api",
+    "deploy:dev": "turbo run deploy:cf:dev",
     "db:migrate": "turbo run db:migrate --filter=@app/api",
-    "db:studio": "turbo run db:studio --filter=@app/api"
+    "db:migrate:up": "turbo run db:migrate:up --filter=@app/api",
+    "db:migrate:down": "turbo run db:migrate:down --filter=@app/api",
+    "db:migrate:make": "turbo run db:migrate:make --filter=@app/api",
+    "db:migrate:list": "turbo run db:migrate:list --filter=@app/api"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "oxlint": "^1.51.0",
     "turbo": "^2.8.13",
     "typescript": "catalog:"
   }

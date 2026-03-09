@@ -8,13 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Dev server (app)**: `pnpm dev:app` (runs Vite SPA dev server on port 3000)
 - **Dev server (api)**: `pnpm dev:api` (runs Hono API worker on port 8787)
 - **Build**: `pnpm build` (builds all packages with dependency ordering and caching)
-- **Deploy (all)**: `pnpm deploy` (builds + deploys both app and api to Cloudflare Workers)
-- **Deploy (app)**: `pnpm deploy:app` (builds + deploys SPA to Cloudflare Workers)
-- **Deploy (api)**: `pnpm deploy:api` (builds + deploys API to Cloudflare Workers)
-- **DB push**: `pnpm db:push`
-- **DB generate migration**: `pnpm db:generate`
-- **DB migrate**: `pnpm db:migrate`
-- **DB studio**: `pnpm db:studio`
+- **Deploy dev**: `pnpm deploy:dev` (deploys both app and api to dev Cloudflare Workers)
+- **Deploy prod**: CI-only — push/merge to `main` triggers `.github/workflows/deploy.yml`
+- **DB migrate (latest)**: `pnpm db:migrate` (runs all pending migrations)
+- **DB migrate up**: `pnpm db:migrate:up` (runs next pending migration)
+- **DB migrate down**: `pnpm db:migrate:down` (rolls back last migration)
+- **DB migrate make**: `pnpm db:migrate:make` (scaffolds a new migration file)
+- **DB migrate list**: `pnpm db:migrate:list` (shows migration status)
 
 No test framework is configured.
 
@@ -30,7 +30,7 @@ No test framework is configured.
 - **Tailwind CSS 4** with oklch color variables and `tw-animate-css`
 - **TanStack React Query** for data fetching with Hono RPC client
 - **Better Auth** for authentication (email/password + Google OAuth, organizations plugin) with cross-subdomain cookies
-- **Drizzle ORM** with PostgreSQL
+- **Kysely** query builder with PostgreSQL (via `kysely-neon` for Cloudflare Workers)
 - **TanStack React Form** + Zod for form handling
 - **Resend** for transactional email via React Email templates
 - **react-i18next** for internationalization
@@ -59,9 +59,10 @@ Standalone Hono app deployed as a Cloudflare Worker. Routes are nested under `/a
 - `src/app.ts` — Hono app composition, exports `apiApp` (with `/api` prefix) and `AppType` (route-level types without `/api` for RPC client)
 - `src/routes/` — Hono RPC routes (organizations, invitations, members, roles, user)
 - `src/middleware/auth.ts` — Session auth middleware using `c.req.raw.headers`
-- `src/lib/auth.ts` — Better Auth server config with Drizzle adapter, cross-subdomain cookies
-- `src/lib/db.ts` — Drizzle connection
-- `src/db/schema.ts` — Drizzle schema
+- `src/lib/auth.ts` — Better Auth server config with Kysely dialect, cross-subdomain cookies
+- `src/lib/db.ts` — Kysely connection (NeonDialect)
+- `src/db/types.ts` — Kysely Database interface (table types)
+- `src/db/migrations/` — Kysely migrations with up/down functions
 - `src/emails/` — React Email templates sent via Resend
 - `wrangler.jsonc` — Cloudflare Workers config
 - `.dev.vars` — Local dev secrets (gitignored)
@@ -98,7 +99,7 @@ Client-only SPA using TanStack Router, deployed to Cloudflare Workers with Stati
 Feature-specific components are co-located with their route files using TanStack Router's `-components/` convention:
 
 ```
-src/routes/_app/
+src/routes/_dashboard/
 ├── roles/
 │   ├── index.tsx              # /roles route
 │   ├── create.tsx             # /roles/create route
@@ -116,12 +117,12 @@ src/routes/_app/
 ### Routing
 
 - `__root` — fetches auth session once via `authClient.getSession()`, passes `authData` through context
-- `_auth` layout — centered card wrapper for sign-in, sign-up, forgot/reset password, verify email, accept-invitation
-- `_protected` layout — auth guard only (no sidebar), reads `context.authData`, redirects to `/sign-in` if no session. Used for `/create-org` and `/select-org`
-- `_app` layout — auth guard + org guard + sidebar layout. Reads `context.authData`. All dashboard routes at root level
-- `_app/users` — member list + `$memberId` detail
-- `_app/roles` — role list + `create` + `$roleId` detail
-- `_app/settings` layout — settings sidebar + header
+- `_guest` layout — centered card wrapper for sign-in, sign-up, forgot/reset password, verify email, accept-invitation
+- `_onboarding` layout — auth guard only (no sidebar), reads `context.authData`, redirects to `/sign-in` if no session. Used for `/create-org` and `/select-org`
+- `_dashboard` layout — auth guard + org guard + sidebar layout. Reads `context.authData`. All dashboard routes at root level
+- `_dashboard/users` — member list + `$memberId` detail
+- `_dashboard/roles` — role list + `create` + `$roleId` detail
+- `_dashboard/settings` layout — settings sidebar + header
 
 ### Data Fetching Pattern
 
@@ -136,7 +137,7 @@ export const rolesListOptions = () => queryOptions({
 });
 
 // In route files — loader + component
-export const Route = createFileRoute('/_app/roles/')({
+export const Route = createFileRoute('/_dashboard/roles/')({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData(rolesListOptions()),
   component: RolesPage,
@@ -178,12 +179,28 @@ Turborepo orchestrates builds, dev servers, and deploys across the monorepo. Con
 
 ### API Worker (wrangler vars/secrets)
 Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `COOKIE_DOMAIN`.
+Optional: `SENTRY_DSN` (enables Sentry error tracking in production; omit for local dev).
 
 ### SPA (Cloudflare Workers, build-time)
 Required: `VITE_API_URL` (baked into bundle, e.g. `https://api.enomisoft.com`).
+
+### CI / GitHub Secrets
+Required: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` (prod Neon connection string), `DATABASE_URL_DEV` (dev Neon connection string).
+CI deploy workflows run `pnpm db:migrate` before deploying, using the appropriate `DATABASE_URL` secret.
 
 ### Local Development
 - API runs on `localhost:8787` (via `wrangler dev`)
 - SPA runs on `localhost:3000` (via `vite dev`)
 - SPA defaults `VITE_API_URL` to `http://localhost:8787`
 - Cross-origin cookies work on localhost because same-site (port doesn't matter)
+
+## Environments (Dev / Prod)
+
+Two deployment environments via Wrangler `env` configs:
+
+- **Production** (`main` branch): Workers `api` + `app` → `api.enomisoft.com` / `app.enomisoft.com`
+- **Dev** (`dev` branch): Workers `api-dev` + `app-dev` → `api-dev.enomisoft.com` / `app-dev.enomisoft.com`
+
+Push to `dev` triggers `.github/workflows/deploy-dev.yml` which runs `pnpm deploy:dev`. The SPA dev build uses `--mode staging` to pick up `.env.staging` (`VITE_API_URL=https://api-dev.enomisoft.com`).
+
+CI runs on PRs to both `main` and `dev`.

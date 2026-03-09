@@ -1,12 +1,16 @@
+import { Kysely } from "kysely";
+import { NeonDialect } from "kysely-neon";
 import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import * as schema from "../db/schema.js";
+import type { Database } from "../db/types.js";
 
-let _db: ReturnType<typeof createDb>;
+let _db: Kysely<Database>;
 
 function createDb() {
-  const sql = neon(process.env.DATABASE_URL!);
-  return drizzle(sql, { schema });
+  return new Kysely<Database>({
+    dialect: new NeonDialect({
+      neon: neon(process.env.DATABASE_URL!),
+    }),
+  });
 }
 
 export function getDb() {

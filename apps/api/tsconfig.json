@@ -4,10 +4,11 @@
     "composite": true,
     "noEmit": true,
     "rootDir": ".",
+    "types": ["@cloudflare/workers-types"],
     "paths": {
       "@/*": ["./*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "drizzle.config.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "kysely.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

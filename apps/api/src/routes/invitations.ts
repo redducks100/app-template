@@ -1,108 +1,125 @@
 import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
-import { eq } from "drizzle-orm";
-import { invitation } from "../db/schema.js";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 import { getAuth } from "../lib/auth.js";
 import { getDb } from "../lib/db.js";
 import { authMiddleware } from "../middleware/auth.js";
+import { ok } from "../lib/result.js";
+import { zv } from "../lib/validation.js";
 import { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
-import { z } from "zod";
 
 export const invitationRoutes = new Hono()
   .get(
-    "/get/:id",
-    zValidator("param", z.object({ id: z.string() })),
+    "/:id",
+    zv("param", z.object({ id: z.string() })),
     async (c) => {
       const { id } = c.req.valid("param");
-      const result = await getDb().query.invitation.findFirst({
-        where: eq(invitation.id, id),
-        with: { inviter: true, organization: true },
-      });
+      const result = await getDb()
+        .selectFrom("invitation")
+        .innerJoin("user", "user.id", "invitation.inviterId")
+        .innerJoin(
+          "organization",
+          "organization.id",
+          "invitation.organizationId",
+        )
+        .select([
+          "invitation.id",
+          "invitation.organizationId",
+          "invitation.email",
+          "invitation.role",
+          "invitation.status",
+          "invitation.expiresAt",
+          "invitation.inviterId",
+          "user.name as inviterName",
+          "user.email as inviterEmail",
+          "user.image as inviterImage",
+          "organization.name as organizationName",
+          "organization.slug as organizationSlug",
+          "organization.logo as organizationLogo",
+        ])
+        .where("invitation.id", "=", id)
+        .executeTakeFirst();
 
       if (!result) {
-        return c.json({ error: "Invitation not found" }, 404);
+        throw new HTTPException(404, { message: "Invitation not found" });
       }
 
-      return c.json(result, 200);
-    }
+      return ok(c, {
+        ...result,
+        inviter: {
+          id: result.inviterId,
+          name: result.inviterName,
+          email: result.inviterEmail,
+          image: result.inviterImage,
+        },
+        organization: {
+          id: result.organizationId,
+          name: result.organizationName,
+          slug: result.organizationSlug,
+          logo: result.organizationLogo,
+        },
+      });
+    },
   )
   .use(authMiddleware)
-  .get("/list", async (c) => {
+  .get("/", async (c) => {
     const session = c.get("session");
     const organizationId = session.activeOrganizationId;
 
     if (!organizationId) {
-      return c.json(
-        { error: "No active organization selected." },
-        400
-      );
+      throw new HTTPException(400, { message: "No active organization selected." });
     }
 
-    const response = await getAuth().api.listInvitations({
+    const response = await getAuth(c.env.R2).api.listInvitations({
       query: { organizationId },
       headers: c.req.raw.headers,
     });
 
-    return c.json(response, 200);
+    return ok(c, response);
   })
-  .post(
-    "/create",
-    zValidator("json", createInvitationSchema),
-    async (c) => {
-      const session = c.get("session");
-      const input = c.req.valid("json");
-      const organizationId = session.activeOrganizationId;
+  .post("/", zv("json", createInvitationSchema), async (c) => {
+    const session = c.get("session");
+    const input = c.req.valid("json");
+    const organizationId = session.activeOrganizationId;
 
-      if (!organizationId) {
-        return c.json(
-          { error: "No active organization selected." },
-          400
-        );
-      }
-
-      const response = await getAuth().api.createInvitation({
-        body: {
-          email: input.email,
-          role: input.role as "admin" | "member" | "owner",
-          organizationId,
-        },
-        headers: c.req.raw.headers,
-      });
-
-      if (!response) {
-        return c.json(
-          {
-            error:
-              "Something went wrong while creating the invitation.",
-          },
-          500
-        );
-      }
-
-      return c.json(response, 201);
+    if (!organizationId) {
+      throw new HTTPException(400, { message: "No active organization selected." });
     }
-  )
-  .post(
-    "/cancel",
-    zValidator("json", z.object({ invitationId: z.string() })),
-    async (c) => {
-      const { invitationId } = c.req.valid("json");
 
-      const response = await getAuth().api.cancelInvitation({
+    const response = await getAuth(c.env.R2).api.createInvitation({
+      body: {
+        email: input.email,
+        role: input.role as "admin" | "member" | "owner",
+        organizationId,
+      },
+      headers: c.req.raw.headers,
+    });
+
+    if (!response) {
+      throw new HTTPException(500, {
+        message: "Something went wrong while creating the invitation.",
+      });
+    }
+
+    return ok(c, response, 201);
+  })
+  .delete(
+    "/:id",
+    zv("param", z.object({ id: z.string() })),
+    async (c) => {
+      const { id: invitationId } = c.req.valid("param");
+
+      const response = await getAuth(c.env.R2).api.cancelInvitation({
         body: { invitationId },
         headers: c.req.raw.headers,
       });
 
       if (!response) {
-        return c.json(
-          {
-            error:
-              "Something went wrong while canceling the invitation.",
-          },
-          500
-        );
+        throw new HTTPException(500, {
+          message: "Something went wrong while canceling the invitation.",
+        });
       }
 
-      return c.json(response, 200);
-    }
+      return ok(c, response);
+    },
   );

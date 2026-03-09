@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const updateOrganizationSchema = z.object({
-  organizationId: z.string(),
   name: z.string().min(4, { message: "Name is required" }),
   slug: z
     .string()

@@ -1,12 +1,14 @@
 import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 import { getAuth } from "../lib/auth.js";
 import { authMiddleware } from "../middleware/auth.js";
+import { ok } from "../lib/result.js";
+import { zv } from "../lib/validation.js";
 import { owner, admin, member } from "@app/shared/permissions";
 import {
   createRoleSchema,
   updateRoleSchema,
-  deleteRoleSchema,
 } from "@app/shared/schemas/create-role-schema";
 import type { RoleData } from "@app/shared/types/roles";
 
@@ -33,16 +35,16 @@ const staticRoles: RoleData[] = [
 
 export const roleRoutes = new Hono()
   .use(authMiddleware)
-  .get("/list", async (c) => {
+  .get("/", async (c) => {
     const session = c.get("session");
     const organizationId = session.activeOrganizationId;
 
     if (!organizationId) {
-      return c.json(staticRoles, 200);
+      return ok(c, staticRoles);
     }
 
     try {
-      const dynamicRoles = await getAuth().api.listOrgRoles({
+      const dynamicRoles = await getAuth(c.env.R2).api.listOrgRoles({
         query: { organizationId },
         headers: c.req.raw.headers,
       });
@@ -56,60 +58,52 @@ export const roleRoutes = new Hono()
         createdAt: r.createdAt,
       }));
 
-      return c.json([...staticRoles, ...dynamicRoleData], 200);
+      return ok(c, [...staticRoles, ...dynamicRoleData]);
     } catch {
-      return c.json(staticRoles, 200);
+      return ok(c, staticRoles);
     }
   })
-  .post(
-    "/create",
-    zValidator("json", createRoleSchema),
-    async (c) => {
-      const session = c.get("session");
-      const input = c.req.valid("json");
-      const organizationId = session.activeOrganizationId;
+  .post("/", zv("json", createRoleSchema), async (c) => {
+    const session = c.get("session");
+    const input = c.req.valid("json");
+    const organizationId = session.activeOrganizationId;
 
-      if (!organizationId) {
-        return c.json(
-          { error: "No active organization selected." },
-          400
-        );
-      }
-
-      const response = await getAuth().api.createOrgRole({
-        body: {
-          role: input.name,
-          permission: input.permission,
-          organizationId,
-        },
-        headers: c.req.raw.headers,
-      });
-
-      if (!response) {
-        return c.json({ error: "Failed to create role." }, 500);
-      }
-
-      return c.json(response, 201);
+    if (!organizationId) {
+      throw new HTTPException(400, { message: "No active organization selected." });
     }
-  )
-  .post(
-    "/update",
-    zValidator("json", updateRoleSchema),
+
+    const response = await getAuth(c.env.R2).api.createOrgRole({
+      body: {
+        role: input.name,
+        permission: input.permission,
+        organizationId,
+      },
+      headers: c.req.raw.headers,
+    });
+
+    if (!response) {
+      throw new HTTPException(500, { message: "Failed to create role." });
+    }
+
+    return ok(c, response, 201);
+  })
+  .patch(
+    "/:id",
+    zv("param", z.object({ id: z.string() })),
+    zv("json", updateRoleSchema),
     async (c) => {
       const session = c.get("session");
+      const { id: roleId } = c.req.valid("param");
       const input = c.req.valid("json");
       const organizationId = session.activeOrganizationId;
 
       if (!organizationId) {
-        return c.json(
-          { error: "No active organization selected." },
-          400
-        );
+        throw new HTTPException(400, { message: "No active organization selected." });
       }
 
-      const response = await getAuth().api.updateOrgRole({
+      const response = await getAuth(c.env.R2).api.updateOrgRole({
         body: {
-          roleId: input.roleId,
+          roleId,
           organizationId,
           data: input.data,
         },
@@ -117,36 +111,33 @@ export const roleRoutes = new Hono()
       });
 
       if (!response) {
-        return c.json({ error: "Failed to update role." }, 500);
+        throw new HTTPException(500, { message: "Failed to update role." });
       }
 
-      return c.json(response, 200);
-    }
+      return ok(c, response);
+    },
   )
-  .post(
-    "/delete",
-    zValidator("json", deleteRoleSchema),
+  .delete(
+    "/:id",
+    zv("param", z.object({ id: z.string() })),
     async (c) => {
       const session = c.get("session");
-      const input = c.req.valid("json");
+      const { id: roleId } = c.req.valid("param");
       const organizationId = session.activeOrganizationId;
 
       if (!organizationId) {
-        return c.json(
-          { error: "No active organization selected." },
-          400
-        );
+        throw new HTTPException(400, { message: "No active organization selected." });
       }
 
-      const response = await getAuth().api.deleteOrgRole({
-        body: { roleId: input.roleId, organizationId },
+      const response = await getAuth(c.env.R2).api.deleteOrgRole({
+        body: { roleId, organizationId },
         headers: c.req.raw.headers,
       });
 
       if (!response) {
-        return c.json({ error: "Failed to delete role." }, 500);
+        throw new HTTPException(500, { message: "Failed to delete role." });
       }
 
-      return c.json(response, 200);
-    }
+      return ok(c, response);
+    },
   );
