@@ -6,7 +6,8 @@
   "exports": {
     "./schemas/*": "./src/schemas/*.ts",
     "./types/*": "./src/types/*.ts",
-    "./permissions": "./src/permissions.ts"
+    "./permissions": "./src/permissions.ts",
+    "./logger": "./src/logger.ts"
   },
   "dependencies": {
     "better-auth": "catalog:",

@@ -8,9 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Dev server (app)**: `pnpm dev:app` (runs Vite SPA dev server on port 3000)
 - **Dev server (api)**: `pnpm dev:api` (runs Hono API worker on port 8787)
 - **Build**: `pnpm build` (builds all packages with dependency ordering and caching)
-- **Deploy (all)**: `pnpm deploy` (builds + deploys both app and api to Cloudflare Workers)
-- **Deploy (app)**: `pnpm deploy:app` (builds + deploys SPA to Cloudflare Workers)
-- **Deploy (api)**: `pnpm deploy:api` (builds + deploys API to Cloudflare Workers)
+- **Deploy dev**: `pnpm deploy:dev` (deploys both app and api to dev Cloudflare Workers)
+- **Deploy prod**: CI-only — push/merge to `main` triggers `.github/workflows/deploy.yml`
 - **DB migrate (latest)**: `pnpm db:migrate` (runs all pending migrations)
 - **DB migrate up**: `pnpm db:migrate:up` (runs next pending migration)
 - **DB migrate down**: `pnpm db:migrate:down` (rolls back last migration)
@@ -180,12 +179,28 @@ Turborepo orchestrates builds, dev servers, and deploys across the monorepo. Con
 
 ### API Worker (wrangler vars/secrets)
 Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `COOKIE_DOMAIN`.
+Optional: `SENTRY_DSN` (enables Sentry error tracking in production; omit for local dev).
 
 ### SPA (Cloudflare Workers, build-time)
 Required: `VITE_API_URL` (baked into bundle, e.g. `https://api.enomisoft.com`).
+
+### CI / GitHub Secrets
+Required: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` (prod Neon connection string), `DATABASE_URL_DEV` (dev Neon connection string).
+CI deploy workflows run `pnpm db:migrate` before deploying, using the appropriate `DATABASE_URL` secret.
 
 ### Local Development
 - API runs on `localhost:8787` (via `wrangler dev`)
 - SPA runs on `localhost:3000` (via `vite dev`)
 - SPA defaults `VITE_API_URL` to `http://localhost:8787`
 - Cross-origin cookies work on localhost because same-site (port doesn't matter)
+
+## Environments (Dev / Prod)
+
+Two deployment environments via Wrangler `env` configs:
+
+- **Production** (`main` branch): Workers `api` + `app` → `api.enomisoft.com` / `app.enomisoft.com`
+- **Dev** (`dev` branch): Workers `api-dev` + `app-dev` → `api-dev.enomisoft.com` / `app-dev.enomisoft.com`
+
+Push to `dev` triggers `.github/workflows/deploy-dev.yml` which runs `pnpm deploy:dev`. The SPA dev build uses `--mode staging` to pick up `.env.staging` (`VITE_API_URL=https://api-dev.enomisoft.com`).
+
+CI runs on PRs to both `main` and `dev`.

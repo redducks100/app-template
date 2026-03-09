@@ -5,6 +5,7 @@
   "compatibility_date": "2026-02-26",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
+  "upload_source_maps": true,
   "observability": {
     "enabled": true,
   },
@@ -20,4 +21,18 @@
     "COOKIE_DOMAIN": ".enomisoft.com",
     "ASSETS_URL": "https://assets.enomisoft.com"
   },
+  "env": {
+    "dev": {
+      "name": "api-dev",
+      "r2_buckets": [
+        { "binding": "R2", "bucket_name": "app-storage-dev" }
+      ],
+      "vars": {
+        "APP_URL": "https://app-dev.enomisoft.com",
+        "BETTER_AUTH_URL": "https://api-dev.enomisoft.com",
+        "COOKIE_DOMAIN": ".enomisoft.com",
+        "ASSETS_URL": "https://assets-dev.enomisoft.com"
+      }
+    }
+  }
 }

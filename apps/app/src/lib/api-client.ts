@@ -1,5 +1,6 @@
 import { hc } from "hono/client";
 import type { AppType } from "@app/api";
+import { getLogger } from "@app/shared/logger";
 
 import type {
   ApiError,
@@ -27,6 +28,7 @@ export const callRPC = async <T>(
     const res = await data.json();
     return res as UnwrapResponse<T>;
   } catch (error) {
+    getLogger().error(error as Error, { source: "callRPC" });
     const message = (error as Error).message;
     return { success: false, error: { message } } as UnwrapResponse<T>;
   }

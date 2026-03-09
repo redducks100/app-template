@@ -92,7 +92,8 @@
       "Bash(do)",
       "Read(//e/Projects/app-template/**)",
       "Bash(done)",
-      "WebFetch(domain:oxc.rs)"
+      "WebFetch(domain:oxc.rs)",
+      "WebFetch(domain:docs.sentry.io)"
     ]
   }
 }
