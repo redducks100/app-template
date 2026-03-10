@@ -1,17 +1,14 @@
 import { buttonVariants } from "@/components/ui/button";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
 import { RolesDataTable } from "./roles-data-table";
-import { activeOrganizationOptions } from "@/lib/query-options/organizations";
+import { useRolePermissions } from "@/lib/hooks/use-permissions";
 
 export const RolesSection = () => {
   const { t } = useTranslation("roles");
 
-  const { data: activeOrg } = useSuspenseQuery(activeOrganizationOptions());
-
-  const isOwner = activeOrg?.role === "owner";
+  const { canCreate } = useRolePermissions();
 
   return (
     <div className="space-y-6 animate-in-page">
@@ -22,7 +19,7 @@ export const RolesSection = () => {
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">{t("permissionsDescription")}</p>
         </div>
-        {isOwner && (
+        {canCreate && (
           <Link
             to="/roles/create"
             className={buttonVariants({ size: "sm" })}

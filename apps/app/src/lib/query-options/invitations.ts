@@ -22,3 +22,13 @@ export const invitationsListOptions = () =>
       return res.data;
     },
   });
+
+export const invitationPermissionsOptions = () =>
+  queryOptions({
+    queryKey: ["invitations", "permissions"],
+    queryFn: async () => {
+      const res = await callRPC(apiClient.invitations.permissions.$get());
+      if (!res.success) throw new Error(res.error.message);
+      return res.data;
+    },
+  });

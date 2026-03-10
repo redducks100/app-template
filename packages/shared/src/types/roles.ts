@@ -13,12 +13,53 @@ export const PERMISSION_MAP: Record<string, string[]> = {
   organization: ["read", "update", "delete"],
   member: ["read", "create", "update", "delete"],
   invitation: ["read", "create", "cancel"],
+  role: ["read", "create", "update", "delete"],
+  billing: ["read", "update"],
+  audit_log: ["read"],
 };
 
 export const RESOURCE_TRANSLATION_KEY: Record<string, string> = {
   organization: "organization",
   member: "members",
   invitation: "invitations",
+  role: "roles",
+  billing: "billing",
+  audit_log: "auditLog",
+};
+
+export const PERMISSION_GROUPS: { key: string; resources: string[] }[] = [
+  {
+    key: "organizationManagement",
+    resources: ["organization", "role"],
+  },
+  {
+    key: "peopleManagement",
+    resources: ["member", "invitation"],
+  },
+  {
+    key: "billingAndLogs",
+    resources: ["billing", "audit_log"],
+  },
+];
+
+export const PERMISSION_DESCRIPTIONS: Record<string, string> = {
+  "organization:read": "permissionDesc.organizationRead",
+  "organization:update": "permissionDesc.organizationUpdate",
+  "organization:delete": "permissionDesc.organizationDelete",
+  "member:read": "permissionDesc.memberRead",
+  "member:create": "permissionDesc.memberCreate",
+  "member:update": "permissionDesc.memberUpdate",
+  "member:delete": "permissionDesc.memberDelete",
+  "invitation:read": "permissionDesc.invitationRead",
+  "invitation:create": "permissionDesc.invitationCreate",
+  "invitation:cancel": "permissionDesc.invitationCancel",
+  "role:read": "permissionDesc.roleRead",
+  "role:create": "permissionDesc.roleCreate",
+  "role:update": "permissionDesc.roleUpdate",
+  "role:delete": "permissionDesc.roleDelete",
+  "billing:read": "permissionDesc.billingRead",
+  "billing:update": "permissionDesc.billingUpdate",
+  "audit_log:read": "permissionDesc.auditLogRead",
 };
 
 export function toRolePermissions(flat: string[]): RolePermissions {

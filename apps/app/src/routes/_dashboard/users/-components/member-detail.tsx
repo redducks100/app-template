@@ -167,6 +167,7 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
                   onValueChange={(v) => {
                     if (v) setSelectedRole(v);
                   }}
+                  items={availableRoles.map((r) => ({ value: r.role, label: r.role }))}
                 >
                   <SelectTrigger className="w-40">
                     <SelectValue />

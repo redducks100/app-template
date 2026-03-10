@@ -77,6 +77,26 @@ export const invitationRoutes = new Hono()
 
     return ok(c, response);
   })
+  .get("/permissions", async (c) => {
+    const headers = c.req.raw.headers;
+
+    const [canCreate, canCancel] = await Promise.all([
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { invitation: ["create"] } },
+        })
+        .then((r) => r.success),
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { invitation: ["cancel"] } },
+        })
+        .then((r) => r.success),
+    ]);
+
+    return ok(c, { canCreate, canCancel });
+  })
   .post("/", zv("json", createInvitationSchema), async (c) => {
     const session = c.get("session");
     const input = c.req.valid("json");
@@ -89,7 +109,7 @@ export const invitationRoutes = new Hono()
     const response = await getAuth(c.env.R2).api.createInvitation({
       body: {
         email: input.email,
-        role: input.role as "admin" | "member" | "owner",
+        role: input.role,
         organizationId,
       },
       headers: c.req.raw.headers,

@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { fromRolePermissions, toRolePermissions } from "@app/shared/types/roles";
 import { PermissionEditor } from "./permission-editor";
 import { rolesListOptions } from "@/lib/query-options/roles";
-import { activeOrganizationOptions } from "@/lib/query-options/organizations";
+import { useRolePermissions } from "@/lib/hooks/use-permissions";
 import {
   updateRole as updateRoleMutation,
   deleteRole as deleteRoleMutation,
@@ -31,11 +31,10 @@ export const RoleDetail = ({ roleId }: RoleDetailProps) => {
 
   const { data: roles } = useSuspenseQuery(rolesListOptions());
 
-  const { data: activeOrg } = useSuspenseQuery(activeOrganizationOptions());
+  const { canUpdate, canDelete } = useRolePermissions();
 
   const role = roles.find((r) => r.id === roleId);
-  const isOwner = activeOrg?.role === "owner";
-  const isEditable = role && !role.isDefault && isOwner;
+  const isEditable = role && !role.isDefault && canUpdate;
 
   const [permissions, setPermissions] = useState<string[]>(
     role ? fromRolePermissions(role.permission) : [],
@@ -125,21 +124,23 @@ export const RoleDetail = ({ roleId }: RoleDetailProps) => {
           >
             {t("saveChanges")}
           </Button>
-          <ConfirmDialog
-            title={t("deleteConfirmTitle")}
-            description={t("deleteConfirm")}
-            confirmLabel={t("delete")}
-            cancelLabel={t("cancel")}
-            variant="destructive"
-            onConfirm={() => deleteRole.mutate({ roleId: role.id })}
-          >
-            <Button
+          {canDelete && (
+            <ConfirmDialog
+              title={t("deleteConfirmTitle")}
+              description={t("deleteConfirm")}
+              confirmLabel={t("delete")}
+              cancelLabel={t("cancel")}
               variant="destructive"
-              disabled={deleteRole.isPending}
+              onConfirm={() => deleteRole.mutate({ roleId: role.id })}
             >
-              {t("deleteRole")}
-            </Button>
-          </ConfirmDialog>
+              <Button
+                variant="destructive"
+                disabled={deleteRole.isPending}
+              >
+                {t("deleteRole")}
+              </Button>
+            </ConfirmDialog>
+          )}
         </div>
       )}
     </div>

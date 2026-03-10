@@ -10,3 +10,13 @@ export const rolesListOptions = () =>
       return res.data;
     },
   });
+
+export const rolePermissionsOptions = () =>
+  queryOptions({
+    queryKey: ["roles", "permissions"],
+    queryFn: async () => {
+      const res = await callRPC(apiClient.roles.permissions.$get());
+      if (!res.success) throw new Error(res.error.message);
+      return res.data;
+    },
+  });

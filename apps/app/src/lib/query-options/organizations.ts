@@ -20,3 +20,13 @@ export const activeOrganizationOptions = () =>
       return res.data;
     },
   });
+
+export const organizationPermissionsOptions = () =>
+  queryOptions({
+    queryKey: ["organizations", "permissions"],
+    queryFn: async () => {
+      const res = await callRPC(apiClient.organizations.permissions.$get());
+      if (!res.success) throw new Error(res.error.message);
+      return res.data;
+    },
+  });

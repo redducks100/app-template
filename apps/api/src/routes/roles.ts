@@ -63,6 +63,32 @@ export const roleRoutes = new Hono()
       return ok(c, staticRoles);
     }
   })
+  .get("/permissions", async (c) => {
+    const headers = c.req.raw.headers;
+
+    const [canCreate, canUpdate, canDelete] = await Promise.all([
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { role: ["create"] } },
+        })
+        .then((r) => r.success),
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { role: ["update"] } },
+        })
+        .then((r) => r.success),
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { role: ["delete"] } },
+        })
+        .then((r) => r.success),
+    ]);
+
+    return ok(c, { canCreate, canUpdate, canDelete });
+  })
   .post("/", zv("json", createRoleSchema), async (c) => {
     const session = c.get("session");
     const input = c.req.valid("json");
@@ -70,6 +96,15 @@ export const roleRoutes = new Hono()
 
     if (!organizationId) {
       throw new HTTPException(400, { message: "No active organization selected." });
+    }
+
+    const hasPermission = await getAuth(c.env.R2).api.hasPermission({
+      headers: c.req.raw.headers,
+      body: { permissions: { role: ["create"] } },
+    });
+
+    if (!hasPermission.success) {
+      throw new HTTPException(403, { message: "You do not have permission to create roles." });
     }
 
     const response = await getAuth(c.env.R2).api.createOrgRole({
@@ -101,6 +136,15 @@ export const roleRoutes = new Hono()
         throw new HTTPException(400, { message: "No active organization selected." });
       }
 
+      const hasPermission = await getAuth(c.env.R2).api.hasPermission({
+        headers: c.req.raw.headers,
+        body: { permissions: { role: ["update"] } },
+      });
+
+      if (!hasPermission.success) {
+        throw new HTTPException(403, { message: "You do not have permission to update roles." });
+      }
+
       const response = await getAuth(c.env.R2).api.updateOrgRole({
         body: {
           roleId,
@@ -127,6 +171,15 @@ export const roleRoutes = new Hono()
 
       if (!organizationId) {
         throw new HTTPException(400, { message: "No active organization selected." });
+      }
+
+      const hasPermission = await getAuth(c.env.R2).api.hasPermission({
+        headers: c.req.raw.headers,
+        body: { permissions: { role: ["delete"] } },
+      });
+
+      if (!hasPermission.success) {
+        throw new HTTPException(403, { message: "You do not have permission to delete roles." });
       }
 
       const response = await getAuth(c.env.R2).api.deleteOrgRole({

@@ -26,8 +26,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { createRoleColumns } from "./roles-columns";
 import { rolesListOptions } from "@/lib/query-options/roles";
-import { activeOrganizationOptions } from "@/lib/query-options/organizations";
 import { deleteRole as deleteRoleMutation } from "@/lib/mutations/roles";
+import { useRolePermissions } from "@/lib/hooks/use-permissions";
 import { ShieldIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
@@ -41,9 +41,7 @@ export const RolesDataTable = () => {
 
   const { data: roles } = useSuspenseQuery(rolesListOptions());
 
-  const { data: activeOrg } = useSuspenseQuery(activeOrganizationOptions());
-
-  const isOwner = activeOrg?.role === "owner";
+  const { canCreate, canDelete } = useRolePermissions();
 
   const invalidateRoles = async () => {
     await queryClient.invalidateQueries({ queryKey: ["roles", "list"] });
@@ -60,7 +58,7 @@ export const RolesDataTable = () => {
   const columns = createRoleColumns(
     (roleId) => deleteRole.mutate({ roleId }),
     deleteRole.isPending,
-    isOwner,
+    canDelete,
     t,
   );
 
@@ -84,7 +82,7 @@ export const RolesDataTable = () => {
           </div>
           <h3 className="mt-4 text-sm font-medium">{t("emptyState")}</h3>
           <p className="mt-1 text-xs text-muted-foreground">{t("noCustomRoles")}</p>
-          {isOwner && (
+          {canCreate && (
             <Link to="/roles/create">
               <Button size="sm" className="mt-4">
                 <PlusIcon className="size-4" />

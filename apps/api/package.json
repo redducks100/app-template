@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "wrangler deploy --dry-run --outdir=dist",
-    "dev": "wrangler dev --remote",
+    "dev": "wrangler dev",
     "deploy:cf": "wrangler deploy",
     "db:migrate": "kysely migrate:latest",
     "db:migrate:up": "kysely migrate:up",

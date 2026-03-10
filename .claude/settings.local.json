@@ -94,7 +94,13 @@
       "Bash(done)",
       "WebFetch(domain:oxc.rs)",
       "WebFetch(domain:docs.sentry.io)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Bash(ls /c/Python*/python.exe)",
+      "Read(//c/Users/devsi/AppData/Local/Programs/**)",
+      "Bash(\"/c/Users/devsi/AppData/Local/Microsoft/WindowsApps/python.exe\":*)"
     ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
   }
 }

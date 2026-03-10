@@ -1,19 +1,35 @@
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   BuildingIcon,
   ChartBarIcon,
+  ChevronRightIcon,
   CogIcon,
+  InfoIcon,
   LayoutDashboardIcon,
   MailsIcon,
   ShieldIcon,
@@ -32,6 +48,7 @@ export const DashboardSidebar = ({
   const { t } = useTranslation("dashboard");
   const { t: tCommon } = useTranslation("common");
   const matchRoute = useMatchRoute();
+  const { state } = useSidebar();
 
   const isSettingsActive = !!matchRoute({ to: "/settings", fuzzy: true });
 
@@ -40,12 +57,16 @@ export const DashboardSidebar = ({
     { title: t("sidebar.analytics"), url: "#", icon: ChartBarIcon },
   ];
 
-  const organizationItems = [
-    { title: t("sidebar.organization"), url: "/organization", icon: BuildingIcon },
+  const organizationSubItems = [
+    { title: t("sidebar.general"), url: "/organization", icon: InfoIcon },
     { title: t("sidebar.invitations"), url: "/invitations", icon: MailsIcon },
     { title: t("sidebar.roles"), url: "/roles", icon: ShieldIcon },
     { title: t("sidebar.users"), url: "/users", icon: UsersIcon },
   ];
+
+  const isOrgSectionActive = organizationSubItems.some(
+    (item) => !!matchRoute({ to: item.url, fuzzy: true }),
+  );
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -79,29 +100,67 @@ export const DashboardSidebar = ({
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Organization group */}
+        {/* Organization group — collapsible / dropdown */}
         <SidebarGroup>
-          <SidebarGroupLabel>{t("sidebar.organizationSection")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {organizationItems.map((item) => {
-                const isActive = !!matchRoute({ to: item.url, fuzzy: true });
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      tooltip={item.title}
-                      isActive={isActive}
-                      className={isActive ? activeClass : ""}
+              <SidebarMenuItem>
+                {state === "collapsed" ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
                       render={
-                        <Link to={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </Link>
+                        <SidebarMenuButton>
+                          <BuildingIcon />
+                        </SidebarMenuButton>
                       }
                     />
-                  </SidebarMenuItem>
-                );
-              })}
+                    <DropdownMenuContent side="right" sideOffset={4} align="start">
+                      {organizationSubItems.map((item) => (
+                        <DropdownMenuItem key={item.url} render={<Link to={item.url} />}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Collapsible
+                    defaultOpen={isOrgSectionActive}
+                    className="group/collapsible"
+                  >
+                    <CollapsibleTrigger
+                      render={
+                        <SidebarMenuButton tooltip={t("sidebar.organizationSection")}>
+                          <BuildingIcon />
+                          <span>{t("sidebar.organizationSection")}</span>
+                          <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      }
+                    />
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {organizationSubItems.map((item) => {
+                          const isActive = !!matchRoute({ to: item.url, fuzzy: true });
+                          return (
+                            <SidebarMenuSubItem key={item.url}>
+                              <SidebarMenuSubButton
+                                isActive={isActive}
+                                className={isActive ? activeClass : ""}
+                                render={
+                                  <Link to={item.url}>
+                                    <item.icon />
+                                    <span>{item.title}</span>
+                                  </Link>
+                                }
+                              />
+                            </SidebarMenuSubItem>
+                          );
+                        })}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

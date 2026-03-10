@@ -31,6 +31,26 @@ export const organizationRoutes = new Hono()
     }));
     return ok(c, result);
   })
+  .get("/permissions", async (c) => {
+    const headers = c.req.raw.headers;
+
+    const [canUpdate, canDelete] = await Promise.all([
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { organization: ["update"] } },
+        })
+        .then((r) => r.success),
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { organization: ["delete"] } },
+        })
+        .then((r) => r.success),
+    ]);
+
+    return ok(c, { canUpdate, canDelete });
+  })
   .post("/", zv("json", createOrganizationSchema), async (c) => {
     const { name, slug } = c.req.valid("json");
     const user = c.get("user");

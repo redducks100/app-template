@@ -5,41 +5,14 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { RoleData } from "@app/shared/types/roles";
 import { createColumnHelper } from "@tanstack/react-table";
 import { TrashIcon } from "lucide-react";
-import {
-  PERMISSION_MAP,
-  RESOURCE_TRANSLATION_KEY,
-} from "@app/shared/types/roles";
+import { PermissionSummaryCell } from "./permission-summary-cell";
 
 const columnHelper = createColumnHelper<RoleData>();
-
-const RESOURCE_ORDER = ["organization", "member", "invitation"] as const;
-
-function formatPermissions(
-  permission: RoleData["permission"],
-  t: (key: string) => string,
-) {
-  return RESOURCE_ORDER
-    .filter((resource) => resource in permission)
-    .map((resource) => {
-      const actions = permission[resource] as string[];
-      const label = t(
-        RESOURCE_TRANSLATION_KEY[resource] as
-          | "organization"
-          | "members"
-          | "invitations",
-      );
-      const actionLabels = actions
-        .map((a) => t(a as "read" | "create" | "update" | "delete" | "cancel"))
-        .join(", ");
-      return `${label}: ${actionLabels}`;
-    })
-    .join(" | ");
-}
 
 export function createRoleColumns(
   onDelete: (roleId: string) => void,
   isDeleting: boolean,
-  isOwner: boolean,
+  canDelete: boolean,
   t: (key: string) => string,
 ) {
   return [
@@ -60,16 +33,9 @@ export function createRoleColumns(
     }),
     columnHelper.accessor("permission", {
       header: t("permissionsColumn"),
-      cell: (info) => {
-        const summary = formatPermissions(info.getValue(), t);
-        return (
-          <span className="truncate max-w-sm block" title={summary}>
-            {summary}
-          </span>
-        );
-      },
+      cell: (info) => <PermissionSummaryCell permission={info.getValue()} />,
     }),
-    ...(isOwner
+    ...(canDelete
       ? [
           columnHelper.display({
             id: "actions",
