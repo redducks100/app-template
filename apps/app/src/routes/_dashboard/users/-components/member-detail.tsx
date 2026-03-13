@@ -5,10 +5,24 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { authClient } from "@/lib/auth-client";
+import {
+  removeMember as removeMemberMutation,
+  updateMemberRole as updateMemberRoleMutation,
+} from "@/lib/mutations/members";
+import { membersListOptions, membersPermissionsOptions } from "@/lib/queries/members";
 import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import { Badge } from "@app/ui/components/badge";
 import { Button } from "@app/ui/components/button";
-import { ConfirmDialog } from "@app/ui/components/confirm-dialog";
+import {
+  ConfirmDialog,
+  ConfirmDialogContent,
+  ConfirmDialogDescription,
+  ConfirmDialogFooter,
+  ConfirmDialogHeader,
+  ConfirmDialogTitle,
+  ConfirmDialogTrigger,
+} from "@app/ui/components/confirm-dialog";
 import { FieldDescription, FieldLabel } from "@app/ui/components/field";
 import {
   Select,
@@ -17,26 +31,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@app/ui/components/select";
-import { authClient } from "@/lib/auth-client";
-import {
-  removeMember as removeMemberMutation,
-  updateMemberRole as updateMemberRoleMutation,
-} from "@/lib/mutations/members";
-import { membersListOptions, membersPermissionsOptions } from "@/lib/queries/members";
-import { getInitials } from "@app/ui/lib/utils";
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-});
+import { formatDate, getInitials } from "@app/ui/lib/utils";
 
 type MemberDetailProps = {
   memberId: string;
 };
 
 export const MemberDetail = ({ memberId }: MemberDetailProps) => {
-  const { t } = useTranslation("members");
+  const { t, i18n } = useTranslation("members");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -108,10 +110,10 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
         {t("backToUsers")}
       </Link>
 
-      <h1 className="text-lg font-semibold">{t("memberDetails")}</h1>
+      <h1 className="text-lg font-medium">{t("memberDetails")}</h1>
 
       {/* Profile header card */}
-      <div className="rounded-xl border border-border bg-card">
+      <div className="border border-border bg-card">
         <div className="flex items-center gap-4 p-5">
           <Avatar className="size-16" size="lg">
             <AvatarImage src={member.user.image ?? undefined} />
@@ -119,7 +121,7 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold capitalize truncate">
+              <h2 className="text-lg font-medium capitalize truncate">
                 {member.user.name ?? member.user.email}
               </h2>
               <Badge variant="outline" className="capitalize shrink-0">
@@ -134,7 +136,7 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
             <p className="text-sm text-muted-foreground truncate">{member.user.email}</p>
             {member.createdAt && (
               <p className="text-sm text-muted-foreground mt-0.5">
-                {t("joinedDate")} {dateFormatter.format(new Date(member.createdAt))}
+                {t("joinedDate")} {formatDate(member.createdAt, i18n.language)}
               </p>
             )}
           </div>
@@ -144,8 +146,8 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
       {/* Role section */}
       {permissions.canUpdate && !isOwnerRole && (
         <section>
-          <h3 className="text-base font-semibold text-foreground mb-4">{t("memberRole")}</h3>
-          <div className="rounded-xl border border-border bg-card">
+          <h3 className="text-base font-medium text-foreground mb-4">{t("memberRole")}</h3>
+          <div className="border border-border bg-card">
             <div className="flex items-center justify-between p-5">
               <div>
                 <FieldLabel>{t("memberRole")}</FieldLabel>
@@ -196,24 +198,31 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
       {/* Danger zone */}
       {permissions.canDelete && !isOwnerRole && !isSelf && (
         <section>
-          <h3 className="text-base font-semibold text-destructive mb-4">{t("dangerZone")}</h3>
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5">
+          <h3 className="text-base font-medium text-destructive mb-4">{t("dangerZone")}</h3>
+          <div className="border border-destructive/30 bg-destructive/5">
             <div className="flex items-center justify-between p-5">
               <div>
                 <p className="font-medium">{t("removeMember")}</p>
                 <p className="text-sm text-muted-foreground">{t("removeDescription")}</p>
               </div>
-              <ConfirmDialog
-                title={t("removeConfirmTitle")}
-                description={t("removeConfirm")}
-                confirmLabel={t("remove")}
-                cancelLabel={t("cancel")}
-                variant="destructive"
-                onConfirm={() => removeMember.mutate({ memberIdOrEmail: member.id })}
-              >
-                <Button variant="destructive" size="sm" disabled={removeMember.isPending}>
-                  {t("removeMember")}
-                </Button>
+              <ConfirmDialog>
+                <ConfirmDialogTrigger>
+                  <Button variant="destructive" size="sm" disabled={removeMember.isPending}>
+                    {t("removeMember")}
+                  </Button>
+                </ConfirmDialogTrigger>
+                <ConfirmDialogContent>
+                  <ConfirmDialogHeader>
+                    <ConfirmDialogTitle>{t("removeConfirmTitle")}</ConfirmDialogTitle>
+                    <ConfirmDialogDescription>{t("removeConfirm")}</ConfirmDialogDescription>
+                  </ConfirmDialogHeader>
+                  <ConfirmDialogFooter
+                    variant="destructive"
+                    confirmLabel={t("remove")}
+                    cancelLabel={t("cancel")}
+                    onConfirm={() => removeMember.mutate({ memberIdOrEmail: member.id })}
+                  />
+                </ConfirmDialogContent>
               </ConfirmDialog>
             </div>
           </div>

@@ -7,14 +7,13 @@ import type {
   OrganizationWithRole,
 } from "@app/shared/types/organizations";
 
-import { createOrganizationSchema } from "@app/shared/schemas/create-organization-schema";
-import { updateOrganizationSchema } from "@app/shared/schemas/update-organization-schema";
-
 import {
   findActiveOrganization,
   findUserMembership,
   findUserOrganizations,
 } from "@app/data-ops/queries/organizations";
+import { createOrganizationSchema } from "@app/shared/schemas/create-organization-schema";
+import { updateOrganizationSchema } from "@app/shared/schemas/update-organization-schema";
 
 import { getAuth } from "../lib/auth";
 import { ok } from "../lib/result";

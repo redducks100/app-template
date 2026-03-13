@@ -1,8 +1,8 @@
 import { toast } from "sonner";
 
-import { useAppForm } from "@app/ui/components/form/hooks";
 import { authClient } from "@/lib/auth-client";
 import { forgotPasswordSchema } from "@app/shared/schemas/forgot-password-schema";
+import { useAppForm } from "@app/ui/components/form/hooks";
 
 type SendChangePasswordEmailForm = {
   email: string;
@@ -41,7 +41,7 @@ export const SendChangePasswordEmailForm = ({ email }: SendChangePasswordEmailFo
         form.handleSubmit();
       }}
     >
-      <div className="rounded-xl border border-border bg-card">
+      <div className="border border-border bg-card">
         <div className="flex items-center justify-between p-6">
           <div>
             <p className="font-medium">Set Password</p>

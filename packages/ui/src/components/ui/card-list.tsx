@@ -1,11 +1,11 @@
 import { SearchIcon } from "lucide-react";
 import { type ReactNode, type RefObject, useCallback, useRef, useState } from "react";
 
-import { Button } from "./button";
-import { Input } from "./input";
 import { useInfiniteScroll } from "../../hooks/use-infinite-scroll";
 import { createSafeContext } from "../../lib/create-safe-context";
 import { cn } from "../../lib/utils";
+import { Button } from "./button";
+import { Input } from "./input";
 
 interface CardListContextValue {
   visible: unknown[];
@@ -117,7 +117,7 @@ function CardListEmpty({ children }: { children: ReactNode }) {
   if (visible.length > 0) return null;
 
   return (
-    <div className="rounded-xl border border-border bg-card p-8 text-center">
+    <div className="rounded-lg border border-border bg-card p-8 text-center">
       <p className="text-muted-foreground">{children}</p>
     </div>
   );

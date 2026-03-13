@@ -6,17 +6,17 @@ import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { authClient } from "@/lib/auth-client";
+import { compressProfileImage, validateProfileImage } from "@/lib/image-utils";
+import { removeAvatar, uploadAvatar } from "@/lib/mutations/user";
+import { sessionOptions } from "@/lib/queries/auth";
+import { updateUserProfileSchema } from "@app/shared/schemas/update-user-profile-schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import { Button } from "@app/ui/components/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@app/ui/components/field";
 import { useAppForm } from "@app/ui/components/form/hooks";
 import { Separator } from "@app/ui/components/separator";
-import { authClient } from "@/lib/auth-client";
-import { compressProfileImage, validateProfileImage } from "@/lib/image-utils";
-import { removeAvatar, uploadAvatar } from "@/lib/mutations/user";
-import { sessionOptions } from "@/lib/queries/auth";
 import { getInitials } from "@app/ui/lib/utils";
-import { updateUserProfileSchema } from "@app/shared/schemas/update-user-profile-schema";
 
 type ProfileSectionProps = {
   user: User;
@@ -108,7 +108,7 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
       }}
     >
       <FieldGroup>
-        <div className="rounded-xl border border-border bg-card">
+        <div className="border border-border bg-card">
           <div className="flex items-center gap-4 p-6">
             <Avatar className="size-14 rounded-lg">
               <AvatarImage src={user.image ?? undefined} />

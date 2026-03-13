@@ -3,24 +3,24 @@ import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { LockIcon, MailIcon } from "lucide-react";
 import { useState } from "react";
 
-import { Button } from "@app/ui/components/button";
-import { Separator } from "@app/ui/components/separator";
 import { authClient } from "@/lib/auth-client";
 import { sessionOptions } from "@/lib/queries/auth";
+import { Button } from "@app/ui/components/button";
+import { Separator } from "@app/ui/components/separator";
 
 const routeApi = getRouteApi("/_guest/sign-in");
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
-import { useAppForm } from "@app/ui/components/form/hooks";
 import {
   SUPPORTED_OATH_PROVIDER_DETAILS,
   SUPPORTED_OAUTH_PROVIDERS,
   SupportedOAuthProvider,
 } from "@/lib/constants";
 import { signInSchema } from "@app/shared/schemas/sign-in-schema";
+import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
 export const SignInView = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -80,7 +80,7 @@ export const SignInView = () => {
   return (
     <div className="animate-in-stagger">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">{t("sign_in.title")}</h1>
+        <h1 className="text-2xl font-medium tracking-tight">{t("sign_in.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("sign_in.description")}</p>
       </div>
 
@@ -93,7 +93,7 @@ export const SignInView = () => {
               variant="outline"
               disabled={loading}
               onClick={() => onProviderSubmit(provider)}
-              className="w-full h-11"
+              className="w-full h-10"
               key={provider}
             >
               <Icon />
@@ -106,7 +106,7 @@ export const SignInView = () => {
 
         <div className="flex items-center gap-3 py-1">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground/60 uppercase tracking-wider font-medium">
+          <span className="text-[10px] tracking-[0.2em] text-muted-foreground/60 uppercase font-medium">
             {tCommon("or")}
           </span>
           <Separator className="flex-1" />

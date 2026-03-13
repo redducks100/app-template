@@ -2,9 +2,9 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { useTranslation } from "react-i18next";
 
+import { invitationGetOptions } from "@/lib/queries/invitations";
 import { buttonVariants } from "@app/ui/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@app/ui/components/card";
-import { invitationGetOptions } from "@/lib/queries/invitations";
 
 import { AcceptInvitationView } from "./-components/accept-invitation-view";
 

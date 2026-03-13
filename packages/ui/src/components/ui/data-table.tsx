@@ -13,18 +13,11 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
-import { Button } from "./button";
-import { Input } from "./input";
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Table as UITable,
-} from "./table";
 import { createSafeContext } from "../../lib/create-safe-context";
 import { cn } from "../../lib/utils";
+import { Button } from "./button";
+import { Input } from "./input";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table as UITable } from "./table";
 
 // --- Context ---
 
@@ -133,7 +126,7 @@ function DataTableContent({ noResultsMessage = "No results.", className }: DataT
   const { table, onRowClick, isLoading, loadingMessage } = useDataTableContext();
 
   return (
-    <div className={cn("rounded-xl border border-border bg-card shadow-xs", className)}>
+    <div className={cn("rounded-lg border border-border bg-card", className)}>
       <UITable>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

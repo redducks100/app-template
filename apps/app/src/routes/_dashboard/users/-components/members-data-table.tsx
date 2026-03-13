@@ -5,9 +5,9 @@ import { UsersIcon } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useIsMobile } from "@app/ui/hooks/use-mobile";
 import { authClient } from "@/lib/auth-client";
 import { membersListOptions } from "@/lib/queries/members";
+import { useIsMobile } from "@app/ui/hooks/use-mobile";
 
 import { createMemberColumns } from "./members-columns";
 import { MembersDesktopDataTable } from "./members-data-table.desktop";
@@ -16,7 +16,7 @@ import { MembersMobileDataTable } from "./members-data-table.mobile";
 const routeApi = getRouteApi("/_dashboard/users/");
 
 export const MembersDataTable = () => {
-  const { t } = useTranslation("members");
+  const { t, i18n } = useTranslation("members");
   const { t: tCommon } = useTranslation("common");
   const isMobile = useIsMobile();
   const navigate = routeApi.useNavigate();
@@ -29,7 +29,7 @@ export const MembersDataTable = () => {
   const members = data.members;
   const currentUserId = session?.user?.id ?? "";
 
-  const columns = createMemberColumns(currentUserId, t);
+  const columns = createMemberColumns(currentUserId, t, i18n.language);
 
   const onPaginationChange = useCallback(
     (updater: Updater<PaginationState>) => {
@@ -42,7 +42,7 @@ export const MembersDataTable = () => {
 
   if (members.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-card p-12 text-center">
+      <div className="border border-border bg-card p-12 text-center">
         <div className="flex flex-col items-center">
           <div className="rounded-lg bg-muted p-3 text-muted-foreground">
             <UsersIcon className="size-6" />
@@ -59,6 +59,7 @@ export const MembersDataTable = () => {
         members={members}
         currentUserId={currentUserId}
         noResultsMessage={tCommon("noResults")}
+        locale={i18n.language}
         t={t}
         onMemberClick={(memberId) => navigate({ to: `/users/${memberId}` })}
       />

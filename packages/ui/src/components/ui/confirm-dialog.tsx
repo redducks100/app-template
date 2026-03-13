@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { createSafeContext } from "../../lib/create-safe-context";
 import { Button } from "./button";
 import {
   Dialog,
@@ -14,50 +15,111 @@ import {
   DialogTrigger,
 } from "./dialog";
 
-type ConfirmDialogProps = {
-  children: React.ReactNode;
-  title: string;
-  description: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  variant?: "default" | "destructive";
-  onConfirm: () => void;
+type ConfirmDialogContextValue = {
+  setOpen: (open: boolean) => void;
 };
 
-export function ConfirmDialog({
+const [ConfirmDialogProvider, useConfirmDialogContext] =
+  createSafeContext<ConfirmDialogContextValue>("ConfirmDialog");
+
+function ConfirmDialog({
   children,
-  title,
-  description,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
-  variant = "default",
-  onConfirm,
-}: ConfirmDialogProps) {
-  const [open, setOpen] = React.useState(false);
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: {
+  children: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [internalOpen, setInternalOpen] = React.useState(false);
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? controlledOnOpenChange! : setInternalOpen;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger nativeButton={false} render={<span className="contents" />}>
+    <ConfirmDialogProvider value={{ setOpen }}>
+      <Dialog open={open} onOpenChange={setOpen}>
         {children}
-      </DialogTrigger>
-      <DialogContent showCloseButton={false}>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose render={<Button variant="outline" />}>{cancelLabel}</DialogClose>
-          <Button
-            variant={variant}
-            onClick={() => {
-              onConfirm();
-              setOpen(false);
-            }}
-          >
-            {confirmLabel}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </Dialog>
+    </ConfirmDialogProvider>
   );
 }
+
+function ConfirmDialogTrigger({ children }: { children: React.ReactNode }) {
+  return (
+    <DialogTrigger nativeButton={false} render={<span className="contents" />}>
+      {children}
+    </DialogTrigger>
+  );
+}
+
+function ConfirmDialogContent({ children }: { children: React.ReactNode }) {
+  return <DialogContent showCloseButton={false}>{children}</DialogContent>;
+}
+
+function ConfirmDialogHeaderComponent({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <DialogHeader>{children}</DialogHeader>;
+}
+
+function ConfirmDialogTitleComponent({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <DialogTitle>{children}</DialogTitle>;
+}
+
+function ConfirmDialogDescriptionComponent({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <DialogDescription>{children}</DialogDescription>;
+}
+
+function ConfirmDialogFooterComponent({
+  variant = "default",
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  onConfirm,
+  disabled,
+}: {
+  variant?: "default" | "destructive";
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm: () => void;
+  disabled?: boolean;
+}) {
+  const { setOpen } = useConfirmDialogContext();
+
+  return (
+    <DialogFooter>
+      <DialogClose render={<Button variant="outline" />}>{cancelLabel}</DialogClose>
+      <Button
+        variant={variant}
+        disabled={disabled}
+        onClick={() => {
+          onConfirm();
+          setOpen(false);
+        }}
+      >
+        {confirmLabel}
+      </Button>
+    </DialogFooter>
+  );
+}
+
+export {
+  ConfirmDialog,
+  ConfirmDialogTrigger,
+  ConfirmDialogContent,
+  ConfirmDialogHeaderComponent as ConfirmDialogHeader,
+  ConfirmDialogTitleComponent as ConfirmDialogTitle,
+  ConfirmDialogDescriptionComponent as ConfirmDialogDescription,
+  ConfirmDialogFooterComponent as ConfirmDialogFooter,
+};

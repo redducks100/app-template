@@ -6,10 +6,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Button } from "@app/ui/components/button";
-import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
-import { useAppForm } from "@app/ui/components/form/hooks";
-import { Separator } from "@app/ui/components/separator";
 import { authClient } from "@/lib/auth-client";
 import {
   SUPPORTED_OATH_PROVIDER_DETAILS,
@@ -18,6 +14,10 @@ import {
 } from "@/lib/constants";
 import { sessionOptions } from "@/lib/queries/auth";
 import { signUpSchema } from "@app/shared/schemas/sign-up-schema";
+import { Button } from "@app/ui/components/button";
+import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
+import { Separator } from "@app/ui/components/separator";
 export const SignUpView = () => {
   const navigate = useNavigate();
   const router = useRouter();
@@ -80,7 +80,7 @@ export const SignUpView = () => {
   return (
     <div className="animate-in-stagger">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">{t("sign_up.title")}</h1>
+        <h1 className="text-2xl font-medium tracking-tight">{t("sign_up.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("sign_up.description")}</p>
       </div>
 
@@ -93,7 +93,7 @@ export const SignUpView = () => {
               variant="outline"
               disabled={loading}
               onClick={() => onProviderSubmit(provider)}
-              className="w-full h-11"
+              className="w-full h-10"
               key={provider}
             >
               <Icon />
@@ -106,7 +106,7 @@ export const SignUpView = () => {
 
         <div className="flex items-center gap-3 py-1">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground/60 uppercase tracking-wider font-medium">
+          <span className="text-[10px] tracking-[0.2em] text-muted-foreground/60 uppercase font-medium">
             {tCommon("or")}
           </span>
           <Separator className="flex-1" />

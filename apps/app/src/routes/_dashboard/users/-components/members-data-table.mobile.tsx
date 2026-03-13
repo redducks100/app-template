@@ -22,6 +22,7 @@ interface MembersMobileDataTableProps {
   members: MemberColumn[];
   currentUserId: string;
   noResultsMessage: string;
+  locale: string;
   t: (key: string) => string;
   onMemberClick: (memberId: string) => void;
 }
@@ -30,6 +31,7 @@ export const MembersMobileDataTable = ({
   members,
   currentUserId,
   noResultsMessage,
+  locale,
   t,
   onMemberClick,
 }: MembersMobileDataTableProps) => {
@@ -43,7 +45,7 @@ export const MembersMobileDataTable = ({
           <button
             key={member.id}
             type="button"
-            className="w-full rounded-xl border border-border bg-card p-4 text-left shadow-xs transition-colors hover:bg-accent/50"
+            className="w-full border border-border bg-card p-4 text-left transition-colors hover:bg-accent/50"
             onClick={() => onMemberClick(member.id)}
           >
             <div className="flex items-start justify-between gap-2">
@@ -60,7 +62,7 @@ export const MembersMobileDataTable = ({
             </div>
             {member.createdAt && (
               <p className="mt-2 text-xs text-muted-foreground">
-                {t("joinedColumn")}: {formatDate(member.createdAt)}
+                {t("joinedColumn")}: {formatDate(member.createdAt, locale)}
               </p>
             )}
           </button>

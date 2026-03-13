@@ -6,20 +6,14 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 import * as React from "react";
 
+import { useIsMobile } from "../../hooks/use-mobile";
+import { cn } from "../../lib/utils";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Separator } from "./separator";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "./sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "./sheet";
 import { Skeleton } from "./skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
-import { useIsMobile } from "../../hooks/use-mobile";
-import { cn } from "../../lib/utils";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

@@ -3,6 +3,9 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { ChevronsUpDownIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
+import { authClient } from "@/lib/auth-client";
+import { sessionOptions } from "@/lib/queries/auth";
+import { activeOrganizationOptions, organizationsListOptions } from "@/lib/queries/organizations";
 import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import {
   DropdownMenu,
@@ -19,9 +22,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@app/ui/components/sidebar";
-import { authClient } from "@/lib/auth-client";
-import { sessionOptions } from "@/lib/queries/auth";
-import { activeOrganizationOptions, organizationsListOptions } from "@/lib/queries/organizations";
 
 export const DashboardOrganizationSwitcher = () => {
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ export const DashboardOrganizationSwitcher = () => {
                 size="lg"
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center">
                   <Avatar className="rounded-md">
                     <AvatarImage src={activeOrganization.logo ?? undefined} />
                     <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground">
@@ -97,7 +97,7 @@ export const DashboardOrganizationSwitcher = () => {
             }
           />
           <DropdownMenuContent
-            className="w-(--anchor-width) min-w-56 rounded-lg"
+            className="w-(--anchor-width) min-w-56"
             align="start"
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}

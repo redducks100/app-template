@@ -7,10 +7,13 @@ import { UAParser } from "ua-parser-js";
 
 import type { apiClient } from "@/lib/api-client";
 
+import { useTranslation } from "react-i18next";
+
+import { revokeSession as revokeSessionMutation } from "@/lib/mutations/user";
 import { Badge } from "@app/ui/components/badge";
 import { Button } from "@app/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@app/ui/components/card";
-import { revokeSession as revokeSessionMutation } from "@/lib/mutations/user";
+import { formatDateTime } from "@app/ui/lib/utils";
 
 type SessionData = InferResponseType<
   (typeof apiClient)["user"]["sessions"]["$get"],
@@ -22,6 +25,7 @@ type SessionCardProps = {
 };
 
 export const SessionCard = ({ session }: SessionCardProps) => {
+  const { i18n } = useTranslation();
   const queryClient = useQueryClient();
   const userAgentInfo = session.userAgent ? UAParser(session.userAgent) : null;
 
@@ -44,13 +48,6 @@ export const SessionCard = ({ session }: SessionCardProps) => {
     return `${userAgentInfo.browser.name}, ${userAgentInfo.os.name}`;
   }
 
-  function formatDate(date: Date) {
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(date);
-  }
-
   return (
     <Card>
       <CardHeader className="flex justify-between">
@@ -63,10 +60,10 @@ export const SessionCard = ({ session }: SessionCardProps) => {
             {userAgentInfo?.device.type === "mobile" ? <SmartphoneIcon /> : <MonitorIcon />}
             <div>
               <p className="text-sm text-muted-foreground">
-                Created: {formatDate(new Date(session.createdAt))}
+                Created: {formatDateTime(session.createdAt, i18n.language)}
               </p>
               <p className="text-sm text-muted-foreground">
-                Expires: {formatDate(new Date(session.expiresAt))}
+                Expires: {formatDateTime(session.expiresAt, i18n.language)}
               </p>
             </div>
           </div>

@@ -3,9 +3,9 @@
 import { Popover } from "@base-ui/react/popover";
 import { ChevronDownIcon, XIcon } from "lucide-react";
 
+import { cn } from "../../lib/utils";
 import { Badge } from "./badge";
 import { Checkbox } from "./checkbox";
-import { cn } from "../../lib/utils";
 
 type MultiSelectProps = {
   options: { value: string; label: string }[];

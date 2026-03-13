@@ -34,8 +34,10 @@ export type AssertPartialFieldsMatch<
 > = AssertFieldsMatch<Schema, DBTable, Fields>;
 
 /** Ensures a Zod enum's values match a Postgres enum's values */
-export type AssertEnumMatch<ZodUnion extends string, DBUnion extends string> =
-  ZodUnion extends DBUnion ? (DBUnion extends ZodUnion ? true : false) : false;
+export type AssertEnumMatch<
+  ZodUnion extends string,
+  DBUnion extends string,
+> = ZodUnion extends DBUnion ? (DBUnion extends ZodUnion ? true : false) : false;
 
 /** Enforcement wrapper — forces tsc to actually evaluate and error on `false` */
 export type MustBeTrue<T extends true> = T;

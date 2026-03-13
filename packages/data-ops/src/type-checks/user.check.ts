@@ -1,8 +1,8 @@
 import type { Updateable } from "kysely";
 import type { z } from "zod";
 
-import type { User } from "@app/shared/types/db.generated";
 import type { updateUserProfileSchema } from "@app/shared/schemas/update-user-profile-schema";
+import type { User } from "@app/shared/types/db.generated";
 
 import type { AllTrue, AssertPartialFieldsMatch } from "./helpers";
 

@@ -5,9 +5,9 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { useIsMobile } from "@app/ui/hooks/use-mobile";
 import { cancelInvitation as cancelInvitationMutation } from "@/lib/mutations/invitations";
 import { invitationsListOptions } from "@/lib/queries/invitations";
+import { useIsMobile } from "@app/ui/hooks/use-mobile";
 
 import { createInvitationColumns } from "./invitations-columns";
 import { InvitationsDesktopDataTable } from "./invitations-data-table.desktop";
@@ -16,7 +16,7 @@ import { InvitationsMobileDataTable } from "./invitations-data-table.mobile";
 const routeApi = getRouteApi("/_dashboard/invitations");
 
 export const InvitationsDataTable = () => {
-  const { t } = useTranslation("invitations");
+  const { t, i18n } = useTranslation("invitations");
   const { t: tCommon } = useTranslation("common");
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
@@ -39,6 +39,7 @@ export const InvitationsDataTable = () => {
     (invitationId) => cancelInvitation.mutate({ invitationId }),
     cancelInvitation.isPending,
     t,
+    i18n.language,
   );
 
   const onPaginationChange = useCallback(
@@ -52,7 +53,7 @@ export const InvitationsDataTable = () => {
 
   if (invitations.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-card p-8 text-center">
+      <div className="border border-border bg-card p-8 text-center">
         <p className="text-muted-foreground">{t("emptyState")}</p>
       </div>
     );
@@ -64,6 +65,7 @@ export const InvitationsDataTable = () => {
         invitations={invitations}
         isCanceling={cancelInvitation.isPending}
         noResultsMessage={tCommon("noResults")}
+        locale={i18n.language}
         t={t}
         onCancel={(invitationId) => cancelInvitation.mutate({ invitationId })}
       />

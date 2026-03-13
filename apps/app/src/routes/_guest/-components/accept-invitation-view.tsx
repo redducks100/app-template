@@ -5,11 +5,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Badge } from "@app/ui/components/badge";
-import { Button, buttonVariants } from "@app/ui/components/button";
-import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
-import { useAppForm } from "@app/ui/components/form/hooks";
-import { Separator } from "@app/ui/components/separator";
 import { authClient } from "@/lib/auth-client";
 import {
   SUPPORTED_OATH_PROVIDER_DETAILS,
@@ -19,6 +14,11 @@ import {
 import { sessionOptions } from "@/lib/queries/auth";
 import { invitationGetOptions } from "@/lib/queries/invitations";
 import { signUpSchema } from "@app/shared/schemas/sign-up-schema";
+import { Badge } from "@app/ui/components/badge";
+import { Button, buttonVariants } from "@app/ui/components/button";
+import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
+import { Separator } from "@app/ui/components/separator";
 
 type AcceptInvitationViewProps = {
   invitationId: string;
@@ -40,7 +40,7 @@ export const AcceptInvitationView = ({ invitationId }: AcceptInvitationViewProps
     return (
       <div className="animate-in-stagger">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight">{t("unavailableTitle")}</h1>
+          <h1 className="text-2xl font-medium tracking-tight">{t("unavailableTitle")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {isExpired ? t("expired") : t("noLongerValid")}
           </p>
@@ -60,7 +60,7 @@ export const AcceptInvitationView = ({ invitationId }: AcceptInvitationViewProps
   return (
     <div className="animate-in-stagger">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">{t("youveBeenInvited")}</h1>
+        <h1 className="text-2xl font-medium tracking-tight">{t("youveBeenInvited")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("invitedBy", { name: invitation.inviter.name })}{" "}
           <span className="font-medium text-foreground">{invitation.organization.name}</span>
@@ -68,7 +68,7 @@ export const AcceptInvitationView = ({ invitationId }: AcceptInvitationViewProps
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between rounded-xl border border-border bg-muted/50 p-4">
+        <div className="flex items-center justify-between border border-border bg-muted/50 p-4">
           <div className="flex items-center gap-3">
             <Building2 className="size-5 text-muted-foreground" />
             <span className="font-medium">{invitation.organization.name}</span>
@@ -260,7 +260,7 @@ function UnauthenticatedActions({
             variant="outline"
             disabled={loading}
             onClick={() => onProviderSubmit(provider)}
-            className="w-full h-11"
+            className="w-full h-10"
             key={provider}
           >
             <Icon />
@@ -273,7 +273,7 @@ function UnauthenticatedActions({
 
       <div className="flex items-center gap-3 py-1">
         <Separator className="flex-1" />
-        <span className="text-xs text-muted-foreground/60 uppercase tracking-wider font-medium">
+        <span className="text-[10px] tracking-[0.2em] text-muted-foreground/60 uppercase font-medium">
           {tCommon("or")}
         </span>
         <Separator className="flex-1" />

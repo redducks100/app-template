@@ -3,14 +3,13 @@ import { setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 
-import { updateLanguageSchema } from "@app/shared/schemas/update-language-schema";
-
 import {
   deleteUserAvatar,
   hasPasswordCredential,
   updateUserAvatar,
   updateUserLocale,
 } from "@app/data-ops/queries/user";
+import { updateLanguageSchema } from "@app/shared/schemas/update-language-schema";
 
 import { getAuth } from "../lib/auth";
 import { ok } from "../lib/result";

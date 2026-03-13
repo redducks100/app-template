@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { Separator } from "@app/ui/components/separator";
 import { SUPPORTED_OAUTH_PROVIDERS } from "@/lib/constants";
 import { linkedAccountsOptions } from "@/lib/queries/user";
+import { Separator } from "@app/ui/components/separator";
 
 import { LinkedAccountCard, LinkedAccountCardProps } from "./linked-account-card";
 
@@ -26,7 +26,7 @@ export const LinkedAccountsSection = () => {
   const allProviders = currentProviders.concat(supportedProvider);
 
   return (
-    <div className="rounded-xl border border-border bg-card">
+    <div className="border border-border bg-card">
       {allProviders.map((provider, index) => (
         <div key={provider.provider}>
           {index > 0 && <Separator orientation="horizontal" />}

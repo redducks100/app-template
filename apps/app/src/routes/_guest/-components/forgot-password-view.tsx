@@ -3,10 +3,10 @@ import { MailIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
-import { useAppForm } from "@app/ui/components/form/hooks";
 import { authClient } from "@/lib/auth-client";
 import { forgotPasswordSchema } from "@app/shared/schemas/forgot-password-schema";
+import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
 
 export const ForgotPasswordView = () => {
   const { t } = useTranslation("auth");
@@ -39,7 +39,7 @@ export const ForgotPasswordView = () => {
   return (
     <div className="animate-in-stagger">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">{t("forgot_password.title")}</h1>
+        <h1 className="text-2xl font-medium tracking-tight">{t("forgot_password.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("forgot_password.description")}</p>
       </div>
 

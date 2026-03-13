@@ -2,9 +2,9 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@app/ui/components/button";
 import { revokeOtherSessions as revokeOtherSessionsMutation } from "@/lib/mutations/user";
 import { sessionsOptions } from "@/lib/queries/user";
+import { Button } from "@app/ui/components/button";
 
 import { SessionCard } from "./session-card";
 
@@ -46,7 +46,7 @@ export const SessionsSection = () => {
       )}
 
       {otherSessions.length === 0 && (
-        <div className="rounded-xl border border-border bg-card py-8 text-center text-muted-foreground">
+        <div className="border border-border bg-card py-8 text-center text-muted-foreground">
           No other active sessions
         </div>
       )}

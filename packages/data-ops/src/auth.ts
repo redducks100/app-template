@@ -33,7 +33,8 @@ function createAuth(options?: AuthOptions) {
       changeEmail: {
         enabled: true,
         sendChangeEmailVerification: async ({ user, url, newEmail }) => {
-          const { default: sendVerificationEmail } = await import("./emails/send-verification-email");
+          const { default: sendVerificationEmail } =
+            await import("./emails/send-verification-email");
           await sendVerificationEmail({
             user: { ...user, email: newEmail },
             url,
@@ -43,9 +44,8 @@ function createAuth(options?: AuthOptions) {
       deleteUser: {
         enabled: true,
         sendDeleteAccountVerification: async ({ user, url, token }) => {
-          const { default: sendAccountDeletionEmail } = await import(
-            "./emails/send-account-deletion-email"
-          );
+          const { default: sendAccountDeletionEmail } =
+            await import("./emails/send-account-deletion-email");
           await sendAccountDeletionEmail({
             user,
             url,
@@ -70,9 +70,8 @@ function createAuth(options?: AuthOptions) {
       enabled: true,
       password: { hash: hashPassword, verify: verifyPassword },
       sendResetPassword: async ({ user, url, token }, request) => {
-        const { default: sendForgotPasswordEmail } = await import(
-          "./emails/send-forgot-password-email"
-        );
+        const { default: sendForgotPasswordEmail } =
+          await import("./emails/send-forgot-password-email");
         await sendForgotPasswordEmail({ user, url });
       },
     },

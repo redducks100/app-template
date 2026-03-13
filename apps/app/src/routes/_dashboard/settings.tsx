@@ -24,7 +24,7 @@ function SettingsLayout() {
         <div className="w-full max-w-screen-2xl">
           <div className="p-4 space-y-6 animate-in-page">
             <div className="mb-1">
-              <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+              <h1 className="text-xl font-medium tracking-tight">{t("title")}</h1>
               <p className="text-sm text-muted-foreground mt-1">{t("description")}</p>
             </div>
 
@@ -38,13 +38,13 @@ function SettingsLayout() {
                     key={item.value}
                     to={`/settings/${item.value}`}
                     className={cn(
-                      "flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0",
+                      "flex items-center gap-1.5 px-2.5 py-2 text-xs uppercase tracking-wider font-medium transition-colors relative whitespace-nowrap shrink-0",
                       isActive
-                        ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:rounded-full"
+                        ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-foreground"
                         : "text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    <Icon className="size-4" />
+                    <Icon className="size-3.5" />
                     {item.label}
                   </Link>
                 );

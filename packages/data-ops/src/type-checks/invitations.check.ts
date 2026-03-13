@@ -1,8 +1,8 @@
 import type { Insertable } from "kysely";
 import type { z } from "zod";
 
-import type { Invitation } from "@app/shared/types/db.generated";
 import type { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
+import type { Invitation } from "@app/shared/types/db.generated";
 
 import type { AllTrue, AssertFieldsMatch } from "./helpers";
 

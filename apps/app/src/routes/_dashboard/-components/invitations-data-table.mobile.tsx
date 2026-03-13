@@ -1,3 +1,5 @@
+import { Trash2Icon } from "lucide-react";
+
 import { Badge } from "@app/ui/components/badge";
 import { Button } from "@app/ui/components/button";
 import {
@@ -7,7 +9,16 @@ import {
   CardListLoadMore,
   CardListSearch,
 } from "@app/ui/components/card-list";
-import { formatDate } from "@app/ui/lib/utils";
+import {
+  ConfirmDialog,
+  ConfirmDialogContent,
+  ConfirmDialogDescription,
+  ConfirmDialogFooter,
+  ConfirmDialogHeader,
+  ConfirmDialogTitle,
+  ConfirmDialogTrigger,
+} from "@app/ui/components/confirm-dialog";
+import { formatDateTime } from "@app/ui/lib/utils";
 
 import type { Invitation } from "./invitations-columns";
 
@@ -22,6 +33,7 @@ interface InvitationsMobileDataTableProps {
   invitations: Invitation[];
   isCanceling: boolean;
   noResultsMessage: string;
+  locale: string;
   t: (key: string) => string;
   onCancel: (invitationId: string) => void;
 }
@@ -30,6 +42,7 @@ export const InvitationsMobileDataTable = ({
   invitations,
   isCanceling,
   noResultsMessage,
+  locale,
   t,
   onCancel,
 }: InvitationsMobileDataTableProps) => {
@@ -45,17 +58,47 @@ export const InvitationsMobileDataTable = ({
         );
       }}
       renderCard={(inv) => (
-        <div key={inv.id} className="rounded-xl border border-border bg-card p-4 shadow-xs">
+        <div key={inv.id} className="border border-border bg-card p-4">
           <div className="flex items-start justify-between gap-2">
             <p className="min-w-0 truncate font-medium">{inv.email}</p>
-            <Badge
-              variant={statusVariant[inv.status] ?? "secondary"}
-              className="shrink-0 capitalize"
-            >
-              {inv.status}
-            </Badge>
+            <div className="flex items-center gap-1.5">
+              <Badge
+                variant={statusVariant[inv.status] ?? "secondary"}
+                className="shrink-0 capitalize"
+              >
+                {inv.status}
+              </Badge>
+              {inv.status === "pending" && (
+                <ConfirmDialog>
+                  <ConfirmDialogTrigger>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      disabled={isCanceling}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </ConfirmDialogTrigger>
+                  <ConfirmDialogContent>
+                    <ConfirmDialogHeader>
+                      <ConfirmDialogTitle>{t("cancelConfirmTitle")}</ConfirmDialogTitle>
+                      <ConfirmDialogDescription>
+                        {t("cancelConfirmDescription")}
+                      </ConfirmDialogDescription>
+                    </ConfirmDialogHeader>
+                    <ConfirmDialogFooter
+                      variant="destructive"
+                      confirmLabel={t("revokeInvitation")}
+                      cancelLabel={t("keepIt")}
+                      onConfirm={() => onCancel(inv.id)}
+                    />
+                  </ConfirmDialogContent>
+                </ConfirmDialog>
+              )}
+            </div>
           </div>
-          <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
+          <div className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground">
             <span>
               {t("roleColumn")}:{" "}
               <Badge variant="outline" className="capitalize">
@@ -64,22 +107,10 @@ export const InvitationsMobileDataTable = ({
             </span>
             {inv.expiresAt && (
               <span>
-                {t("expiresColumn")}: {formatDate(inv.expiresAt)}
+                {t("expiresColumn")}: {formatDateTime(inv.expiresAt, locale)}
               </span>
             )}
           </div>
-          {inv.status === "pending" && (
-            <div className="mt-3 flex justify-end">
-              <Button
-                variant="destructive"
-                size="sm"
-                disabled={isCanceling}
-                onClick={() => onCancel(inv.id)}
-              >
-                {t("cancel")}
-              </Button>
-            </div>
-          )}
         </div>
       )}
     >

@@ -30,9 +30,9 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "react": "^19",
-    "react-dom": "^19",
     "@tanstack/react-form": "^1",
-    "@tanstack/react-table": "^8"
+    "@tanstack/react-table": "^8",
+    "react": "^19",
+    "react-dom": "^19"
   }
 }

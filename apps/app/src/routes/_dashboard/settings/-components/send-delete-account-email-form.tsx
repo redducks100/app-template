@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
-import { useAppForm } from "@app/ui/components/form/hooks";
 import { authClient } from "@/lib/auth-client";
+import { useAppForm } from "@app/ui/components/form/hooks";
 
 export const SendDeleteAccountEmailForm = () => {
   const form = useAppForm({
@@ -24,7 +24,7 @@ export const SendDeleteAccountEmailForm = () => {
         form.handleSubmit();
       }}
     >
-      <div className="rounded-xl border border-destructive/30 bg-destructive/5">
+      <div className="border border-destructive/30 bg-destructive/5">
         <div className="flex items-center justify-between p-6">
           <div>
             <p className="font-medium">Delete account</p>

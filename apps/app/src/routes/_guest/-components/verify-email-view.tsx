@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { Field, FieldGroup } from "@app/ui/components/field";
-import { useAppForm } from "@app/ui/components/form/hooks";
 import { authClient } from "@/lib/auth-client";
 import { verifyEmailSchema } from "@app/shared/schemas/verify-email-schema";
+import { Field, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
 
 type VerifyEmailViewProps = {
   email: string;
@@ -38,7 +38,7 @@ export const VerifyEmailView = ({ email }: VerifyEmailViewProps) => {
   return (
     <div className="animate-in-page">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">{t("verify_email.title")}</h1>
+        <h1 className="text-2xl font-medium tracking-tight">{t("verify_email.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("verify_email.description")}</p>
       </div>
 

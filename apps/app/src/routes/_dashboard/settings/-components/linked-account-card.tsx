@@ -3,9 +3,9 @@ import { Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@app/ui/components/button";
 import { authClient } from "@/lib/auth-client";
 import { SUPPORTED_OATH_PROVIDER_DETAILS, SupportedOAuthProvider } from "@/lib/constants";
+import { Button } from "@app/ui/components/button";
 
 export type LinkedAccountCardProps = {
   provider: string;

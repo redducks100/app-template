@@ -12,7 +12,7 @@ export type MemberColumn = MembersResponse["members"][number];
 
 const columnHelper = createColumnHelper<MemberColumn>();
 
-export function createMemberColumns(currentUserId: string, t: (key: string) => string) {
+export function createMemberColumns(currentUserId: string, t: (key: string) => string, locale: string) {
   return [
     columnHelper.display({
       id: "name",
@@ -49,7 +49,7 @@ export function createMemberColumns(currentUserId: string, t: (key: string) => s
       cell: (info) => {
         const value = info.row.original.createdAt;
         if (!value) return <span className="text-muted-foreground">-</span>;
-        return formatDate(value);
+        return formatDate(value, locale);
       },
     }),
   ];

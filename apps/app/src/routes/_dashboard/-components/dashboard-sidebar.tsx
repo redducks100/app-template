@@ -12,7 +12,11 @@ import {
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@app/ui/components/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@app/ui/components/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,7 +43,7 @@ import { DashboardOrganizationSwitcher } from "./dashboard-organization-switcher
 import { DashboardUserButton } from "./dashboard-user-button";
 
 const activeClass =
-  "relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-0.5 before:rounded-full before:bg-primary";
+  "relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-primary";
 
 export const DashboardSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { t } = useTranslation("dashboard");

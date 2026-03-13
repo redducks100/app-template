@@ -3,9 +3,9 @@ import { Link } from "@tanstack/react-router";
 import { CogIcon, MailsIcon, UserPlusIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@app/ui/components/button";
 import { invitationsListOptions } from "@/lib/queries/invitations";
 import { membersListOptions } from "@/lib/queries/members";
+import { Button } from "@app/ui/components/button";
 
 type StatCardProps = {
   label: string;
@@ -18,16 +18,16 @@ function StatCard({ label, value, icon, href }: StatCardProps) {
   return (
     <Link
       to={href}
-      className="group rounded-xl border border-border bg-card p-5 transition-all duration-200 hover:shadow-md hover:border-border/80"
+      className="group border border-border bg-card p-4 transition-colors hover:bg-muted/50"
     >
       <div className="flex items-center justify-between">
-        <div className="rounded-lg bg-muted p-2 text-muted-foreground group-hover:text-foreground transition-colors">
+        <div className="text-muted-foreground group-hover:text-foreground transition-colors">
           {icon}
         </div>
       </div>
       <div className="mt-4">
-        <p className="text-3xl font-semibold tracking-tight">{value}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{label}</p>
+        <p className="text-2xl font-medium tabular-nums tracking-tight">{value}</p>
+        <p className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
       </div>
     </Link>
   );
@@ -44,7 +44,7 @@ function QuickAction({ label, icon, href }: QuickActionProps) {
     <Link to={href}>
       <Button
         variant="outline"
-        className="h-auto w-full flex-col gap-2 py-4 hover:bg-muted/50 transition-all duration-200"
+        className="h-auto w-full flex-col gap-1.5 py-3"
       >
         {icon}
         <span className="text-xs font-medium">{label}</span>
@@ -74,8 +74,8 @@ export const DashboardView = () => {
     <div className="animate-in-stagger space-y-6">
       {/* Welcome header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("welcome")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{today}</p>
+        <h1 className="text-xl font-medium tracking-tight">{t("welcome")}</h1>
+        <p className="mt-1 text-xs text-muted-foreground">{today}</p>
       </div>
 
       {/* Stats row */}

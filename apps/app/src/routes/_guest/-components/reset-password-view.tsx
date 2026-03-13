@@ -3,12 +3,12 @@ import { AlertCircleIcon, LockIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { authClient } from "@/lib/auth-client";
+import { resetPasswordSchema } from "@app/shared/schemas/reset-password-schema";
 import { Alert, AlertTitle } from "@app/ui/components/alert";
 import { buttonVariants } from "@app/ui/components/button";
 import { Field, FieldGroup } from "@app/ui/components/field";
 import { useAppForm } from "@app/ui/components/form/hooks";
-import { authClient } from "@/lib/auth-client";
-import { resetPasswordSchema } from "@app/shared/schemas/reset-password-schema";
 
 const routeApi = getRouteApi("/_guest/reset-password");
 
@@ -53,7 +53,7 @@ export const ResetPasswordView = () => {
     return (
       <div className="animate-in-page">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-medium tracking-tight">
             {t("reset_password.invalidTitle")}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ export const ResetPasswordView = () => {
   return (
     <div className="animate-in-stagger">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">{t("reset_password.title")}</h1>
+        <h1 className="text-2xl font-medium tracking-tight">{t("reset_password.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("reset_password.description")}</p>
       </div>
 

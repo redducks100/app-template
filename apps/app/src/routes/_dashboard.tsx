@@ -1,8 +1,8 @@
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import { SidebarInset, SidebarProvider } from "@app/ui/components/sidebar";
 import i18n from "@/lib/i18n";
+import { SidebarInset, SidebarProvider } from "@app/ui/components/sidebar";
 
 import { DashboardNavbar } from "./_dashboard/-components/dashboard-navbar";
 import { DashboardSidebar } from "./_dashboard/-components/dashboard-sidebar";

@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { authClient } from "@/lib/auth-client";
+import { locales } from "@/lib/i18n";
+import { updateLanguage } from "@/lib/mutations/user";
+import { sessionOptions } from "@/lib/queries/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import {
   DropdownMenu,
@@ -28,10 +32,6 @@ import {
 } from "@app/ui/components/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@app/ui/components/sidebar";
 import { useIsMobile } from "@app/ui/hooks/use-mobile";
-import { authClient } from "@/lib/auth-client";
-import { locales } from "@/lib/i18n";
-import { updateLanguage } from "@/lib/mutations/user";
-import { sessionOptions } from "@/lib/queries/auth";
 import { getInitials } from "@app/ui/lib/utils";
 
 const languageLabels: Record<string, string> = {

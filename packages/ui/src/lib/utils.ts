@@ -13,25 +13,21 @@ export function getInitials(name: string): string {
   return name.substring(0, 2).toUpperCase();
 }
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
-
-const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date, locale: string = "en-US"): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return dateFormatter.format(d);
+  return new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(d);
 }
 
-export function formatDateTime(date: string | Date): string {
+export function formatDateTime(date: string | Date, locale: string = "en-US"): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return dateTimeFormatter.format(d);
+  return new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(d);
 }
