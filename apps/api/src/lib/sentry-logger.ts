@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/cloudflare";
-import type { Logger, LogContext } from "@app/shared/logger";
+
+import type { LogContext, Logger } from "@app/shared/logger";
 
 export class SentryLogger implements Logger {
   debug(message: string, context?: LogContext): void {

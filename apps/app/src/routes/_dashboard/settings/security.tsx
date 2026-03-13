@@ -1,13 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
-import { SecuritySection } from "./-components/security-section";
-import { hasPasswordOptions } from "@/lib/query-options/user";
 
-export const Route = createFileRoute(
-  "/_dashboard/settings/security",
-)({
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(hasPasswordOptions()),
+import { hasPasswordOptions } from "@/lib/queries/user";
+
+import { SecuritySection } from "./-components/security-section";
+
+export const Route = createFileRoute("/_dashboard/settings/security")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(hasPasswordOptions()),
   component: SettingsSecurityPage,
 });
 

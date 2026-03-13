@@ -1,0 +1,47 @@
+import type { LucideIcon } from "lucide-react";
+
+import { HTMLInputTypeAttribute } from "react";
+
+import { InputGroup, InputGroupAddon, InputGroupInput } from "../input-group";
+import { FormBase, FormControlProps } from "./form-base";
+import { useFieldContext } from "./hooks";
+
+export function FormInput({
+  placeholder,
+  type,
+  LeftIcon,
+  disabled,
+  ...props
+}: FormControlProps & {
+  LeftIcon?: LucideIcon;
+  placeholder?: string;
+  type?: HTMLInputTypeAttribute;
+  disabled?: boolean;
+}) {
+  const field = useFieldContext<string>();
+
+  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+  return (
+    <FormBase {...props}>
+      <InputGroup>
+        <InputGroupInput
+          id={field.name}
+          name={field.name}
+          type={type}
+          placeholder={placeholder}
+          value={field.state.value}
+          onBlur={field.handleBlur}
+          onChange={(e) => field.handleChange(e.target.value)}
+          aria-invalid={isInvalid}
+          disabled={disabled}
+        />
+        {LeftIcon && (
+          <InputGroupAddon>
+            <LeftIcon />
+          </InputGroupAddon>
+        )}
+      </InputGroup>
+    </FormBase>
+  );
+}

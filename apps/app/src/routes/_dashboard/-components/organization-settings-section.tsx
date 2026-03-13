@@ -1,16 +1,14 @@
-import { BuildingIcon, Link2Icon } from "lucide-react";
-import { useAppForm } from "@/components/ui/form/hooks";
-import { Field, FieldGroup } from "@/components/ui/field";
-import { updateOrganizationSchema } from "@app/shared/schemas/update-organization-schema";
-import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Separator } from "@/components/ui/separator";
+import { BuildingIcon, Link2Icon } from "lucide-react";
 import { toast } from "sonner";
-import {
-  activeOrganizationOptions,
-  organizationsListOptions,
-} from "@/lib/query-options/organizations";
+import { z } from "zod";
+
+import { Field, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
+import { Separator } from "@app/ui/components/separator";
 import { updateOrganization as updateOrganizationMutation } from "@/lib/mutations/organizations";
+import { activeOrganizationOptions } from "@/lib/queries/organizations";
+import { updateOrganizationSchema } from "@app/shared/schemas/update-organization-schema";
 
 export const OrganizationSettingsSection = () => {
   const queryClient = useQueryClient();
@@ -57,9 +55,7 @@ export const OrganizationSettingsSection = () => {
     >
       <FieldGroup>
         <section>
-          <h3 className="text-base font-semibold text-foreground mb-4">
-            General
-          </h3>
+          <h3 className="text-base font-semibold text-foreground mb-4">General</h3>
           <div className="rounded-xl border border-border bg-card">
             <form.AppField name="name">
               {(field) => (

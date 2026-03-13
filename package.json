@@ -2,26 +2,38 @@
   "name": "app-template",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.19.0",
   "scripts": {
+    "fmt": "oxfmt .",
+    "fmt:check": "oxfmt --check .",
+    "typecheck": "turbo run typecheck",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
+    "fix": "oxlint --fix && oxfmt .",
     "prepare": "husky",
     "dev": "turbo run dev",
     "dev:app": "turbo run dev --filter=@app/app",
     "dev:api": "turbo run dev --filter=@app/api",
     "build": "turbo run build",
     "deploy:cf": "turbo run deploy:cf",
-    "db:migrate": "turbo run db:migrate --filter=@app/api",
-    "db:migrate:up": "turbo run db:migrate:up --filter=@app/api",
-    "db:migrate:down": "turbo run db:migrate:down --filter=@app/api",
-    "db:migrate:make": "turbo run db:migrate:make --filter=@app/api",
-    "db:migrate:list": "turbo run db:migrate:list --filter=@app/api"
+    "db:migrate": "turbo run db:migrate --filter=@app/data-ops",
+    "db:migrate:up": "turbo run db:migrate:up --filter=@app/data-ops",
+    "db:migrate:down": "turbo run db:migrate:down --filter=@app/data-ops",
+    "db:migrate:make": "turbo run db:migrate:make --filter=@app/data-ops",
+    "db:migrate:list": "turbo run db:migrate:list --filter=@app/data-ops",
+    "db:codegen": "kysely-codegen --dialect postgres --env-file apps/api/.dev.vars --out-file packages/shared/src/types/db.generated.ts",
+    "syncpack": "syncpack lint",
+    "syncpack:fix": "syncpack fix"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.4",
     "husky": "^9.1.7",
+    "kysely-codegen": "^0.18.1",
+    "oxfmt": "latest",
     "oxlint": "^1.51.0",
+    "pg": "^8.16.0",
+    "syncpack": "^13.0.0",
     "turbo": "^2.8.13",
     "typescript": "catalog:"
-  }
+  },
+  "packageManager": "pnpm@10.19.0"
 }

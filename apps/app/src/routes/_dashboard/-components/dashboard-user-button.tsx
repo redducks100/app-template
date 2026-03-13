@@ -1,5 +1,17 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getInitials } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  BadgeCheckIcon,
+  BellIcon,
+  ChevronsUpDownIcon,
+  CreditCardIcon,
+  GlobeIcon,
+  LogOutIcon,
+  SparklesIcon,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,29 +25,14 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
+} from "@app/ui/components/dropdown-menu";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@app/ui/components/sidebar";
+import { useIsMobile } from "@app/ui/hooks/use-mobile";
 import { authClient } from "@/lib/auth-client";
 import { locales } from "@/lib/i18n";
 import { updateLanguage } from "@/lib/mutations/user";
-import {
-  BadgeCheckIcon,
-  BellIcon,
-  ChevronsUpDownIcon,
-  CreditCardIcon,
-  GlobeIcon,
-  LogOutIcon,
-  SparklesIcon,
-} from "lucide-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useRouter } from "@tanstack/react-router";
-import { sessionOptions } from "@/lib/query-options/auth";
-import { useTranslation } from "react-i18next";
+import { sessionOptions } from "@/lib/queries/auth";
+import { getInitials } from "@app/ui/lib/utils";
 
 const languageLabels: Record<string, string> = {
   en: "English",
@@ -109,9 +106,7 @@ export const DashboardUserButton = () => {
                     <AvatarFallback>{userInitials}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">
-                      {data.user.name}
-                    </span>
+                    <span className="truncate font-medium">{data.user.name}</span>
                     <span className="truncate text-xs">{data.user.email}</span>
                   </div>
                 </div>
@@ -126,9 +121,7 @@ export const DashboardUserButton = () => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem
-                onClick={() => navigate({ to: "/settings/profile" })}
-              >
+              <DropdownMenuItem onClick={() => navigate({ to: "/settings/profile" })}>
                 <BadgeCheckIcon />
                 Profile
               </DropdownMenuItem>

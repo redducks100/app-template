@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { MembersDataTable } from "./members-data-table";
+
 import { InviteMemberDialog } from "../../-components/invite-member-dialog";
+import { MembersDataTable } from "./members-data-table";
 
 export const MembersSection = () => {
   const { t } = useTranslation("members");
@@ -12,9 +13,7 @@ export const MembersSection = () => {
           <h3 className="text-xl font-semibold tracking-tight text-foreground">
             {t("allMembers")}
           </h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("membersDescription")}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("membersDescription")}</p>
         </div>
         <InviteMemberDialog />
       </div>

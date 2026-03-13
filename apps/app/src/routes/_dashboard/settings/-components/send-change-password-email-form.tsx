@@ -1,15 +1,14 @@
-import { useAppForm } from "@/components/ui/form/hooks";
+import { toast } from "sonner";
+
+import { useAppForm } from "@app/ui/components/form/hooks";
 import { authClient } from "@/lib/auth-client";
 import { forgotPasswordSchema } from "@app/shared/schemas/forgot-password-schema";
-import { toast } from "sonner";
 
 type SendChangePasswordEmailForm = {
   email: string;
 };
 
-export const SendChangePasswordEmailForm = ({
-  email,
-}: SendChangePasswordEmailForm) => {
+export const SendChangePasswordEmailForm = ({ email }: SendChangePasswordEmailForm) => {
   const form = useAppForm({
     defaultValues: {
       email: email,
@@ -25,9 +24,7 @@ export const SendChangePasswordEmailForm = ({
         },
         {
           onError: (error: { error: { message?: string } }) => {
-            toast.error(
-              error.error.message || "Failed to send password reset email.",
-            );
+            toast.error(error.error.message || "Failed to send password reset email.");
           },
           onSuccess: () => {
             toast.success("Password reset email sent");
@@ -53,11 +50,7 @@ export const SendChangePasswordEmailForm = ({
             </p>
           </div>
           <form.AppForm>
-            <form.SubmitButton
-              timer={30}
-              label="Send"
-              dontStartOnRender={true}
-            />
+            <form.SubmitButton timer={30} label="Send" dontStartOnRender={true} />
           </form.AppForm>
         </div>
       </div>

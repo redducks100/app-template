@@ -1,37 +1,27 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { DataTableToolbar } from "@/components/ui/data-table-toolbar";
-import { DataTablePagination } from "@/components/ui/data-table-pagination";
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { useState } from "react";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { getRouteApi } from "@tanstack/react-router";
+import { type PaginationState, type Updater } from "@tanstack/react-table";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { createInvitationColumns } from "./invitations-columns";
-import { invitationsListOptions } from "@/lib/query-options/invitations";
+
+import { useIsMobile } from "@app/ui/hooks/use-mobile";
 import { cancelInvitation as cancelInvitationMutation } from "@/lib/mutations/invitations";
+import { invitationsListOptions } from "@/lib/queries/invitations";
+
+import { createInvitationColumns } from "./invitations-columns";
+import { InvitationsDesktopDataTable } from "./invitations-data-table.desktop";
+import { InvitationsMobileDataTable } from "./invitations-data-table.mobile";
+
+const routeApi = getRouteApi("/_dashboard/invitations");
 
 export const InvitationsDataTable = () => {
   const { t } = useTranslation("invitations");
   const { t: tCommon } = useTranslation("common");
+  const isMobile = useIsMobile();
   const queryClient = useQueryClient();
-  const [globalFilter, setGlobalFilter] = useState("");
+  const navigate = routeApi.useNavigate();
+  const { page } = routeApi.useSearch();
 
   const { data: invitations } = useSuspenseQuery(invitationsListOptions());
 
@@ -51,16 +41,14 @@ export const InvitationsDataTable = () => {
     t,
   );
 
-  const table = useReactTable({
-    data: invitations,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: { globalFilter },
-    onGlobalFilterChange: setGlobalFilter,
-    initialState: { pagination: { pageSize: 10 } },
-  });
+  const onPaginationChange = useCallback(
+    (updater: Updater<PaginationState>) => {
+      const next =
+        typeof updater === "function" ? updater({ pageIndex: page - 1, pageSize: 10 }) : updater;
+      navigate({ search: { page: next.pageIndex + 1 } });
+    },
+    [page, navigate],
+  );
 
   if (invitations.length === 0) {
     return (
@@ -70,57 +58,25 @@ export const InvitationsDataTable = () => {
     );
   }
 
+  if (isMobile) {
+    return (
+      <InvitationsMobileDataTable
+        invitations={invitations}
+        isCanceling={cancelInvitation.isPending}
+        noResultsMessage={tCommon("noResults")}
+        t={t}
+        onCancel={(invitationId) => cancelInvitation.mutate({ invitationId })}
+      />
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <DataTableToolbar value={globalFilter} onChange={setGlobalFilter} />
-
-      <div className="rounded-xl border border-border bg-card shadow-xs">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  {tCommon("noResults")}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <DataTablePagination table={table} />
-    </div>
+    <InvitationsDesktopDataTable
+      invitations={invitations}
+      columns={columns}
+      page={page}
+      noResultsMessage={tCommon("noResults")}
+      onPaginationChange={onPaginationChange}
+    />
   );
 };

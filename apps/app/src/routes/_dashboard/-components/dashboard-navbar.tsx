@@ -1,7 +1,8 @@
-import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { BellIcon, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
+
+import { Button } from "@app/ui/components/button";
+import { Separator } from "@app/ui/components/separator";
+import { SidebarTrigger } from "@app/ui/components/sidebar";
 
 export const DashboardNavbar = () => {
   return (
@@ -17,9 +18,6 @@ export const DashboardNavbar = () => {
           <kbd className="pointer-events-none hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
             <span className="text-xs">⌘</span>K
           </kbd>
-        </Button>
-        <Button variant="ghost" size="icon-sm" className="text-muted-foreground">
-          <BellIcon className="size-4" />
         </Button>
       </div>
     </header>

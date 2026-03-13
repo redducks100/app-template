@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { SignInView } from "./-components/sign-in-view";
 import { z } from "zod";
+
+import { SignInView } from "./-components/sign-in-view";
 
 const searchSchema = z.object({
   callbackURL: z.string().catch("/"),

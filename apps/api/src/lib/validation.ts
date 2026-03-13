@@ -1,5 +1,6 @@
-import { zValidator } from "@hono/zod-validator";
 import type { z } from "zod";
+
+import { zValidator } from "@hono/zod-validator";
 
 type ValidationTarget = "json" | "query" | "param" | "header" | "cookie" | "form";
 

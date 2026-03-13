@@ -1,19 +1,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { membersListOptions } from "@/lib/query-options/members";
-import { rolesListOptions } from "@/lib/query-options/roles";
-import { invitationsListOptions } from "@/lib/query-options/invitations";
 import { Link } from "@tanstack/react-router";
+import { CogIcon, MailsIcon, UserPlusIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import {
-  UsersIcon,
-  ShieldIcon,
-  MailsIcon,
-  UserPlusIcon,
-  PlusCircleIcon,
-  CogIcon,
-  ActivityIcon,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+
+import { Button } from "@app/ui/components/button";
+import { invitationsListOptions } from "@/lib/queries/invitations";
+import { membersListOptions } from "@/lib/queries/members";
 
 type StatCardProps = {
   label: string;
@@ -64,11 +56,9 @@ function QuickAction({ label, icon, href }: QuickActionProps) {
 export const DashboardView = () => {
   const { t } = useTranslation("dashboard");
   const { data: membersData } = useSuspenseQuery(membersListOptions());
-  const { data: roles } = useSuspenseQuery(rolesListOptions());
   const { data: invitations } = useSuspenseQuery(invitationsListOptions());
 
   const membersCount = membersData.members.length;
-  const rolesCount = roles.length;
   const pendingInvitations = invitations.filter(
     (inv: { status: string }) => inv.status === "pending",
   ).length;
@@ -84,25 +74,17 @@ export const DashboardView = () => {
     <div className="animate-in-stagger space-y-6">
       {/* Welcome header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t("welcome")}
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("welcome")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{today}</p>
       </div>
 
       {/* Stats row */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         <StatCard
           label={t("stats.members")}
           value={membersCount}
           icon={<UsersIcon className="size-5" />}
           href="/users"
-        />
-        <StatCard
-          label={t("stats.roles")}
-          value={rolesCount}
-          icon={<ShieldIcon className="size-5" />}
-          href="/roles"
         />
         <StatCard
           label={t("stats.pendingInvitations")}
@@ -115,35 +97,17 @@ export const DashboardView = () => {
       {/* Quick actions */}
       <div className="space-y-3">
         <h2 className="text-sm font-medium text-muted-foreground">{t("quickActions")}</h2>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <QuickAction
             label={t("actions.inviteMember")}
             icon={<UserPlusIcon className="size-5 text-muted-foreground" />}
             href="/invitations"
           />
           <QuickAction
-            label={t("actions.createRole")}
-            icon={<PlusCircleIcon className="size-5 text-muted-foreground" />}
-            href="/roles/create"
-          />
-          <QuickAction
             label={t("actions.settings")}
             icon={<CogIcon className="size-5 text-muted-foreground" />}
             href="/settings/profile"
           />
-        </div>
-      </div>
-
-      {/* Activity placeholder */}
-      <div className="rounded-xl border border-border bg-card p-8">
-        <div className="flex flex-col items-center justify-center text-center">
-          <div className="rounded-lg bg-muted p-3 text-muted-foreground">
-            <ActivityIcon className="size-6" />
-          </div>
-          <h3 className="mt-4 text-sm font-medium">{t("activity.title")}</h3>
-          <p className="mt-1 text-xs text-muted-foreground max-w-[240px]">
-            {t("activity.description")}
-          </p>
         </div>
       </div>
     </div>

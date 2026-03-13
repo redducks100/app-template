@@ -1,0 +1,40 @@
+{
+  "name": "@app/data-ops",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./database": "./src/db.ts",
+    "./auth": "./src/auth.ts",
+    "./password": "./src/password.ts",
+    "./queries/*": "./src/queries/*.ts",
+    "./emails/*": "./src/emails/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "kysely migrate:latest",
+    "db:migrate:up": "kysely migrate:up",
+    "db:migrate:down": "kysely migrate:down",
+    "db:migrate:make": "kysely migrate:make",
+    "db:migrate:list": "kysely migrate:list"
+  },
+  "dependencies": {
+    "@app/shared": "workspace:*",
+    "@neondatabase/serverless": "^1.0.0",
+    "@react-email/components": "^0.5.7",
+    "better-auth": "catalog:",
+    "kysely": "catalog:",
+    "kysely-neon": "^2.0.2",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
+    "resend": "^6.3.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "dotenv": "^16.5.0",
+    "kysely-ctl": "^0.20.0",
+    "typescript": "catalog:"
+  }
+}

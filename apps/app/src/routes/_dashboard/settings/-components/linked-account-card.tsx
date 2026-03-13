@@ -1,13 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
-import {
-  SUPPORTED_OATH_PROVIDER_DETAILS,
-  SupportedOAuthProvider,
-} from "@/lib/constants";
-import { Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { Button } from "@app/ui/components/button";
+import { authClient } from "@/lib/auth-client";
+import { SUPPORTED_OATH_PROVIDER_DETAILS, SupportedOAuthProvider } from "@/lib/constants";
 
 export type LinkedAccountCardProps = {
   provider: string;
@@ -18,14 +16,10 @@ export type LinkedAccountCardProps = {
   };
 };
 
-export const LinkedAccountCard = ({
-  provider,
-  account,
-}: LinkedAccountCardProps) => {
+export const LinkedAccountCard = ({ provider, account }: LinkedAccountCardProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const queryClient = useQueryClient();
-  const providerDetails =
-    SUPPORTED_OATH_PROVIDER_DETAILS[provider as SupportedOAuthProvider];
+  const providerDetails = SUPPORTED_OATH_PROVIDER_DETAILS[provider as SupportedOAuthProvider];
 
   function unlinkAccount() {
     if (account == null) {
@@ -48,10 +42,7 @@ export const LinkedAccountCard = ({
         },
         onError: (error) => {
           setLoading(false);
-          toast.error(
-            error.error.message ||
-              "Something went wrong while unlinking the account",
-          );
+          toast.error(error.error.message || "Something went wrong while unlinking the account");
         },
       },
     );
@@ -70,10 +61,7 @@ export const LinkedAccountCard = ({
           toast.success("Account was linked successfully");
         },
         onError: (error) => {
-          toast.error(
-            error.error.message ||
-              "Something went wrong while linking your account",
-          );
+          toast.error(error.error.message || "Something went wrong while linking your account");
         },
       },
     );
@@ -96,12 +84,7 @@ export const LinkedAccountCard = ({
         </div>
       </div>
       {account == null ? (
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={loading}
-          onClick={linkAccount}
-        >
+        <Button variant="outline" size="sm" disabled={loading} onClick={linkAccount}>
           {loading ? (
             <Loader2Icon className="animate-spin" />
           ) : (
@@ -112,12 +95,7 @@ export const LinkedAccountCard = ({
           )}
         </Button>
       ) : (
-        <Button
-          variant="destructive"
-          size="sm"
-          disabled={loading}
-          onClick={unlinkAccount}
-        >
+        <Button variant="destructive" size="sm" disabled={loading} onClick={unlinkAccount}>
           {loading ? (
             <Loader2Icon className="animate-spin" />
           ) : (

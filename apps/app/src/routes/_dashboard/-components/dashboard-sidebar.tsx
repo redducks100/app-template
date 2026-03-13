@@ -1,14 +1,24 @@
+import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  BuildingIcon,
+  ChartBarIcon,
+  ChevronRightIcon,
+  CogIcon,
+  InfoIcon,
+  LayoutDashboardIcon,
+  MailsIcon,
+  UsersIcon,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@app/ui/components/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@app/ui/components/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -23,28 +33,15 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from "@/components/ui/sidebar";
-import {
-  BuildingIcon,
-  ChartBarIcon,
-  ChevronRightIcon,
-  CogIcon,
-  InfoIcon,
-  LayoutDashboardIcon,
-  MailsIcon,
-  ShieldIcon,
-  UsersIcon,
-} from "lucide-react";
-import { DashboardUserButton } from "./dashboard-user-button";
+} from "@app/ui/components/sidebar";
+
 import { DashboardOrganizationSwitcher } from "./dashboard-organization-switcher";
-import { useTranslation } from "react-i18next";
-import { Link, useMatchRoute } from "@tanstack/react-router";
+import { DashboardUserButton } from "./dashboard-user-button";
 
-const activeClass = "relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-0.5 before:rounded-full before:bg-primary";
+const activeClass =
+  "relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-0.5 before:rounded-full before:bg-primary";
 
-export const DashboardSidebar = ({
-  ...props
-}: React.ComponentProps<typeof Sidebar>) => {
+export const DashboardSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { t } = useTranslation("dashboard");
   const { t: tCommon } = useTranslation("common");
   const matchRoute = useMatchRoute();
@@ -60,13 +57,18 @@ export const DashboardSidebar = ({
   const organizationSubItems = [
     { title: t("sidebar.general"), url: "/organization", icon: InfoIcon },
     { title: t("sidebar.invitations"), url: "/invitations", icon: MailsIcon },
-    { title: t("sidebar.roles"), url: "/roles", icon: ShieldIcon },
     { title: t("sidebar.users"), url: "/users", icon: UsersIcon },
   ];
 
   const isOrgSectionActive = organizationSubItems.some(
     (item) => !!matchRoute({ to: item.url, fuzzy: true }),
   );
+
+  const [orgOpen, setOrgOpen] = useState(isOrgSectionActive);
+
+  useEffect(() => {
+    if (isOrgSectionActive) setOrgOpen(true);
+  }, [isOrgSectionActive]);
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -125,7 +127,8 @@ export const DashboardSidebar = ({
                   </DropdownMenu>
                 ) : (
                   <Collapsible
-                    defaultOpen={isOrgSectionActive}
+                    open={orgOpen}
+                    onOpenChange={setOrgOpen}
                     className="group/collapsible"
                   >
                     <CollapsibleTrigger

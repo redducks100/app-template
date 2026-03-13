@@ -1,10 +1,13 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { getAuth } from "../lib/auth.js";
-import { authMiddleware } from "../middleware/auth.js";
-import { ok } from "../lib/result.js";
-import { zv } from "../lib/validation.js";
+
+import type { MemberPermissions } from "@app/shared/types/members";
+
+import { getAuth } from "../lib/auth";
+import { ok } from "../lib/result";
+import { zv } from "../lib/validation";
+import { authMiddleware } from "../middleware/auth";
 
 export const memberRoutes = new Hono()
   .use(authMiddleware)
@@ -41,7 +44,7 @@ export const memberRoutes = new Hono()
         .then((r) => r.success),
     ]);
 
-    return ok(c, { canUpdate, canDelete });
+    return ok(c, { canUpdate, canDelete } satisfies MemberPermissions);
   })
   .patch(
     "/:id/role",
@@ -73,30 +76,26 @@ export const memberRoutes = new Hono()
       return ok(c, response);
     },
   )
-  .delete(
-    "/:id",
-    zv("param", z.object({ id: z.string() })),
-    async (c) => {
-      const session = c.get("session");
-      const { id: memberIdOrEmail } = c.req.valid("param");
-      const organizationId = session.activeOrganizationId;
+  .delete("/:id", zv("param", z.object({ id: z.string() })), async (c) => {
+    const session = c.get("session");
+    const { id: memberIdOrEmail } = c.req.valid("param");
+    const organizationId = session.activeOrganizationId;
 
-      if (!organizationId) {
-        throw new HTTPException(400, { message: "No active organization selected." });
-      }
+    if (!organizationId) {
+      throw new HTTPException(400, { message: "No active organization selected." });
+    }
 
-      const response = await getAuth(c.env.R2).api.removeMember({
-        body: {
-          memberIdOrEmail,
-          organizationId,
-        },
-        headers: c.req.raw.headers,
-      });
+    const response = await getAuth(c.env.R2).api.removeMember({
+      body: {
+        memberIdOrEmail,
+        organizationId,
+      },
+      headers: c.req.raw.headers,
+    });
 
-      if (!response) {
-        throw new HTTPException(500, { message: "Failed to remove member." });
-      }
+    if (!response) {
+      throw new HTTPException(500, { message: "Failed to remove member." });
+    }
 
-      return ok(c, response);
-    },
-  );
+    return ok(c, response);
+  });

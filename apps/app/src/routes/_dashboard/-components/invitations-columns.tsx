@@ -1,10 +1,15 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import type { InferResponseType } from "hono/client";
-import type { apiClient } from "@/lib/api-client";
 import { createColumnHelper } from "@tanstack/react-table";
+import { InferResponseType } from "hono/client";
 
-type Invitation = InferResponseType<(typeof apiClient)["invitations"]["$get"], 200>["data"][number];
+import { Badge } from "@app/ui/components/badge";
+import { Button } from "@app/ui/components/button";
+import { apiClient } from "@/lib/api-client";
+import { formatDate } from "@app/ui/lib/utils";
+
+export type Invitation = InferResponseType<
+  (typeof apiClient)["invitations"]["$get"],
+  200
+>["data"][number];
 
 const columnHelper = createColumnHelper<Invitation>();
 
@@ -15,36 +20,31 @@ const statusVariant: Record<string, "secondary" | "default" | "destructive"> = {
   rejected: "destructive",
 };
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
-
 export function createInvitationColumns(
   onCancel: (invitationId: string) => void,
   isCanceling: boolean,
   t: (key: string) => string,
 ) {
   return [
-    columnHelper.accessor("email", {
+    columnHelper.display({
+      id: "email",
       header: t("emailColumn"),
-      cell: (info) => (
-        <span className="font-medium">{info.getValue()}</span>
-      ),
+      cell: (info) => <span>{info.row.original.email}</span>,
     }),
-    columnHelper.accessor("role", {
+    columnHelper.display({
+      id: "role",
       header: t("roleColumn"),
       cell: (info) => (
         <Badge variant="outline" className="capitalize">
-          {info.getValue()}
+          {info.row.original.role}
         </Badge>
       ),
     }),
-    columnHelper.accessor("status", {
+    columnHelper.display({
+      id: "status",
       header: t("statusColumn"),
       cell: (info) => {
-        const status = info.getValue();
+        const status = info.row.original.status;
         return (
           <Badge variant={statusVariant[status] ?? "secondary"} className="capitalize">
             {status}
@@ -52,12 +52,13 @@ export function createInvitationColumns(
         );
       },
     }),
-    columnHelper.accessor("expiresAt", {
+    columnHelper.display({
+      id: "expiresAt",
       header: t("expiresColumn"),
       cell: (info) => {
-        const value = info.getValue();
+        const value = info.row.original.expiresAt;
         if (!value) return <span className="text-muted-foreground">-</span>;
-        return dateFormatter.format(new Date(value));
+        return <span>{formatDate(value)}</span>;
       },
     }),
     columnHelper.display({

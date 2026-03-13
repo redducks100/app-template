@@ -1,7 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 import { type LucideIcon } from "lucide-react";
 import React from "react";
+
+import { Card, CardContent } from "@app/ui/components/card";
 
 type ViewSectionProps = {
   title: string;
@@ -58,15 +59,12 @@ export const ViewSection = ({
       <div className="lg:col-span-2 space-y-4">
         {React.Children.map(children, (child, index) =>
           insideCard ? (
-            <Card
-              className={viewSectionVariants({ viewVariant })}
-              key={`view-card-${index}`}
-            >
+            <Card className={viewSectionVariants({ viewVariant })} key={`view-card-${index}`}>
               <CardContent className="space-y-4">{child}</CardContent>
             </Card>
           ) : (
             child
-          )
+          ),
         )}
       </div>
     </div>

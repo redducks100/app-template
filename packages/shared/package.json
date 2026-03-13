@@ -9,8 +9,12 @@
     "./permissions": "./src/permissions.ts",
     "./logger": "./src/logger.ts"
   },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "better-auth": "catalog:",
+    "kysely": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

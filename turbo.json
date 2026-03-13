@@ -1,12 +1,14 @@
 {
   "$schema": "https://turborepo.dev/schema.v2.json",
+  "globalEnv": ["DATABASE_URL", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"],
   "tasks": {
-    "//#lint": {},
-    "//#lint:fix": {},
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
     "build": {
-      "dependsOn": ["^build", "//#lint:fix"],
+      "dependsOn": ["^build", "typecheck"],
       "outputs": ["dist/**"],
-      "passThroughEnv": ["VITE_API_URL"]
+      "env": ["VITE_API_URL"]
     },
     "dev": {
       "cache": false,
@@ -14,13 +16,12 @@
     },
     "deploy:cf": {
       "dependsOn": ["build"],
-      "cache": false,
-      "passThroughEnv": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
+      "cache": false
     },
-    "db:migrate": { "cache": false, "passThroughEnv": ["DATABASE_URL"] },
-    "db:migrate:up": { "cache": false, "passThroughEnv": ["DATABASE_URL"] },
-    "db:migrate:down": { "cache": false, "passThroughEnv": ["DATABASE_URL"] },
+    "db:migrate": { "cache": false },
+    "db:migrate:up": { "cache": false },
+    "db:migrate:down": { "cache": false },
     "db:migrate:make": { "cache": false },
-    "db:migrate:list": { "cache": false, "passThroughEnv": ["DATABASE_URL"] }
+    "db:migrate:list": { "cache": false }
   }
 }

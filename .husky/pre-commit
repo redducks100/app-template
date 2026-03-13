@@ -1,1 +1,2 @@
+pnpm fmt:check
 pnpm lint

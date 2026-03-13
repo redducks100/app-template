@@ -1,9 +1,10 @@
-import { Field, FieldGroup } from "@/components/ui/field";
-import { useAppForm } from "@/components/ui/form/hooks";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+
+import { Field, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
 import { authClient } from "@/lib/auth-client";
 import { verifyEmailSchema } from "@app/shared/schemas/verify-email-schema";
-import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 
 type VerifyEmailViewProps = {
   email: string;

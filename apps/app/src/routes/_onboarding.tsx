@@ -1,5 +1,6 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
+
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_onboarding")({

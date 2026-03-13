@@ -1,16 +1,14 @@
-import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { useState } from "react";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  organizationsListOptions,
-  activeOrganizationOptions,
-} from "@/lib/query-options/organizations";
-import { sessionOptions } from "@/lib/query-options/auth";
+import { toast } from "sonner";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
+import { authClient } from "@/lib/auth-client";
+import { sessionOptions } from "@/lib/queries/auth";
+import { activeOrganizationOptions, organizationsListOptions } from "@/lib/queries/organizations";
 
 export const SelectOrganizationContent = () => {
   const { t } = useTranslation("selectOrg");
@@ -21,9 +19,7 @@ export const SelectOrganizationContent = () => {
 
   const { data: organizations } = useSuspenseQuery(organizationsListOptions());
 
-  const { data: activeOrganization } = useSuspenseQuery(
-    activeOrganizationOptions(),
-  );
+  const { data: activeOrganization } = useSuspenseQuery(activeOrganizationOptions());
 
   const onCreateOrganization = () => {
     navigate({ to: "/create-org" });
@@ -89,9 +85,7 @@ export const SelectOrganizationContent = () => {
         className="rounded-xl border-2 border-dashed p-5 text-left cursor-pointer transition-all hover:border-primary/50 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-2 min-h-[140px]"
       >
         <PlusIcon className="size-8 text-muted-foreground" />
-        <span className="text-sm font-medium text-muted-foreground">
-          {t("createNew")}
-        </span>
+        <span className="text-sm font-medium text-muted-foreground">{t("createNew")}</span>
       </button>
     </div>
   );

@@ -1,10 +1,9 @@
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { getAuth } from "../lib/auth.js";
 
-type AuthSession = Awaited<
-  ReturnType<ReturnType<typeof getAuth>["api"]["getSession"]>
->;
+import { getAuth } from "../lib/auth";
+
+type AuthSession = Awaited<ReturnType<ReturnType<typeof getAuth>["api"]["getSession"]>>;
 
 type AuthEnv = {
   Variables: {

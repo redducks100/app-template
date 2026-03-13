@@ -1,26 +1,22 @@
-import { Loader2, MailIcon, Trash2, Upload, UserIcon } from "lucide-react";
-import { useAppForm } from "@/components/ui/form/hooks";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { updateUserProfileSchema } from "@app/shared/schemas/update-user-profile-schema";
-import { type User } from "better-auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { Separator } from "@/components/ui/separator";
-import { useTranslation } from "react-i18next";
-import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { compressProfileImage, validateProfileImage } from "@/lib/image-utils";
-import { uploadAvatar, removeAvatar } from "@/lib/mutations/user";
-import { sessionOptions } from "@/lib/query-options/auth";
 import { useRouter } from "@tanstack/react-router";
-import { getInitials } from "@/lib/utils";
+import { type User } from "better-auth";
+import { Loader2, MailIcon, Trash2, Upload, UserIcon } from "lucide-react";
+import { useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
+import { Button } from "@app/ui/components/button";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
+import { Separator } from "@app/ui/components/separator";
+import { authClient } from "@/lib/auth-client";
+import { compressProfileImage, validateProfileImage } from "@/lib/image-utils";
+import { removeAvatar, uploadAvatar } from "@/lib/mutations/user";
+import { sessionOptions } from "@/lib/queries/auth";
+import { getInitials } from "@app/ui/lib/utils";
+import { updateUserProfileSchema } from "@app/shared/schemas/update-user-profile-schema";
 
 type ProfileSectionProps = {
   user: User;
@@ -92,9 +88,7 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
       const emailResult = res[1] ?? { error: false };
 
       if (updateUserResult.error) {
-        toast.error(
-          updateUserResult.error.message || t("profile.updateProfileError"),
-        );
+        toast.error(updateUserResult.error.message || t("profile.updateProfileError"));
       } else if (emailResult.error) {
         toast.error(emailResult.error.message || t("profile.changeEmailError"));
       } else {
@@ -127,9 +121,7 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
             </Avatar>
             <div className="flex-1">
               <FieldLabel>{t("profile.profilePicture")}</FieldLabel>
-              <FieldDescription>
-                {t("profile.profilePictureDescription")}
-              </FieldDescription>
+              <FieldDescription>{t("profile.profilePictureDescription")}</FieldDescription>
             </div>
             <div className="flex items-center gap-2">
               <Button

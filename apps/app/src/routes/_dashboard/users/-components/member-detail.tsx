@@ -1,33 +1,29 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { FieldDescription, FieldLabel } from "@/components/ui/field";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowLeftIcon } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
+import { Badge } from "@app/ui/components/badge";
+import { Button } from "@app/ui/components/button";
+import { ConfirmDialog } from "@app/ui/components/confirm-dialog";
+import { FieldDescription, FieldLabel } from "@app/ui/components/field";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@app/ui/components/select";
 import { authClient } from "@/lib/auth-client";
 import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
-import { ArrowLeftIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { getInitials } from "@/lib/utils";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { toast } from "sonner";
-import { membersListOptions, membersPermissionsOptions } from "@/lib/query-options/members";
-import { rolesListOptions } from "@/lib/query-options/roles";
-import {
-  updateMemberRole as updateMemberRoleMutation,
   removeMember as removeMemberMutation,
+  updateMemberRole as updateMemberRoleMutation,
 } from "@/lib/mutations/members";
+import { membersListOptions, membersPermissionsOptions } from "@/lib/queries/members";
+import { getInitials } from "@app/ui/lib/utils";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -50,8 +46,6 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
 
   const { data: permissions } = useSuspenseQuery(membersPermissionsOptions());
 
-  const { data: roles } = useSuspenseQuery(rolesListOptions());
-
   const { data: session } = authClient.useSession();
 
   const member = members.find((m) => m.id === memberId);
@@ -59,7 +53,10 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
   const isSelf = member?.userId === currentUserId;
   const isOwnerRole = member?.role === "owner";
 
-  const availableRoles = roles.filter((r) => r.role !== "owner");
+  const availableRoles = [
+    { role: "admin", id: "admin" },
+    { role: "member", id: "member" },
+  ];
 
   const [selectedRole, setSelectedRole] = useState<string>(member?.role ?? "");
   const isDirty = selectedRole !== member?.role;
@@ -134,13 +131,10 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-muted-foreground truncate">
-              {member.user.email}
-            </p>
+            <p className="text-sm text-muted-foreground truncate">{member.user.email}</p>
             {member.createdAt && (
               <p className="text-sm text-muted-foreground mt-0.5">
-                {t("joinedDate")}{" "}
-                {dateFormatter.format(new Date(member.createdAt))}
+                {t("joinedDate")} {dateFormatter.format(new Date(member.createdAt))}
               </p>
             )}
           </div>
@@ -150,16 +144,12 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
       {/* Role section */}
       {permissions.canUpdate && !isOwnerRole && (
         <section>
-          <h3 className="text-base font-semibold text-foreground mb-4">
-            {t("memberRole")}
-          </h3>
+          <h3 className="text-base font-semibold text-foreground mb-4">{t("memberRole")}</h3>
           <div className="rounded-xl border border-border bg-card">
             <div className="flex items-center justify-between p-5">
               <div>
                 <FieldLabel>{t("memberRole")}</FieldLabel>
-                <FieldDescription>
-                  {t("memberRoleDescription")}
-                </FieldDescription>
+                <FieldDescription>{t("memberRoleDescription")}</FieldDescription>
               </div>
               <div className="flex items-center gap-3">
                 <Select
@@ -167,14 +157,17 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
                   onValueChange={(v) => {
                     if (v) setSelectedRole(v);
                   }}
-                  items={availableRoles.map((r) => ({ value: r.role, label: r.role }))}
+                  items={availableRoles.map((r) => ({
+                    value: r.role,
+                    label: r.role,
+                  }))}
                 >
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {availableRoles.map((role) => (
-                      <SelectItem key={role.id} value={role.role}>
+                      <SelectItem key={role.role} value={role.role}>
                         <span className="capitalize">{role.role}</span>
                       </SelectItem>
                     ))}
@@ -203,16 +196,12 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
       {/* Danger zone */}
       {permissions.canDelete && !isOwnerRole && !isSelf && (
         <section>
-          <h3 className="text-base font-semibold text-destructive mb-4">
-            {t("dangerZone")}
-          </h3>
+          <h3 className="text-base font-semibold text-destructive mb-4">{t("dangerZone")}</h3>
           <div className="rounded-xl border border-destructive/30 bg-destructive/5">
             <div className="flex items-center justify-between p-5">
               <div>
                 <p className="font-medium">{t("removeMember")}</p>
-                <p className="text-sm text-muted-foreground">
-                  {t("removeDescription")}
-                </p>
+                <p className="text-sm text-muted-foreground">{t("removeDescription")}</p>
               </div>
               <ConfirmDialog
                 title={t("removeConfirmTitle")}
@@ -220,15 +209,9 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
                 confirmLabel={t("remove")}
                 cancelLabel={t("cancel")}
                 variant="destructive"
-                onConfirm={() =>
-                  removeMember.mutate({ memberIdOrEmail: member.id })
-                }
+                onConfirm={() => removeMember.mutate({ memberIdOrEmail: member.id })}
               >
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  disabled={removeMember.isPending}
-                >
+                <Button variant="destructive" size="sm" disabled={removeMember.isPending}>
                   {t("removeMember")}
                 </Button>
               </ConfirmDialog>

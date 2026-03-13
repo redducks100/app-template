@@ -1,13 +1,14 @@
+import { Link, getRouteApi, useNavigate } from "@tanstack/react-router";
 import { AlertCircleIcon, LockIcon } from "lucide-react";
-import { useAppForm } from "@/components/ui/form/hooks";
-import { Field, FieldGroup } from "@/components/ui/field";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { resetPasswordSchema } from "@app/shared/schemas/reset-password-schema";
-import { getRouteApi, Link, useNavigate } from "@tanstack/react-router";
-import { Alert, AlertTitle } from "@/components/ui/alert";
-import { buttonVariants } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+
+import { Alert, AlertTitle } from "@app/ui/components/alert";
+import { buttonVariants } from "@app/ui/components/button";
+import { Field, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
+import { authClient } from "@/lib/auth-client";
+import { resetPasswordSchema } from "@app/shared/schemas/reset-password-schema";
 
 const routeApi = getRouteApi("/_guest/reset-password");
 
@@ -55,7 +56,9 @@ export const ResetPasswordView = () => {
           <h1 className="text-3xl font-semibold tracking-tight">
             {t("reset_password.invalidTitle")}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">{t("reset_password.invalidDescription")}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {t("reset_password.invalidDescription")}
+          </p>
         </div>
         <Link to="/sign-in" className={buttonVariants({ className: "w-full" })}>
           {t("reset_password.backToSignIn")}

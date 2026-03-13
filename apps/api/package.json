@@ -8,37 +8,28 @@
     "./lib/auth": "./src/lib/auth.ts"
   },
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "build": "wrangler deploy --dry-run --outdir=dist",
     "dev": "wrangler dev",
-    "deploy:cf": "wrangler deploy",
-    "db:migrate": "kysely migrate:latest",
-    "db:migrate:up": "kysely migrate:up",
-    "db:migrate:down": "kysely migrate:down",
-    "db:migrate:make": "kysely migrate:make",
-    "db:migrate:list": "kysely migrate:list"
+    "deploy:cf": "wrangler deploy"
   },
   "dependencies": {
+    "@app/data-ops": "workspace:*",
     "@app/shared": "workspace:*",
     "@hono/zod-validator": "^0.5.0",
-    "@neondatabase/serverless": "^1.0.0",
-    "@react-email/components": "^0.5.7",
     "@sentry/cloudflare": "^10.42.0",
     "better-auth": "catalog:",
     "hono": "catalog:",
-    "kysely": "^0.28.11",
-    "kysely-neon": "^2.0.2",
-    "react": "catalog:",
-    "react-dom": "catalog:",
-    "resend": "^6.3.0",
+    "kysely": "catalog:",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260305.1",
     "@types/node": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
-    "dotenv": "^16.5.0",
-    "kysely-ctl": "^0.20.0",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
     "typescript": "catalog:",
     "wrangler": "catalog:"
   }

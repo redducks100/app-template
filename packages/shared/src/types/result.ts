@@ -36,5 +36,12 @@ export type ApiError = {
   error: { message: string };
 };
 
+export interface ApiCursorSuccess<T> {
+  success: true;
+  data: T[];
+  nextCursor: string | null;
+}
+
+export type ApiCursorResponse<T> = ApiCursorSuccess<T> | ApiError;
 export type ApiPaginatedResponse<T> = ApiPaginatedSuccess<T> | ApiError;
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;

@@ -1,5 +1,8 @@
+import { PlusIcon } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+
+import { Button } from "@app/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -7,9 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { PlusIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
+} from "@app/ui/components/dialog";
+
 import { CreateInvitationForm } from "./create-invitation-form";
 
 export const InviteMemberDialog = () => {

@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **DB migrate down**: `pnpm db:migrate:down` (rolls back last migration)
 - **DB migrate make**: `pnpm db:migrate:make` (scaffolds a new migration file)
 - **DB migrate list**: `pnpm db:migrate:list` (shows migration status)
+- **DB codegen**: `pnpm db:codegen` (introspects DB and regenerates `packages/shared/src/types/db.generated.ts`; run after migrations)
 
 No test framework is configured.
 
@@ -43,7 +44,9 @@ app-template/
 │   ├── api/          # @app/api — Standalone Hono API worker → api.enomisoft.com
 │   └── app/          # @app/app — TanStack Router SPA → app.enomisoft.com (Cloudflare Workers Static Assets)
 ├── packages/
-│   └── shared/       # @app/shared — Zod schemas, types, permissions
+│   ├── data-ops/     # @app/data-ops — Database, auth, password, emails, migrations, queries
+│   ├── shared/       # @app/shared — Zod schemas, types, permissions
+│   └── ui/           # @app/ui — UI components, hooks, utilities, CSS theme
 ├── turbo.json
 ├── pnpm-workspace.yaml
 ├── tsconfig.base.json
@@ -56,13 +59,10 @@ Standalone Hono app deployed as a Cloudflare Worker. Routes are nested under `/a
 
 - `src/worker.ts` — Worker entry point (exports `apiApp`)
 - `src/app.ts` — Hono app composition, exports `apiApp` (with `/api` prefix) and `AppType` (route-level types without `/api` for RPC client)
-- `src/routes/` — Hono RPC routes (organizations, invitations, members, roles, user)
+- `src/routes/` — Hono RPC routes (organizations, invitations, members, user)
 - `src/middleware/auth.ts` — Session auth middleware using `c.req.raw.headers`
-- `src/lib/auth.ts` — Better Auth server config with Kysely dialect, cross-subdomain cookies
-- `src/lib/db.ts` — Kysely connection (NeonDialect)
-- `src/db/types.ts` — Kysely Database interface (table types)
-- `src/db/migrations/` — Kysely migrations with up/down functions
-- `src/emails/` — React Email templates sent via Resend
+- `src/lib/auth.ts` — Thin wrapper around `@app/data-ops/auth`, passes R2 bucket for avatar uploads
+- `src/lib/result.ts`, `src/lib/validation.ts` — Hono-specific helpers
 - `wrangler.jsonc` — Cloudflare Workers config
 - `.dev.vars` — Local dev secrets (gitignored)
 
@@ -71,8 +71,12 @@ Standalone Hono app deployed as a Cloudflare Worker. Routes are nested under `/a
 ```ts
 export const roleRoutes = new Hono()
   .use(authMiddleware)
-  .get('/list', async (c) => { return c.json(result); })
-  .post('/create', zValidator('json', schema), async (c) => { return c.json(result, 201); });
+  .get("/list", async (c) => {
+    return c.json(result);
+  })
+  .post("/create", zValidator("json", schema), async (c) => {
+    return c.json(result, 201);
+  });
 ```
 
 ## Dashboard App (`apps/app`)
@@ -84,7 +88,8 @@ Client-only SPA using TanStack Router, deployed to Cloudflare Workers with Stati
 - `vite.config.ts` — Vite + TanStack Router plugin + Tailwind CSS
 - `src/router.tsx` — `getRouter()` factory
 - `src/routes/` — TanStack Router file-based routes
-- `src/components/ui/` — shadcn + form system
+- `src/components/` — App-specific components (generated-avatar, error boundaries)
+- UI components, hooks, and utilities are in `@app/ui` (`packages/ui`)
 - `src/lib/api-client.ts` — Hono RPC client (`hc<AppType>`) pointing to `VITE_API_URL`
 - `src/lib/auth-client.ts` — Better Auth client pointing to `VITE_API_URL`
 - `src/lib/query-options.ts` — TanStack Query option factories
@@ -127,18 +132,18 @@ src/routes/_dashboard/
 
 ```tsx
 // Query options (src/lib/query-options.ts)
-export const rolesListOptions = () => queryOptions({
-  queryKey: ['roles', 'list'],
-  queryFn: async () => {
-    const res = await apiClient.roles.list.$get();
-    return res.json();
-  },
-});
+export const rolesListOptions = () =>
+  queryOptions({
+    queryKey: ["roles", "list"],
+    queryFn: async () => {
+      const res = await apiClient.roles.list.$get();
+      return res.json();
+    },
+  });
 
 // In route files — loader + component
-export const Route = createFileRoute('/_dashboard/roles/')({
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(rolesListOptions()),
+export const Route = createFileRoute("/_dashboard/roles/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(rolesListOptions()),
   component: RolesPage,
 });
 ```
@@ -153,6 +158,31 @@ Built on Base UI + shadcn. Key subsystem:
 
 **Form components** (`components/ui/form/`): `useAppForm` hook wraps TanStack React Form with pre-registered field components (`Input`, `Textarea`, `Select`, `Checkbox`) and `SubmitButton`.
 
+## Data Ops Package (`packages/data-ops`)
+
+Backend-only package for database, auth, and email operations.
+
+- `src/db.ts` — Kysely + NeonDialect singleton (`getDb()`)
+- `src/auth.ts` — Better Auth factory (`getAuth()`) with optional R2 avatar callback
+- `src/password.ts` — PBKDF2 hash/verify
+- `src/queries/` — Extracted database queries (organizations, invitations, user)
+- `src/emails/` — React Email templates + Resend senders
+- `src/db/migrations/` — Kysely migration files
+- `src/type-checks/` — Compile-time Zod schema ↔ DB type assertions (zero runtime cost)
+- `kysely.config.ts` — Kysely CLI config for migrations
+
+## UI Package (`packages/ui`)
+
+Shared UI components, hooks, and utilities extracted from the app.
+
+- `src/components/ui/` — All shadcn primitives + form system
+- `src/hooks/` — use-mobile, use-tablet, use-infinite-scroll
+- `src/lib/utils.ts` — cn(), getInitials(), formatDate(), formatDateTime()
+- `src/lib/create-safe-context.ts` — Type-safe React context factory
+- `src/styles/globals.css` — Theme variables, animations, base styles
+
+Import pattern: `@app/ui/components/button`, `@app/ui/lib/utils`, `@app/ui/hooks/use-mobile`
+
 ## Shared Package (`packages/shared`)
 
 - `src/schemas/` — Zod validation schemas shared between API and web
@@ -162,7 +192,7 @@ Built on Base UI + shadcn. Key subsystem:
 ## Path Aliases
 
 - `@/*` maps to `apps/app/src/`
-- `@app/api` and `@app/shared` are workspace package imports
+- `@app/api`, `@app/shared`, `@app/data-ops`, `@app/ui` are workspace package imports
 
 ## Build System (Turborepo)
 
@@ -177,17 +207,21 @@ Turborepo orchestrates builds, dev servers, and deploys across the monorepo. Con
 ## Environment Variables
 
 ### API Worker (wrangler vars/secrets)
+
 Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `COOKIE_DOMAIN`.
 Optional: `SENTRY_DSN` (enables Sentry error tracking in production; omit for local dev).
 
 ### SPA (Cloudflare Workers, build-time)
+
 Required: `VITE_API_URL` (baked into bundle, e.g. `https://api.enomisoft.com`).
 
 ### CI / GitHub Secrets
+
 Required: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DATABASE_URL` (prod Neon connection string).
 CI deploy workflow runs `pnpm db:migrate` before deploying.
 
 ### Local Development
+
 - API runs on `localhost:8787` (via `wrangler dev`)
 - SPA runs on `localhost:3000` (via `vite dev`)
 - SPA defaults `VITE_API_URL` to `http://localhost:8787`

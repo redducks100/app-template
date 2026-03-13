@@ -1,13 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { rolePermissionsOptions } from "@/lib/query-options/roles";
-import { membersPermissionsOptions } from "@/lib/query-options/members";
-import { invitationPermissionsOptions } from "@/lib/query-options/invitations";
-import { organizationPermissionsOptions } from "@/lib/query-options/organizations";
 
-export function useRolePermissions() {
-  const { data } = useSuspenseQuery(rolePermissionsOptions());
-  return data;
-}
+import { invitationPermissionsOptions } from "@/lib/queries/invitations";
+import { membersPermissionsOptions } from "@/lib/queries/members";
+import { organizationPermissionsOptions } from "@/lib/queries/organizations";
 
 export function useMemberPermissions() {
   const { data } = useSuspenseQuery(membersPermissionsOptions());

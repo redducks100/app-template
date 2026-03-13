@@ -1,43 +1,26 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { DataTableToolbar } from "@/components/ui/data-table-toolbar";
-import { DataTablePagination } from "@/components/ui/data-table-pagination";
-import { authClient } from "@/lib/auth-client";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-  type FilterFn,
-} from "@tanstack/react-table";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "@tanstack/react-router";
-import { createMemberColumns } from "./members-columns";
-import { membersListOptions } from "@/lib/query-options/members";
+import { getRouteApi } from "@tanstack/react-router";
+import { type PaginationState, type Updater } from "@tanstack/react-table";
 import { UsersIcon } from "lucide-react";
+import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
-const memberGlobalFilterFn: FilterFn<any> = (row, _columnId, filterValue) => {
-  const search = String(filterValue).toLowerCase();
-  const name = (row.original.user?.name ?? "").toLowerCase();
-  const email = (row.original.user?.email ?? "").toLowerCase();
-  const role = (row.original.role ?? "").toLowerCase();
-  return name.includes(search) || email.includes(search) || role.includes(search);
-};
+import { useIsMobile } from "@app/ui/hooks/use-mobile";
+import { authClient } from "@/lib/auth-client";
+import { membersListOptions } from "@/lib/queries/members";
+
+import { createMemberColumns } from "./members-columns";
+import { MembersDesktopDataTable } from "./members-data-table.desktop";
+import { MembersMobileDataTable } from "./members-data-table.mobile";
+
+const routeApi = getRouteApi("/_dashboard/users/");
 
 export const MembersDataTable = () => {
   const { t } = useTranslation("members");
   const { t: tCommon } = useTranslation("common");
-  const navigate = useNavigate();
-  const [globalFilter, setGlobalFilter] = useState("");
+  const isMobile = useIsMobile();
+  const navigate = routeApi.useNavigate();
+  const { page } = routeApi.useSearch();
 
   const { data: session } = authClient.useSession();
 
@@ -48,17 +31,14 @@ export const MembersDataTable = () => {
 
   const columns = createMemberColumns(currentUserId, t);
 
-  const table = useReactTable({
-    data: members,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    globalFilterFn: memberGlobalFilterFn,
-    state: { globalFilter },
-    onGlobalFilterChange: setGlobalFilter,
-    initialState: { pagination: { pageSize: 10 } },
-  });
+  const onPaginationChange = useCallback(
+    (updater: Updater<PaginationState>) => {
+      const next =
+        typeof updater === "function" ? updater({ pageIndex: page - 1, pageSize: 10 }) : updater;
+      navigate({ search: { page: next.pageIndex + 1 } });
+    },
+    [page, navigate],
+  );
 
   if (members.length === 0) {
     return (
@@ -73,60 +53,26 @@ export const MembersDataTable = () => {
     );
   }
 
+  if (isMobile) {
+    return (
+      <MembersMobileDataTable
+        members={members}
+        currentUserId={currentUserId}
+        noResultsMessage={tCommon("noResults")}
+        t={t}
+        onMemberClick={(memberId) => navigate({ to: `/users/${memberId}` })}
+      />
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <DataTableToolbar value={globalFilter} onChange={setGlobalFilter} />
-
-      <div className="rounded-xl border border-border bg-card shadow-xs">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="cursor-pointer transition-colors duration-150"
-                  onClick={() =>
-                    navigate({ to: `/users/${row.original.id}` })
-                  }
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  {tCommon("noResults")}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <DataTablePagination table={table} />
-    </div>
+    <MembersDesktopDataTable
+      members={members}
+      columns={columns}
+      page={page}
+      noResultsMessage={tCommon("noResults")}
+      onPaginationChange={onPaginationChange}
+      onRowClick={(row) => navigate({ to: `/users/${row.id}` })}
+    />
   );
 };

@@ -1,35 +1,32 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { getAuth } from "../lib/auth.js";
-import { getDb } from "../lib/db.js";
-import { authMiddleware } from "../middleware/auth.js";
-import { ok } from "../lib/result.js";
-import { zv } from "../lib/validation.js";
+
+import type {
+  OrganizationPermissions,
+  OrganizationWithRole,
+} from "@app/shared/types/organizations";
+
 import { createOrganizationSchema } from "@app/shared/schemas/create-organization-schema";
 import { updateOrganizationSchema } from "@app/shared/schemas/update-organization-schema";
+
+import {
+  findActiveOrganization,
+  findUserMembership,
+  findUserOrganizations,
+} from "@app/data-ops/queries/organizations";
+
+import { getAuth } from "../lib/auth";
+import { ok } from "../lib/result";
+import { zv } from "../lib/validation";
+import { authMiddleware } from "../middleware/auth";
 
 export const organizationRoutes = new Hono()
   .use(authMiddleware)
   .get("/", async (c) => {
     const session = c.get("session");
-    const userMembers = await getDb()
-      .selectFrom("member")
-      .innerJoin("organization", "organization.id", "member.organizationId")
-      .selectAll("organization")
-      .select("member.role")
-      .where("member.userId", "=", session.userId)
-      .execute();
-    const result = userMembers.map((x) => ({
-      id: x.id,
-      name: x.name,
-      slug: x.slug,
-      logo: x.logo,
-      createdAt: x.createdAt,
-      metadata: x.metadata,
-      role: x.role,
-    }));
-    return ok(c, result);
+    const result = await findUserOrganizations(session.userId);
+    return ok(c, result satisfies OrganizationWithRole[]);
   })
   .get("/permissions", async (c) => {
     const headers = c.req.raw.headers;
@@ -49,7 +46,7 @@ export const organizationRoutes = new Hono()
         .then((r) => r.success),
     ]);
 
-    return ok(c, { canUpdate, canDelete });
+    return ok(c, { canUpdate, canDelete } satisfies OrganizationPermissions);
   })
   .post("/", zv("json", createOrganizationSchema), async (c) => {
     const { name, slug } = c.req.valid("json");
@@ -82,20 +79,7 @@ export const organizationRoutes = new Hono()
       const { name, slug } = c.req.valid("json");
       const session = c.get("session");
 
-      const currentMember = await getDb()
-        .selectFrom("member")
-        .innerJoin("organization", "organization.id", "member.organizationId")
-        .selectAll("member")
-        .select([
-          "organization.name as orgName",
-          "organization.slug as orgSlug",
-          "organization.logo as orgLogo",
-          "organization.createdAt as orgCreatedAt",
-          "organization.metadata as orgMetadata",
-        ])
-        .where("member.userId", "=", session.userId)
-        .where("member.organizationId", "=", organizationId)
-        .executeTakeFirst();
+      const currentMember = await findUserMembership(session.userId, organizationId);
 
       if (!currentMember) {
         throw new HTTPException(404, { message: "Organization not found." });
@@ -127,30 +111,9 @@ export const organizationRoutes = new Hono()
   )
   .get("/active", async (c) => {
     const session = c.get("session");
-    const userMember = await getDb()
-      .selectFrom("member")
-      .innerJoin("organization", "organization.id", "member.organizationId")
-      .selectAll("organization")
-      .select("member.role")
-      .where("member.userId", "=", session.userId)
-      .where(
-        "member.organizationId",
-        "=",
-        session.activeOrganizationId as string,
-      )
-      .executeTakeFirst();
-
-    const data = userMember
-      ? {
-          id: userMember.id,
-          name: userMember.name,
-          slug: userMember.slug,
-          logo: userMember.logo,
-          createdAt: userMember.createdAt,
-          metadata: userMember.metadata,
-          role: userMember.role,
-        }
-      : null;
-
-    return ok(c, data);
+    const data = await findActiveOrganization(
+      session.userId,
+      session.activeOrganizationId as string,
+    );
+    return ok(c, data satisfies OrganizationWithRole | null);
   });

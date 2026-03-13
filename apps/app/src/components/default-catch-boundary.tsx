@@ -1,12 +1,8 @@
+import { ErrorComponent, type ErrorComponentProps, Link, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import {
-  ErrorComponent,
-  type ErrorComponentProps,
-  Link,
-  useRouter,
-} from "@tanstack/react-router";
+
+import { Button } from "@app/ui/components/button";
 import { getLogger } from "@app/shared/logger";
-import { Button } from "@/components/ui/button";
 
 export function DefaultCatchBoundary({ error, reset }: ErrorComponentProps) {
   const router = useRouter();

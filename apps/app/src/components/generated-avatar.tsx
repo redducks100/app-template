@@ -1,7 +1,9 @@
-import { createAvatar } from "@dicebear/core";
 import { initials } from "@dicebear/collection";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { cn } from "@/lib/utils";
+import { createAvatar } from "@dicebear/core";
+
+import { cn } from "@app/ui/lib/utils";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 
 interface GeneratedAvatarProps {
   seed: string;

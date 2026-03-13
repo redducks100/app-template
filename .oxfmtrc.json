@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": true,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "useTabs": false,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "insertFinalNewline": true,
+  "ignorePatterns": ["dist/**", ".turbo/**", ".wrangler/**", "**/routeTree.gen.ts", ".tanstack/**"],
+  "sortImports": {
+    "groups": [
+      "type-import",
+      ["value-builtin", "value-external"],
+      "type-internal",
+      "value-internal",
+      ["type-parent", "type-sibling", "type-index"],
+      ["value-parent", "value-sibling", "value-index"],
+      "unknown"
+    ],
+    "internalPattern": ["@/", "@app/"],
+    "newlinesBetween": true
+  }
+}

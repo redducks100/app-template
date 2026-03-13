@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_guest")({
   component: AuthLayout,
@@ -17,13 +17,9 @@ function AuthLayout() {
         <div className="relative z-10">
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-sm font-bold text-primary-foreground">
-                C
-              </span>
+              <span className="text-sm font-bold text-primary-foreground">C</span>
             </div>
-            <span className="text-lg font-semibold tracking-tight">
-              Corporsky
-            </span>
+            <span className="text-lg font-semibold tracking-tight">Corporsky</span>
           </div>
         </div>
 

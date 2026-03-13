@@ -1,24 +1,30 @@
-import { hc } from "hono/client";
-import type { AppType } from "@app/api";
-import { getLogger } from "@app/shared/logger";
+import type { ClientResponse } from "hono/client";
 
+import { hc } from "hono/client";
+
+import type { AppType } from "@app/api";
 import type {
+  ApiCursorResponse,
   ApiError,
   ApiPaginatedResponse,
   ApiResponse,
 } from "@app/shared/types/result";
-import type { ClientResponse } from "hono/client";
 
-type UnwrapResponse<T> =
-  T extends ApiPaginatedResponse<infer U>
-    ? ApiPaginatedResponse<U>
-    : T extends ApiResponse<infer U>
-      ? ApiResponse<U>
-      : never;
+import { getLogger } from "@app/shared/logger";
 
-export const callRPC = async <T>(
-  rpc: Promise<ClientResponse<T>>,
-): Promise<UnwrapResponse<T>> => {
+const API_URL = `${import.meta.env.VITE_API_URL}/api/`;
+
+type InferCursor<T> = T extends ApiCursorResponse<infer U> ? ApiCursorResponse<U> : never;
+type InferPaginated<T> = T extends ApiPaginatedResponse<infer U> ? ApiPaginatedResponse<U> : never;
+type InferSimple<T> = T extends ApiResponse<infer U> ? ApiResponse<U> : never;
+
+type UnwrapResponse<T> = [InferCursor<T>] extends [never]
+  ? [InferPaginated<T>] extends [never]
+    ? InferSimple<T>
+    : InferPaginated<T>
+  : InferCursor<T>;
+
+export const callRPC = async <T>(rpc: Promise<ClientResponse<T>>): Promise<UnwrapResponse<T>> => {
   try {
     const data = await rpc;
     if (!data.ok) {
@@ -33,8 +39,6 @@ export const callRPC = async <T>(
     return { success: false, error: { message } } as UnwrapResponse<T>;
   }
 };
-
-const API_URL = `${import.meta.env.VITE_API_URL}/api/`;
 
 export const apiClient = hc<AppType>(API_URL, {
   init: { credentials: "include" },

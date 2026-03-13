@@ -1,9 +1,11 @@
-import { QueryClient, MutationCache } from "@tanstack/react-query";
+import { MutationCache, QueryClient } from "@tanstack/react-query";
 import { createRouter as createTanstackRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
+
 import { getLogger } from "@app/shared/logger";
-import { routeTree } from "./routeTree.gen";
+
 import { DefaultCatchBoundary } from "./components/default-catch-boundary";
+import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
   const queryClient = new QueryClient({
