@@ -58,27 +58,15 @@ function ConfirmDialogContent({ children }: { children: React.ReactNode }) {
   return <DialogContent showCloseButton={false}>{children}</DialogContent>;
 }
 
-function ConfirmDialogHeaderComponent({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function ConfirmDialogHeaderComponent({ children }: { children: React.ReactNode }) {
   return <DialogHeader>{children}</DialogHeader>;
 }
 
-function ConfirmDialogTitleComponent({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function ConfirmDialogTitleComponent({ children }: { children: React.ReactNode }) {
   return <DialogTitle>{children}</DialogTitle>;
 }
 
-function ConfirmDialogDescriptionComponent({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function ConfirmDialogDescriptionComponent({ children }: { children: React.ReactNode }) {
   return <DialogDescription>{children}</DialogDescription>;
 }
 

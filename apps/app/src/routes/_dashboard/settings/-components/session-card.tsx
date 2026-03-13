@@ -2,12 +2,11 @@ import type { InferResponseType } from "hono/client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon, MonitorIcon, SmartphoneIcon, Trash2Icon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 
 import type { apiClient } from "@/lib/api-client";
-
-import { useTranslation } from "react-i18next";
 
 import { revokeSession as revokeSessionMutation } from "@/lib/mutations/user";
 import { Badge } from "@app/ui/components/badge";

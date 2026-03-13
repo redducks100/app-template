@@ -12,7 +12,11 @@ export type MemberColumn = MembersResponse["members"][number];
 
 const columnHelper = createColumnHelper<MemberColumn>();
 
-export function createMemberColumns(currentUserId: string, t: (key: string) => string, locale: string) {
+export function createMemberColumns(
+  currentUserId: string,
+  t: (key: string) => string,
+  locale: string,
+) {
   return [
     columnHelper.display({
       id: "name",

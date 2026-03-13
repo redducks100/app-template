@@ -42,10 +42,7 @@ type QuickActionProps = {
 function QuickAction({ label, icon, href }: QuickActionProps) {
   return (
     <Link to={href}>
-      <Button
-        variant="outline"
-        className="h-auto w-full flex-col gap-1.5 py-3"
-      >
+      <Button variant="outline" className="h-auto w-full flex-col gap-1.5 py-3">
         {icon}
         <span className="text-xs font-medium">{label}</span>
       </Button>
