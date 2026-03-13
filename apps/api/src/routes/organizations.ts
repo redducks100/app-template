@@ -5,7 +5,7 @@ import { z } from "zod";
 import type {
   OrganizationPermissions,
   OrganizationWithRole,
-} from "@app/shared/types/organizations";
+} from "@app/shared/schemas/organization";
 
 import {
   findActiveOrganization,

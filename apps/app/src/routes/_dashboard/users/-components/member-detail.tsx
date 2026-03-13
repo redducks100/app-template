@@ -10,7 +10,7 @@ import {
   removeMember as removeMemberMutation,
   updateMemberRole as updateMemberRoleMutation,
 } from "@/lib/mutations/members";
-import { membersListOptions, membersPermissionsOptions } from "@/lib/queries/members";
+import { memberGetOptions, membersPermissionsOptions } from "@/lib/queries/members";
 import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import { Badge } from "@app/ui/components/badge";
 import { Button } from "@app/ui/components/button";
@@ -42,18 +42,15 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: membersData } = useSuspenseQuery(membersListOptions());
-
-  const members = membersData.members;
+  const { data: member } = useSuspenseQuery(memberGetOptions(memberId));
 
   const { data: permissions } = useSuspenseQuery(membersPermissionsOptions());
 
   const { data: session } = authClient.useSession();
 
-  const member = members.find((m) => m.id === memberId);
   const currentUserId = session?.user?.id ?? "";
-  const isSelf = member?.userId === currentUserId;
-  const isOwnerRole = member?.role === "owner";
+  const isSelf = member.userId === currentUserId;
+  const isOwnerRole = member.role === "owner";
 
   const availableRoles = [
     { role: "admin", id: "admin" },
@@ -66,7 +63,10 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
   const updateRole = useMutation({
     mutationFn: updateMemberRoleMutation,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["members", "list"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["members", "list"] }),
+        queryClient.invalidateQueries({ queryKey: ["members", "get", memberId] }),
+      ]);
       toast.success(t("roleUpdateSuccess"));
     },
   });
@@ -74,29 +74,14 @@ export const MemberDetail = ({ memberId }: MemberDetailProps) => {
   const removeMember = useMutation({
     mutationFn: removeMemberMutation,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["members", "list"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["members", "list"] }),
+        queryClient.invalidateQueries({ queryKey: ["members", "get", memberId] }),
+      ]);
       toast.success(t("removeSuccess"));
       navigate({ to: "/users" });
     },
   });
-
-  if (!member) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-muted-foreground mb-4">{t("emptyState")}</p>
-        <Button
-          variant="outline"
-          size="sm"
-          render={
-            <Link to="/users">
-              <ArrowLeftIcon className="size-4" />
-              {t("backToUsers")}
-            </Link>
-          }
-        ></Button>
-      </div>
-    );
-  }
 
   const userInitials = getInitials(member.user.name ?? member.user.email ?? "");
 

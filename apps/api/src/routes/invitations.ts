@@ -2,13 +2,14 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 
-import type { InvitationDetail, InvitationPermissions } from "@app/shared/types/invitations";
+import type { InvitationDetail, InvitationPermissions } from "@app/shared/schemas/invitation";
 
-import { findInvitationDetails } from "@app/data-ops/queries/invitations";
+import { findInvitationDetails, findInvitationsPaginated } from "@app/data-ops/queries/invitations";
 import { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
+import { SearchPaginationParams } from "@app/shared/types/result";
 
 import { getAuth } from "../lib/auth";
-import { ok } from "../lib/result";
+import { ok, okPaginated } from "../lib/result";
 import { zv } from "../lib/validation";
 import { authMiddleware } from "../middleware/auth";
 
@@ -24,7 +25,7 @@ export const invitationRoutes = new Hono()
     return ok(c, result satisfies InvitationDetail);
   })
   .use(authMiddleware)
-  .get("/", async (c) => {
+  .get("/", zv("query", SearchPaginationParams), async (c) => {
     const session = c.get("session");
     const organizationId = session.activeOrganizationId;
 
@@ -34,12 +35,23 @@ export const invitationRoutes = new Hono()
       });
     }
 
-    const response = await getAuth(c.env.R2).api.listInvitations({
-      query: { organizationId },
-      headers: c.req.raw.headers,
+    const { page, pageSize, search } = c.req.valid("query");
+    const { invitations, total } = await findInvitationsPaginated({
+      organizationId,
+      page,
+      pageSize,
+      search,
     });
 
-    return ok(c, response);
+    return okPaginated(c, {
+      data: invitations,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
   })
   .get("/permissions", async (c) => {
     const headers = c.req.raw.headers;

@@ -1,6 +1,7 @@
-import type { FilterFn, PaginationState, Updater } from "@tanstack/react-table";
+import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 
+import { DEFAULT_PAGE_SIZE } from "@app/shared/types/result";
 import {
   DataTable,
   DataTableContent,
@@ -10,27 +11,25 @@ import {
 
 import type { MemberColumn } from "./members-columns";
 
-const memberGlobalFilterFn: FilterFn<MemberColumn> = (row, _columnId, filterValue) => {
-  const search = String(filterValue).toLowerCase();
-  const name = (row.original.user?.name ?? "").toLowerCase();
-  const email = (row.original.user?.email ?? "").toLowerCase();
-  const role = (row.original.role ?? "").toLowerCase();
-  return name.includes(search) || email.includes(search) || role.includes(search);
-};
-
 interface MembersDesktopDataTableProps {
   members: MemberColumn[];
   columns: ColumnDef<MemberColumn>[];
+  totalRows: number;
   page: number;
+  search: string;
+  onSearchChange: (value: string) => void;
   noResultsMessage: string;
-  onPaginationChange: (updater: Updater<PaginationState>) => void;
+  onPaginationChange: OnChangeFn<PaginationState>;
   onRowClick: (row: MemberColumn) => void;
 }
 
 export const MembersDesktopDataTable = ({
   members,
   columns,
+  totalRows,
   page,
+  search,
+  onSearchChange,
   noResultsMessage,
   onPaginationChange,
   onRowClick,
@@ -39,8 +38,10 @@ export const MembersDesktopDataTable = ({
     <DataTable
       data={members}
       columns={columns}
-      globalFilterFn={memberGlobalFilterFn}
-      pagination={{ pageIndex: page - 1, pageSize: 10 }}
+      totalRows={totalRows}
+      search={search}
+      onSearchChange={onSearchChange}
+      pagination={{ pageIndex: page - 1, pageSize: DEFAULT_PAGE_SIZE }}
       onPaginationChange={onPaginationChange}
       onRowClick={onRowClick}
     >

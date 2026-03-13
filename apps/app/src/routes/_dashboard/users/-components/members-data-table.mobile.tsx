@@ -10,17 +10,13 @@ import { formatDate } from "@app/ui/lib/utils";
 
 import type { MemberColumn } from "./members-columns";
 
-function filterMember(member: MemberColumn, search: string): boolean {
-  const s = search.toLowerCase();
-  const name = (member.user?.name ?? "").toLowerCase();
-  const email = (member.user?.email ?? "").toLowerCase();
-  const role = (member.role ?? "").toLowerCase();
-  return name.includes(s) || email.includes(s) || role.includes(s);
-}
-
 interface MembersMobileDataTableProps {
   members: MemberColumn[];
   currentUserId: string;
+  hasNextPage: boolean;
+  onLoadMore: () => void;
+  search: string;
+  onSearchChange: (value: string) => void;
   noResultsMessage: string;
   locale: string;
   t: (key: string) => string;
@@ -30,6 +26,10 @@ interface MembersMobileDataTableProps {
 export const MembersMobileDataTable = ({
   members,
   currentUserId,
+  hasNextPage,
+  onLoadMore,
+  search,
+  onSearchChange,
   noResultsMessage,
   locale,
   t,
@@ -38,7 +38,10 @@ export const MembersMobileDataTable = ({
   return (
     <CardList
       data={members}
-      filterFn={filterMember}
+      hasNextPage={hasNextPage}
+      onLoadMore={onLoadMore}
+      search={search}
+      onSearchChange={onSearchChange}
       renderCard={(member) => {
         const isYou = member.userId === currentUserId;
         return (

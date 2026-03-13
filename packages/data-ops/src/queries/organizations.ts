@@ -1,4 +1,4 @@
-import type { OrganizationWithRole } from "@app/shared/types/organizations";
+import type { OrganizationWithRole } from "@app/shared/schemas/organization";
 
 import { getDb } from "../db";
 

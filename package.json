@@ -20,7 +20,7 @@
     "db:migrate:down": "turbo run db:migrate:down --filter=@app/data-ops",
     "db:migrate:make": "turbo run db:migrate:make --filter=@app/data-ops",
     "db:migrate:list": "turbo run db:migrate:list --filter=@app/data-ops",
-    "db:codegen": "kysely-codegen --dialect postgres --env-file apps/api/.dev.vars --out-file packages/shared/src/types/db.generated.ts",
+    "db:codegen": "kysely-codegen --dialect postgres --env-file apps/api/.dev.vars --out-file packages/data-ops/src/types/db.generated.ts",
     "syncpack": "syncpack lint",
     "syncpack:fix": "syncpack fix"
   },
@@ -28,12 +28,22 @@
     "@changesets/cli": "^2.29.4",
     "husky": "^9.1.7",
     "kysely-codegen": "^0.18.1",
+    "lint-staged": "^16.3.3",
     "oxfmt": "latest",
     "oxlint": "^1.51.0",
     "pg": "^8.16.0",
     "syncpack": "^13.0.0",
     "turbo": "^2.8.13",
     "typescript": "catalog:"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs,cjs}": [
+      "oxlint",
+      "oxfmt --check"
+    ],
+    "*.{json,css,md,yaml,yml}": [
+      "oxfmt --check"
+    ]
   },
   "packageManager": "pnpm@10.19.0"
 }

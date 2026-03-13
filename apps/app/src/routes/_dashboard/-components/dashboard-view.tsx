@@ -7,6 +7,8 @@ import { invitationsListOptions } from "@/lib/queries/invitations";
 import { membersListOptions } from "@/lib/queries/members";
 import { Button } from "@app/ui/components/button";
 
+const defaultListParams = { page: 1, pageSize: 100, search: "" };
+
 type StatCardProps = {
   label: string;
   value: number;
@@ -52,12 +54,12 @@ function QuickAction({ label, icon, href }: QuickActionProps) {
 
 export const DashboardView = () => {
   const { t } = useTranslation("dashboard");
-  const { data: membersData } = useSuspenseQuery(membersListOptions());
-  const { data: invitations } = useSuspenseQuery(invitationsListOptions());
+  const { data: membersResult } = useSuspenseQuery(membersListOptions(defaultListParams));
+  const { data: invitationsResult } = useSuspenseQuery(invitationsListOptions(defaultListParams));
 
-  const membersCount = membersData.members.length;
-  const pendingInvitations = invitations.filter(
-    (inv: { status: string }) => inv.status === "pending",
+  const membersCount = membersResult.pagination.total;
+  const pendingInvitations = invitationsResult.data.filter(
+    (inv) => inv.status === "pending",
   ).length;
 
   const today = new Date().toLocaleDateString(undefined, {

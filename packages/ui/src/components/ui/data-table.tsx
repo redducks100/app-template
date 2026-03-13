@@ -1,33 +1,40 @@
 import {
-  type FilterFn,
   type OnChangeFn,
   type PaginationState,
   type Table,
   type TableOptions,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode } from "react";
 
 import { createSafeContext } from "../../lib/create-safe-context";
 import { cn } from "../../lib/utils";
-import { Button } from "./button";
-import { Input } from "./input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "./pagination";
+import { SearchInput } from "./search-input";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table as UITable } from "./table";
 
 // --- Context ---
 
 interface DataTableContextValue {
   table: Table<unknown>;
-  globalFilter: string;
-  setGlobalFilter: (value: string) => void;
+  totalRows: number;
+  search: string;
+  onSearchChange: (value: string) => void;
   onRowClick?: (row: unknown) => void;
   isLoading?: boolean;
   loadingMessage?: string;
+  pagination: PaginationState;
+  onPaginationChange: OnChangeFn<PaginationState>;
 }
 
 const [DataTableProvider, useDataTableContext] =
@@ -36,47 +43,40 @@ const [DataTableProvider, useDataTableContext] =
 interface DataTableProps<TData> {
   data: TData[];
   columns: TableOptions<TData>["columns"];
+  totalRows: number;
   onRowClick?: (row: TData) => void;
   isLoading?: boolean;
   loadingMessage?: string;
-  globalFilterFn?: FilterFn<TData>;
-  pagination?: PaginationState;
-  onPaginationChange?: OnChangeFn<PaginationState>;
+  search: string;
+  onSearchChange: (value: string) => void;
+  pagination: PaginationState;
+  onPaginationChange: OnChangeFn<PaginationState>;
   children: ReactNode;
 }
 
 function DataTable<TData>({
   data,
   columns,
+  totalRows,
   onRowClick,
   isLoading,
   loadingMessage,
-  globalFilterFn,
+  search,
+  onSearchChange,
   pagination,
   onPaginationChange,
   children,
 }: DataTableProps<TData>) {
-  const [globalFilter, setGlobalFilter] = useState("");
-
-  const hasSearch = !!globalFilterFn || children !== undefined;
-  const hasPagination = !!pagination;
-
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    ...(hasSearch && {
-      getFilteredRowModel: getFilteredRowModel(),
-      globalFilterFn,
-      onGlobalFilterChange: setGlobalFilter,
-    }),
-    ...(hasPagination && {
-      getPaginationRowModel: getPaginationRowModel(),
-      onPaginationChange,
-    }),
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount: Math.ceil(totalRows / pagination.pageSize),
+    onPaginationChange,
     state: {
-      globalFilter,
-      ...(hasPagination && { pagination }),
+      pagination,
     },
   });
 
@@ -84,11 +84,14 @@ function DataTable<TData>({
     <DataTableProvider
       value={{
         table: table as Table<unknown>,
-        globalFilter,
-        setGlobalFilter,
+        totalRows,
+        search,
+        onSearchChange,
         onRowClick: onRowClick as ((row: unknown) => void) | undefined,
         isLoading,
         loadingMessage,
+        pagination,
+        onPaginationChange,
       }}
     >
       <div className="space-y-4">{children}</div>
@@ -102,18 +105,15 @@ interface DataTableSearchProps {
 }
 
 function DataTableSearch({ placeholder = "Search...", className }: DataTableSearchProps) {
-  const { globalFilter, setGlobalFilter } = useDataTableContext();
+  const { search, onSearchChange } = useDataTableContext();
 
   return (
-    <div className={cn("relative w-full max-w-sm", className)}>
-      <SearchIcon className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-      <Input
-        value={globalFilter}
-        onChange={(e) => setGlobalFilter(e.target.value)}
-        placeholder={placeholder}
-        className="pl-8"
-      />
-    </div>
+    <SearchInput
+      value={search}
+      onChange={onSearchChange}
+      placeholder={placeholder}
+      className={className}
+    />
   );
 }
 
@@ -182,57 +182,80 @@ function DataTableContent({ noResultsMessage = "No results.", className }: DataT
   );
 }
 
+function getPageNumbers(currentPage: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  if (currentPage <= 3) {
+    return [1, 2, 3, 4, "ellipsis", totalPages];
+  }
+
+  if (currentPage >= totalPages - 2) {
+    return [1, "ellipsis", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  }
+
+  return [1, "ellipsis", currentPage - 1, currentPage, currentPage + 1, "ellipsis", totalPages];
+}
+
 interface DataTablePaginationProps {
   labels?: {
     showing?: (args: { from: number; to: number; total: number }) => string;
-    page?: (args: { page: number; total: number }) => string;
     previous?: string;
     next?: string;
   };
 }
 
 function DataTablePagination({ labels }: DataTablePaginationProps = {}) {
-  const { table } = useDataTableContext();
+  const { table, totalRows, pagination } = useDataTableContext();
 
-  const totalRows = table.getFilteredRowModel().rows.length;
-  const pageIndex = table.getState().pagination.pageIndex;
-  const pageSize = table.getState().pagination.pageSize;
-  const from = pageIndex * pageSize + 1;
-  const to = Math.min((pageIndex + 1) * pageSize, totalRows);
+  const pageIndex = pagination.pageIndex;
+  const pageSize = pagination.pageSize;
   const pageCount = table.getPageCount();
+  const currentPage = pageIndex + 1;
+  const from = totalRows === 0 ? 0 : pageIndex * pageSize + 1;
+  const to = Math.min(currentPage * pageSize, totalRows);
 
   const showingText = labels?.showing
     ? labels.showing({ from, to, total: totalRows })
     : `Showing ${from}-${to} of ${totalRows}`;
 
-  const pageText = labels?.page
-    ? labels.page({ page: pageIndex + 1, total: pageCount })
-    : `Page ${pageIndex + 1} of ${pageCount}`;
+  const pages = getPageNumbers(currentPage, pageCount);
 
   return (
     <div className="flex items-center justify-between">
       <p className="text-sm text-muted-foreground">{showingText}</p>
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon-sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-          aria-label={labels?.previous ?? "Previous"}
-        >
-          <ChevronLeftIcon />
-        </Button>
-        <span className="text-sm text-muted-foreground">{pageText}</span>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-          aria-label={labels?.next ?? "Next"}
-        >
-          <ChevronRightIcon />
-        </Button>
-      </div>
+      {pageCount > 1 && (
+        <Pagination className="mx-0 w-auto">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              />
+            </PaginationItem>
+            {pages.map((page, i) =>
+              page === "ellipsis" ? (
+                <PaginationItem key={`ellipsis-${i}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              ) : (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    isActive={page === currentPage}
+                    onClick={() => table.setPageIndex(page - 1)}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ),
+            )}
+            <PaginationItem>
+              <PaginationNext onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

@@ -9,29 +9,41 @@ export type StripOptional<T> = {
 };
 
 /**
- * Assert that a schema field type is assignable to a DB column type.
- * One-directional: schema → DB (a non-null schema value can be written to a nullable column).
+ * Bidirectional field-level type assertion.
+ * Ensures schema output and DB column types are mutually assignable (after stripping `undefined`).
  */
-type FieldMatch<SchemaVal, DBVal> =
-  StripOptional<{ v: SchemaVal }> extends StripOptional<{ v: DBVal }> ? true : false;
-
-/** Assert that all named fields in a schema are assignable to the corresponding DB table columns */
 export type AssertFieldsMatch<
   Schema extends Record<string, unknown>,
   DBTable extends Record<string, unknown>,
-  Fields extends (keyof Schema & keyof DBTable)[],
+  Fields extends keyof Schema & keyof DBTable,
 > = {
-  [K in Fields[number]]: FieldMatch<Schema[K], DBTable[K]> extends true
+  [K in Fields]: Exclude<Schema[K], undefined> extends Exclude<DBTable[K], undefined>
+    ? Exclude<DBTable[K], undefined> extends Exclude<Schema[K], undefined>
+      ? true
+      : ["Schema output too narrow for DB column", K, { db: DBTable[K]; schema: Schema[K] }]
+    : ["DB column not satisfied by schema output", K, { db: DBTable[K]; schema: Schema[K] }];
+};
+
+/**
+ * One-directional field-level type assertion (schema → DB).
+ * Used for input/create/update schemas where a non-null schema value can be written to a nullable column.
+ */
+export type AssertInputFieldsMatch<
+  Schema extends Record<string, unknown>,
+  DBTable extends Record<string, unknown>,
+  Fields extends keyof Schema & keyof DBTable,
+> = {
+  [K in Fields]: Exclude<Schema[K], undefined> extends Exclude<DBTable[K], undefined>
     ? true
-    : { error: `Field '${K & string}' type mismatch between schema and DB` };
+    : ["Input field not assignable to DB column", K, { db: DBTable[K]; schema: Schema[K] }];
 };
 
 /** Semantic alias for update/PATCH paths */
 export type AssertPartialFieldsMatch<
   Schema extends Record<string, unknown>,
   DBTable extends Record<string, unknown>,
-  Fields extends (keyof Schema & keyof DBTable)[],
-> = AssertFieldsMatch<Schema, DBTable, Fields>;
+  Fields extends keyof Schema & keyof DBTable,
+> = AssertInputFieldsMatch<Schema, DBTable, Fields>;
 
 /** Ensures a Zod enum's values match a Postgres enum's values */
 export type AssertEnumMatch<

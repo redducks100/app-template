@@ -1,6 +1,65 @@
-import type { InvitationDetail } from "@app/shared/types/invitations";
+import { sql } from "kysely";
+
+import type { InvitationDetail, InvitationListItem } from "@app/shared/schemas/invitation";
 
 import { getDb } from "../db";
+
+interface FindInvitationsPaginatedParams {
+  organizationId: string;
+  page: number;
+  pageSize: number;
+  search: string;
+}
+
+export async function findInvitationsPaginated({
+  organizationId,
+  page,
+  pageSize,
+  search,
+}: FindInvitationsPaginatedParams): Promise<{ invitations: InvitationListItem[]; total: number }> {
+  const offset = (page - 1) * pageSize;
+
+  let baseQuery = getDb()
+    .selectFrom("invitation")
+    .where("invitation.organizationId", "=", organizationId);
+
+  if (search) {
+    const pattern = `%${search}%`;
+    baseQuery = baseQuery.where((eb) =>
+      eb.or([
+        eb("invitation.email", "ilike", pattern),
+        eb("invitation.role", "ilike", pattern),
+        eb("invitation.status", "ilike", pattern),
+      ]),
+    );
+  }
+
+  const [rows, countResult] = await Promise.all([
+    baseQuery
+      .select([
+        "invitation.id",
+        "invitation.email",
+        "invitation.role",
+        "invitation.status",
+        "invitation.expiresAt",
+      ])
+      .orderBy("invitation.createdAt", "desc")
+      .limit(pageSize)
+      .offset(offset)
+      .execute(),
+    baseQuery.select(sql<number>`count(*)::int`.as("count")).executeTakeFirstOrThrow(),
+  ]);
+
+  const invitations: InvitationListItem[] = rows.map((row) => ({
+    id: row.id,
+    email: row.email,
+    role: row.role,
+    status: row.status,
+    expiresAt: row.expiresAt,
+  }));
+
+  return { invitations, total: countResult.count };
+}
 
 export async function findInvitationDetails(id: string): Promise<InvitationDetail | null> {
   const result = await getDb()

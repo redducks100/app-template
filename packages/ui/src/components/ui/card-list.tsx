@@ -1,22 +1,21 @@
-import { SearchIcon } from "lucide-react";
-import { type ReactNode, type RefObject, useCallback, useRef, useState } from "react";
+import { type ReactNode, type RefObject, useCallback, useState } from "react";
 
 import { useInfiniteScroll } from "../../hooks/use-infinite-scroll";
 import { createSafeContext } from "../../lib/create-safe-context";
 import { cn } from "../../lib/utils";
 import { Button } from "./button";
-import { Input } from "./input";
+import { SearchInput } from "./search-input";
 
 interface CardListContextValue {
-  visible: unknown[];
+  data: unknown[];
   renderCard: (item: unknown) => ReactNode;
-  hasMore: boolean;
+  hasNextPage: boolean;
   autoScrollEnabled: boolean;
-  loadMore: () => void;
+  onLoadMore: () => void;
   enableAutoScroll: () => void;
   sentinelRef: RefObject<HTMLDivElement | null>;
   search: string;
-  setSearch: (value: string) => void;
+  onSearchChange: (value: string) => void;
 }
 
 const [CardListProvider, useCardListContext] = createSafeContext<CardListContextValue>("CardList");
@@ -24,57 +23,43 @@ const [CardListProvider, useCardListContext] = createSafeContext<CardListContext
 interface CardListProps<TData> {
   data: TData[];
   renderCard: (item: TData) => ReactNode;
-  filterFn?: (item: TData, search: string) => boolean;
-  pageSize?: number;
+  hasNextPage: boolean;
+  onLoadMore: () => void;
+  search: string;
+  onSearchChange: (value: string) => void;
   children: ReactNode;
 }
 
 function CardList<TData>({
   data,
   renderCard,
-  filterFn,
-  pageSize = 10,
+  hasNextPage,
+  onLoadMore,
+  search,
+  onSearchChange,
   children,
 }: CardListProps<TData>) {
-  const [search, setSearch] = useState("");
-  const [displayCount, setDisplayCount] = useState(pageSize);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
 
-  // Reset display count when search changes
-  const prevSearchRef = useRef(search);
-  if (prevSearchRef.current !== search) {
-    prevSearchRef.current = search;
-    setDisplayCount(pageSize);
-    setAutoScrollEnabled(false);
-  }
-
-  const filtered = search && filterFn ? data.filter((item) => filterFn(item, search)) : data;
-  const visible = filtered.slice(0, displayCount);
-  const hasMore = displayCount < filtered.length;
-
-  const loadMore = useCallback(() => {
-    setDisplayCount((prev) => prev + pageSize);
-  }, [pageSize]);
-
   const enableAutoScroll = useCallback(() => {
-    loadMore();
+    onLoadMore();
     setAutoScrollEnabled(true);
-  }, [loadMore]);
+  }, [onLoadMore]);
 
-  const sentinelRef = useInfiniteScroll(loadMore, autoScrollEnabled && hasMore);
+  const sentinelRef = useInfiniteScroll(onLoadMore, autoScrollEnabled && hasNextPage);
 
   return (
     <CardListProvider
       value={{
-        visible,
+        data,
         renderCard: renderCard as (item: unknown) => ReactNode,
-        hasMore,
+        hasNextPage,
         autoScrollEnabled,
-        loadMore,
+        onLoadMore,
         enableAutoScroll,
         sentinelRef,
         search,
-        setSearch,
+        onSearchChange,
       }}
     >
       <div className="space-y-4">{children}</div>
@@ -88,33 +73,28 @@ interface CardListSearchProps {
 }
 
 function CardListSearch({ placeholder = "Search...", className }: CardListSearchProps) {
-  const { search, setSearch } = useCardListContext();
+  const { search, onSearchChange } = useCardListContext();
 
   return (
-    <div className={cn("relative w-full max-w-sm", className)}>
-      <SearchIcon className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-      <Input
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder={placeholder}
-        className="pl-8"
-      />
-    </div>
+    <SearchInput
+      value={search}
+      onChange={onSearchChange}
+      placeholder={placeholder}
+      className={className}
+    />
   );
 }
 
 function CardListItems({ className }: { className?: string }) {
-  const { visible, renderCard } = useCardListContext();
+  const { data, renderCard } = useCardListContext();
 
-  return (
-    <div className={cn("space-y-3", className)}>{visible.map((item) => renderCard(item))}</div>
-  );
+  return <div className={cn("space-y-3", className)}>{data.map((item) => renderCard(item))}</div>;
 }
 
 function CardListEmpty({ children }: { children: ReactNode }) {
-  const { visible } = useCardListContext();
+  const { data } = useCardListContext();
 
-  if (visible.length > 0) return null;
+  if (data.length > 0) return null;
 
   return (
     <div className="rounded-lg border border-border bg-card p-8 text-center">
@@ -128,18 +108,18 @@ interface CardListLoadMoreProps {
 }
 
 function CardListLoadMore({ label = "Load more" }: CardListLoadMoreProps) {
-  const { hasMore, autoScrollEnabled, enableAutoScroll, sentinelRef } = useCardListContext();
+  const { hasNextPage, autoScrollEnabled, enableAutoScroll, sentinelRef } = useCardListContext();
 
   return (
     <>
-      {hasMore && !autoScrollEnabled && (
+      {hasNextPage && !autoScrollEnabled && (
         <div className="flex justify-center">
           <Button variant="outline" onClick={enableAutoScroll}>
             {label}
           </Button>
         </div>
       )}
-      {autoScrollEnabled && hasMore && <div ref={sentinelRef} />}
+      {autoScrollEnabled && hasNextPage && <div ref={sentinelRef} />}
     </>
   );
 }

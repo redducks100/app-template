@@ -2,7 +2,7 @@ import { neon } from "@neondatabase/serverless";
 import { Kysely } from "kysely";
 import { NeonDialect } from "kysely-neon";
 
-import type { DB } from "@app/shared/types/db.generated";
+import type { DB } from "./types/db.generated";
 
 let _db: Kysely<DB>;
 

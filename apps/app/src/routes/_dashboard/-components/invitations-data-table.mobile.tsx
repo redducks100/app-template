@@ -1,5 +1,7 @@
 import { Trash2Icon } from "lucide-react";
 
+import type { InvitationListItem } from "@app/shared/schemas/invitation";
+
 import { Badge } from "@app/ui/components/badge";
 import { Button } from "@app/ui/components/button";
 import {
@@ -20,8 +22,6 @@ import {
 } from "@app/ui/components/confirm-dialog";
 import { formatDateTime } from "@app/ui/lib/utils";
 
-import type { Invitation } from "./invitations-columns";
-
 const statusVariant: Record<string, "secondary" | "default" | "destructive"> = {
   pending: "secondary",
   accepted: "default",
@@ -30,7 +30,11 @@ const statusVariant: Record<string, "secondary" | "default" | "destructive"> = {
 };
 
 interface InvitationsMobileDataTableProps {
-  invitations: Invitation[];
+  invitations: InvitationListItem[];
+  hasNextPage: boolean;
+  onLoadMore: () => void;
+  search: string;
+  onSearchChange: (value: string) => void;
   isCanceling: boolean;
   noResultsMessage: string;
   locale: string;
@@ -40,6 +44,10 @@ interface InvitationsMobileDataTableProps {
 
 export const InvitationsMobileDataTable = ({
   invitations,
+  hasNextPage,
+  onLoadMore,
+  search,
+  onSearchChange,
   isCanceling,
   noResultsMessage,
   locale,
@@ -49,14 +57,10 @@ export const InvitationsMobileDataTable = ({
   return (
     <CardList
       data={invitations}
-      filterFn={(inv, search) => {
-        const s = search.toLowerCase();
-        return (
-          inv.email.toLowerCase().includes(s) ||
-          inv.role.toLowerCase().includes(s) ||
-          inv.status.toLowerCase().includes(s)
-        );
-      }}
+      hasNextPage={hasNextPage}
+      onLoadMore={onLoadMore}
+      search={search}
+      onSearchChange={onSearchChange}
       renderCard={(inv) => (
         <div key={inv.id} className="border border-border bg-card p-4">
           <div className="flex items-start justify-between gap-2">

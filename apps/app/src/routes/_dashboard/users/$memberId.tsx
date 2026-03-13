@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 
-import { membersListOptions, membersPermissionsOptions } from "@/lib/queries/members";
+import { memberGetOptions, membersPermissionsOptions } from "@/lib/queries/members";
 
 import { MemberDetail } from "./-components/member-detail";
 
 export const Route = createFileRoute("/_dashboard/users/$memberId")({
-  loader: ({ context }) =>
+  loader: ({ context, params }) =>
     Promise.all([
-      context.queryClient.ensureQueryData(membersListOptions()),
+      context.queryClient.ensureQueryData(memberGetOptions(params.memberId)),
       context.queryClient.ensureQueryData(membersPermissionsOptions()),
     ]),
   component: MemberDetailPage,

@@ -1,6 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import type { PaginationState, Updater } from "@tanstack/react-table";
+import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 
+import { DEFAULT_PAGE_SIZE } from "@app/shared/types/result";
 import {
   DataTable,
   DataTableContent,
@@ -8,20 +9,26 @@ import {
   DataTableSearch,
 } from "@app/ui/components/data-table";
 
-import type { Invitation } from "./invitations-columns";
+import type { InvitationListItem } from "./invitations-columns";
 
 interface InvitationsDesktopDataTableProps {
-  invitations: Invitation[];
-  columns: ColumnDef<Invitation>[];
+  invitations: InvitationListItem[];
+  columns: ColumnDef<InvitationListItem>[];
+  totalRows: number;
   page: number;
+  search: string;
+  onSearchChange: (value: string) => void;
   noResultsMessage: string;
-  onPaginationChange: (updater: Updater<PaginationState>) => void;
+  onPaginationChange: OnChangeFn<PaginationState>;
 }
 
 export const InvitationsDesktopDataTable = ({
   invitations,
   columns,
+  totalRows,
   page,
+  search,
+  onSearchChange,
   noResultsMessage,
   onPaginationChange,
 }: InvitationsDesktopDataTableProps) => {
@@ -29,7 +36,10 @@ export const InvitationsDesktopDataTable = ({
     <DataTable
       data={invitations}
       columns={columns}
-      pagination={{ pageIndex: page - 1, pageSize: 10 }}
+      totalRows={totalRows}
+      search={search}
+      onSearchChange={onSearchChange}
+      pagination={{ pageIndex: page - 1, pageSize: DEFAULT_PAGE_SIZE }}
       onPaginationChange={onPaginationChange}
     >
       <DataTableSearch />

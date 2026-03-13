@@ -1,18 +1,29 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { z } from "zod";
 
 import { invitationsListOptions } from "@/lib/queries/invitations";
+import { DEFAULT_PAGE_SIZE } from "@app/shared/types/result";
 
 import { InvitationsSection } from "./-components/invitations-section";
 
+const searchDefaults = { page: 1, search: "" } as const;
+
 const searchSchema = z.object({
-  page: z.number().catch(1),
+  page: z.number().default(1).catch(1),
+  search: z.string().default("").catch(""),
 });
 
 export const Route = createFileRoute("/_dashboard/invitations")({
   validateSearch: searchSchema,
-  loader: ({ context }) => context.queryClient.ensureQueryData(invitationsListOptions()),
+  search: {
+    middlewares: [stripSearchParams(searchDefaults)],
+  },
+  loaderDeps: ({ search: { page, search } }) => ({ page, search }),
+  loader: ({ context, deps }) =>
+    context.queryClient.ensureQueryData(
+      invitationsListOptions({ page: deps.page, pageSize: DEFAULT_PAGE_SIZE, search: deps.search }),
+    ),
   component: InvitationsPage,
 });
 

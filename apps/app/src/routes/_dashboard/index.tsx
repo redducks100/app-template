@@ -5,11 +5,13 @@ import { membersListOptions } from "@/lib/queries/members";
 
 import { DashboardView } from "./-components/dashboard-view";
 
+const defaultListParams = { page: 1, pageSize: 100, search: "" };
+
 export const Route = createFileRoute("/_dashboard/")({
   loader: ({ context }) =>
     Promise.all([
-      context.queryClient.ensureQueryData(membersListOptions()),
-      context.queryClient.ensureQueryData(invitationsListOptions()),
+      context.queryClient.ensureQueryData(membersListOptions(defaultListParams)),
+      context.queryClient.ensureQueryData(invitationsListOptions(defaultListParams)),
     ]),
   component: DashboardPage,
 });

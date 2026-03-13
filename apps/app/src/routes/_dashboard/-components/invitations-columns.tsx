@@ -1,9 +1,9 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { InferResponseType } from "hono/client";
 import { MoreHorizontalIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
-import { apiClient } from "@/lib/api-client";
+import type { InvitationListItem } from "@app/shared/schemas/invitation";
+
 import { Badge } from "@app/ui/components/badge";
 import { Button } from "@app/ui/components/button";
 import {
@@ -22,12 +22,9 @@ import {
 } from "@app/ui/components/dropdown-menu";
 import { formatDateTime } from "@app/ui/lib/utils";
 
-export type Invitation = InferResponseType<
-  (typeof apiClient)["invitations"]["$get"],
-  200
->["data"][number];
+export type { InvitationListItem };
 
-const columnHelper = createColumnHelper<Invitation>();
+const columnHelper = createColumnHelper<InvitationListItem>();
 
 const statusVariant: Record<string, "secondary" | "default" | "destructive"> = {
   pending: "secondary",
@@ -42,7 +39,7 @@ function InvitationActions({
   isCanceling,
   t,
 }: {
-  invitation: Invitation;
+  invitation: InvitationListItem;
   onCancel: (invitationId: string) => void;
   isCanceling: boolean;
   t: (key: string) => string;

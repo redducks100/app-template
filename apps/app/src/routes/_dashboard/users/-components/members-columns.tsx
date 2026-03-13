@@ -1,14 +1,11 @@
-import type { InferResponseType } from "hono/client";
-
 import { createColumnHelper } from "@tanstack/react-table";
 
-import type { apiClient } from "@/lib/api-client";
+import type { MemberListItem } from "@app/shared/schemas/member";
 
 import { Badge } from "@app/ui/components/badge";
 import { formatDate } from "@app/ui/lib/utils";
 
-type MembersResponse = InferResponseType<(typeof apiClient)["members"]["$get"], 200>["data"];
-export type MemberColumn = MembersResponse["members"][number];
+export type MemberColumn = MemberListItem;
 
 const columnHelper = createColumnHelper<MemberColumn>();
 
