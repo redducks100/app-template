@@ -1,8 +1,8 @@
-import { type VariantProps, cva } from "class-variance-authority";
 import { type LucideIcon } from "lucide-react";
 import React from "react";
 
 import { Card, CardContent } from "@app/ui/components/card";
+import { cn } from "@app/ui/lib/utils";
 
 type ViewSectionProps = {
   title: string;
@@ -10,31 +10,9 @@ type ViewSectionProps = {
   insideCard?: boolean;
   children: React.ReactNode | React.ReactNode[];
   Icon: LucideIcon;
+  viewVariant?: "default" | "destructive";
+  iconVariant?: "default" | "destructive";
 };
-
-const viewSectionVariants = cva("", {
-  variants: {
-    viewVariant: {
-      default: "",
-      destructive: "border-destructive/30 bg-destructive/5 dark:bg-destructive/10",
-    },
-  },
-  defaultVariants: {
-    viewVariant: "default",
-  },
-});
-
-const iconViewSectionVariants = cva("size-5", {
-  variants: {
-    iconVariant: {
-      default: "",
-      destructive: "text-destructive",
-    },
-  },
-  defaultVariants: {
-    iconVariant: "default",
-  },
-});
 
 export const ViewSection = ({
   title,
@@ -44,14 +22,12 @@ export const ViewSection = ({
   children,
   viewVariant = "default",
   iconVariant = "default",
-}: ViewSectionProps &
-  VariantProps<typeof viewSectionVariants> &
-  VariantProps<typeof iconViewSectionVariants>) => {
+}: ViewSectionProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 space-y-4">
       <div className="lg:col-span-1">
         <h2 className="font-semibold text-lg flex items-center gap-2">
-          <Icon className={iconViewSectionVariants({ iconVariant })} />
+          <Icon className={cn("size-5", iconVariant === "destructive" && "text-destructive")} />
           {title}
         </h2>
         <p className="text-sm text-muted-foreground mt-1">{description}</p>
@@ -59,7 +35,13 @@ export const ViewSection = ({
       <div className="lg:col-span-2 space-y-4">
         {React.Children.map(children, (child, index) =>
           insideCard ? (
-            <Card className={viewSectionVariants({ viewVariant })} key={`view-card-${index}`}>
+            <Card
+              className={cn(
+                viewVariant === "destructive" &&
+                  "border-destructive/30 bg-destructive/5 dark:bg-destructive/10",
+              )}
+              key={`view-card-${index}`}
+            >
               <CardContent className="space-y-4">{child}</CardContent>
             </Card>
           ) : (
