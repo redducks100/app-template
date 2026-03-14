@@ -1,29 +1,22 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import z from "zod";
-import { ArrowLeftIcon, BuildingIcon, Link2Icon } from "lucide-react";
-import { createOrganizationSchema } from "@app/shared/schemas/create-organization-schema";
-import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { ArrowLeftIcon, BuildingIcon, Link2Icon } from "lucide-react";
+import z from "zod";
+
 import { authClient } from "@/lib/auth-client";
-import { useAppForm } from "@/components/ui/form/hooks";
-import { Field, FieldGroup } from "@/components/ui/field";
 import { createOrganization as createOrganizationMutation } from "@/lib/mutations/organizations";
-import { sessionOptions } from "@/lib/query-options/auth";
+import { sessionOptions } from "@/lib/queries/auth";
+import { createOrganizationSchema } from "@app/shared/schemas/create-organization-schema";
+import { Button } from "@app/ui/components/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@app/ui/components/card";
+import { Field, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
 
 type CreateOrganizationViewProps = {
   canGoBack: boolean;
 };
 
-export const CreateOrganizationView = ({
-  canGoBack,
-}: CreateOrganizationViewProps) => {
+export const CreateOrganizationView = ({ canGoBack }: CreateOrganizationViewProps) => {
   const navigate = useNavigate();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -79,9 +72,7 @@ export const CreateOrganizationView = ({
         </Button>
       )}
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">
-          Create Organization
-        </CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">Create Organization</CardTitle>
         <CardDescription className="text-center">
           Create a new organization to collaborate with your team
         </CardDescription>
@@ -108,11 +99,7 @@ export const CreateOrganizationView = ({
               }}
             >
               {(field) => (
-                <field.Input
-                  label="Name"
-                  placeholder="Acme organization"
-                  LeftIcon={BuildingIcon}
-                />
+                <field.Input label="Name" placeholder="Acme organization" LeftIcon={BuildingIcon} />
               )}
             </form.AppField>
             <form.AppField name="slug">
@@ -129,8 +116,7 @@ export const CreateOrganizationView = ({
                 <form.SubmitButton label="Create organization" />
               </form.AppForm>
               <p className="text-xs text-center text-muted-foreground">
-                By creating an organization, you agree to our Terms of Service
-                and Privacy Policy.
+                By creating an organization, you agree to our Terms of Service and Privacy Policy.
               </p>
             </Field>
           </FieldGroup>

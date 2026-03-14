@@ -1,10 +1,18 @@
 import { z } from "zod";
 
+export const DEFAULT_PAGE_SIZE = 10;
+export const MAX_PAGE_SIZE = 50;
+
 export const PaginationParams = z.object({
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
 });
 export type PaginationParams = z.infer<typeof PaginationParams>;
+
+export const SearchPaginationParams = PaginationParams.extend({
+  search: z.string().optional().default(""),
+});
+export type SearchPaginationParams = z.infer<typeof SearchPaginationParams>;
 
 export const Pagination = z.object({
   page: z.number(),
@@ -36,5 +44,12 @@ export type ApiError = {
   error: { message: string };
 };
 
+export interface ApiCursorSuccess<T> {
+  success: true;
+  data: T[];
+  nextCursor: string | null;
+}
+
+export type ApiCursorResponse<T> = ApiCursorSuccess<T> | ApiError;
 export type ApiPaginatedResponse<T> = ApiPaginatedSuccess<T> | ApiError;
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;

@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import { DangerSection } from "./-components/danger-section";
 
-export const Route = createFileRoute(
-  "/_dashboard/settings/danger",
-)({
+export const Route = createFileRoute("/_dashboard/settings/danger")({
   component: SettingsDangerPage,
 });
 

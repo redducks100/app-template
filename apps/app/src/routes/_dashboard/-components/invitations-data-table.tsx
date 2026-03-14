@@ -1,39 +1,156 @@
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { DataTableToolbar } from "@/components/ui/data-table-toolbar";
-import { DataTablePagination } from "@/components/ui/data-table-pagination";
-import {
   useMutation,
   useQueryClient,
+  useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { useState } from "react";
+import { getRouteApi } from "@tanstack/react-router";
+import { type PaginationState, type Updater } from "@tanstack/react-table";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { createInvitationColumns } from "./invitations-columns";
-import { invitationsListOptions } from "@/lib/query-options/invitations";
+
 import { cancelInvitation as cancelInvitationMutation } from "@/lib/mutations/invitations";
+import { invitationsInfiniteOptions, invitationsListOptions } from "@/lib/queries/invitations";
+import { DEFAULT_PAGE_SIZE } from "@app/shared/types/result";
+import { useIsMobile } from "@app/ui/hooks/use-mobile";
+
+import { createInvitationColumns } from "./invitations-columns";
+import { InvitationsDesktopDataTable } from "./invitations-data-table.desktop";
+import { InvitationsMobileDataTable } from "./invitations-data-table.mobile";
+const DEBOUNCE_MS = 300;
+
+const routeApi = getRouteApi("/_dashboard/invitations");
+
+const InvitationsDesktopContent = ({
+  page,
+  urlSearch,
+  localSearch,
+  noResultsMessage,
+  onSearchChange,
+  onPaginationChange,
+  onCancel,
+  isCanceling,
+  locale,
+}: {
+  page: number;
+  urlSearch: string;
+  localSearch: string;
+  noResultsMessage: string;
+  onSearchChange: (value: string) => void;
+  onPaginationChange: (updater: Updater<PaginationState>) => void;
+  onCancel: (invitationId: string) => void;
+  isCanceling: boolean;
+  locale: string;
+}) => {
+  const { t } = useTranslation("invitations");
+  const columns = createInvitationColumns(onCancel, isCanceling, t, locale);
+
+  const {
+    data: { data: invitations, pagination },
+  } = useSuspenseQuery(
+    invitationsListOptions({ page, pageSize: DEFAULT_PAGE_SIZE, search: urlSearch }),
+  );
+
+  if (pagination.total === 0 && !urlSearch) {
+    return (
+      <div className="border border-border bg-card p-8 text-center">
+        <p className="text-muted-foreground">{t("emptyState")}</p>
+      </div>
+    );
+  }
+
+  return (
+    <InvitationsDesktopDataTable
+      invitations={invitations}
+      columns={columns}
+      totalRows={pagination.total}
+      page={page}
+      search={localSearch}
+      onSearchChange={onSearchChange}
+      noResultsMessage={noResultsMessage}
+      onPaginationChange={onPaginationChange}
+    />
+  );
+};
+
+const InvitationsMobileContent = ({
+  urlSearch,
+  localSearch,
+  noResultsMessage,
+  locale,
+  onSearchChange,
+  onCancel,
+  isCanceling,
+}: {
+  urlSearch: string;
+  localSearch: string;
+  noResultsMessage: string;
+  locale: string;
+  onSearchChange: (value: string) => void;
+  onCancel: (invitationId: string) => void;
+  isCanceling: boolean;
+}) => {
+  const { t } = useTranslation("invitations");
+  const { data, hasNextPage, fetchNextPage } = useSuspenseInfiniteQuery(
+    invitationsInfiniteOptions(urlSearch, DEFAULT_PAGE_SIZE),
+  );
+
+  const allInvitations = data.pages.flatMap((p) => p.data);
+  const firstPageTotal = data.pages[0]?.pagination.total ?? 0;
+
+  if (firstPageTotal === 0 && !urlSearch) {
+    return (
+      <div className="border border-border bg-card p-8 text-center">
+        <p className="text-muted-foreground">{t("emptyState")}</p>
+      </div>
+    );
+  }
+
+  return (
+    <InvitationsMobileDataTable
+      invitations={allInvitations}
+      hasNextPage={hasNextPage}
+      onLoadMore={() => fetchNextPage()}
+      search={localSearch}
+      onSearchChange={onSearchChange}
+      isCanceling={isCanceling}
+      noResultsMessage={noResultsMessage}
+      locale={locale}
+      t={t}
+      onCancel={onCancel}
+    />
+  );
+};
 
 export const InvitationsDataTable = () => {
-  const { t } = useTranslation("invitations");
+  const { t, i18n } = useTranslation("invitations");
   const { t: tCommon } = useTranslation("common");
+  const isMobile = useIsMobile();
   const queryClient = useQueryClient();
-  const [globalFilter, setGlobalFilter] = useState("");
+  const navigate = routeApi.useNavigate();
+  const { page, search: urlSearch } = routeApi.useSearch();
 
-  const { data: invitations } = useSuspenseQuery(invitationsListOptions());
+  // Local search state for debouncing
+  const [localSearch, setLocalSearch] = useState(urlSearch);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    setLocalSearch(urlSearch);
+  }, [urlSearch]);
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setLocalSearch(value);
+      clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        navigate({
+          search: { page: undefined, search: value || undefined },
+        });
+      }, DEBOUNCE_MS);
+    },
+    [navigate],
+  );
 
   const cancelInvitation = useMutation({
     mutationFn: cancelInvitationMutation,
@@ -45,82 +162,48 @@ export const InvitationsDataTable = () => {
     },
   });
 
-  const columns = createInvitationColumns(
-    (invitationId) => cancelInvitation.mutate({ invitationId }),
-    cancelInvitation.isPending,
-    t,
+  const onPaginationChange = useCallback(
+    (updater: Updater<PaginationState>) => {
+      const next =
+        typeof updater === "function"
+          ? updater({ pageIndex: page - 1, pageSize: DEFAULT_PAGE_SIZE })
+          : updater;
+      const newPage = next.pageIndex + 1;
+      navigate({
+        search: {
+          page: newPage === 1 ? undefined : newPage,
+          search: urlSearch || undefined,
+        },
+      });
+    },
+    [page, urlSearch, navigate],
   );
 
-  const table = useReactTable({
-    data: invitations,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: { globalFilter },
-    onGlobalFilterChange: setGlobalFilter,
-    initialState: { pagination: { pageSize: 10 } },
-  });
-
-  if (invitations.length === 0) {
+  if (isMobile) {
     return (
-      <div className="rounded-xl border border-border bg-card p-8 text-center">
-        <p className="text-muted-foreground">{t("emptyState")}</p>
-      </div>
+      <InvitationsMobileContent
+        urlSearch={urlSearch}
+        localSearch={localSearch}
+        noResultsMessage={tCommon("noResults")}
+        locale={i18n.language}
+        onSearchChange={handleSearchChange}
+        onCancel={(invitationId) => cancelInvitation.mutate({ invitationId })}
+        isCanceling={cancelInvitation.isPending}
+      />
     );
   }
 
   return (
-    <div className="space-y-4">
-      <DataTableToolbar value={globalFilter} onChange={setGlobalFilter} />
-
-      <div className="rounded-xl border border-border bg-card shadow-xs">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  {tCommon("noResults")}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <DataTablePagination table={table} />
-    </div>
+    <InvitationsDesktopContent
+      page={page}
+      urlSearch={urlSearch}
+      localSearch={localSearch}
+      noResultsMessage={tCommon("noResults")}
+      onSearchChange={handleSearchChange}
+      onPaginationChange={onPaginationChange}
+      onCancel={(invitationId) => cancelInvitation.mutate({ invitationId })}
+      isCanceling={cancelInvitation.isPending}
+      locale={i18n.language}
+    />
   );
 };

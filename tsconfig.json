@@ -3,9 +3,5 @@
     "skipLibCheck": true
   },
   "files": [],
-  "references": [
-    { "path": "apps/app" },
-    { "path": "apps/api" },
-    { "path": "packages/shared" }
-  ]
+  "references": [{ "path": "apps/app" }, { "path": "apps/api" }, { "path": "packages/shared" }]
 }

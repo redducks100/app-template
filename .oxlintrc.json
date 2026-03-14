@@ -1,14 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "eslint",
-    "typescript",
-    "unicorn",
-    "oxc",
-    "react",
-    "import",
-    "promise"
-  ],
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "import", "promise"],
   "categories": {
     "correctness": "error"
   },
@@ -18,7 +10,8 @@
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "warn",
     "typescript/no-explicit-any": "warn",
-    "typescript/triple-slash-reference": "off"
+    "typescript/triple-slash-reference": "off",
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }]
   },
   "ignorePatterns": [
     "node_modules/**",

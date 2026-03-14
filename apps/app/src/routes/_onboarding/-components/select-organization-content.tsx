@@ -1,16 +1,14 @@
-import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { useState } from "react";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  organizationsListOptions,
-  activeOrganizationOptions,
-} from "@/lib/query-options/organizations";
-import { sessionOptions } from "@/lib/query-options/auth";
+import { toast } from "sonner";
+
+import { authClient } from "@/lib/auth-client";
+import { sessionOptions } from "@/lib/queries/auth";
+import { activeOrganizationOptions, organizationsListOptions } from "@/lib/queries/organizations";
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 
 export const SelectOrganizationContent = () => {
   const { t } = useTranslation("selectOrg");
@@ -21,9 +19,7 @@ export const SelectOrganizationContent = () => {
 
   const { data: organizations } = useSuspenseQuery(organizationsListOptions());
 
-  const { data: activeOrganization } = useSuspenseQuery(
-    activeOrganizationOptions(),
-  );
+  const { data: activeOrganization } = useSuspenseQuery(activeOrganizationOptions());
 
   const onCreateOrganization = () => {
     navigate({ to: "/create-org" });
@@ -65,7 +61,7 @@ export const SelectOrganizationContent = () => {
             key={org.id}
             onClick={() => onSelectOrganization(org.id)}
             disabled={loading}
-            className={`rounded-xl border bg-card p-5 text-left cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`border bg-card p-4 text-left cursor-pointer transition-all hover:border-primary/50 hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed ${
               isActive ? "ring-2 ring-primary" : ""
             }`}
           >
@@ -75,7 +71,7 @@ export const SelectOrganizationContent = () => {
                 {org.name.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <h3 className="font-semibold">{org.name}</h3>
+            <h3 className="font-medium">{org.name}</h3>
             <span className="text-xs text-muted-foreground uppercase tracking-wide">
               {org.role}
             </span>
@@ -86,12 +82,10 @@ export const SelectOrganizationContent = () => {
       <button
         onClick={onCreateOrganization}
         disabled={loading}
-        className="rounded-xl border-2 border-dashed p-5 text-left cursor-pointer transition-all hover:border-primary/50 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-2 min-h-[140px]"
+        className="border-2 border-dashed p-4 text-left cursor-pointer transition-all hover:border-primary/50 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-2 min-h-[140px]"
       >
         <PlusIcon className="size-8 text-muted-foreground" />
-        <span className="text-sm font-medium text-muted-foreground">
-          {t("createNew")}
-        </span>
+        <span className="text-sm font-medium text-muted-foreground">{t("createNew")}</span>
       </button>
     </div>
   );

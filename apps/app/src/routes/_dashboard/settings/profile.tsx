@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import { ProfileSection } from "./-components/profile-section";
 
-export const Route = createFileRoute(
-  "/_dashboard/settings/profile",
-)({
+export const Route = createFileRoute("/_dashboard/settings/profile")({
   component: SettingsProfilePage,
 });
 

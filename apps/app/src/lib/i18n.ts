@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+
 import en from "../locales/en.json";
 import ro from "../locales/ro.json";
 
@@ -9,9 +10,7 @@ export type Locale = (typeof locales)[number];
 
 function detectLocale(): Locale {
   const browserLang = navigator.language?.split("-")[0];
-  return locales.includes(browserLang as Locale)
-    ? (browserLang as Locale)
-    : defaultLocale;
+  return locales.includes(browserLang as Locale) ? (browserLang as Locale) : defaultLocale;
 }
 
 i18n.use(initReactI18next).init({

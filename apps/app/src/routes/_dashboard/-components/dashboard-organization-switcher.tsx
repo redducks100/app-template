@@ -1,4 +1,12 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { ChevronsUpDownIcon, Loader2Icon, PlusIcon } from "lucide-react";
+import { toast } from "sonner";
+
+import { authClient } from "@/lib/auth-client";
+import { sessionOptions } from "@/lib/queries/auth";
+import { activeOrganizationOptions, organizationsListOptions } from "@/lib/queries/organizations";
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,23 +15,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@app/ui/components/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronsUpDownIcon, Loader2Icon, PlusIcon } from "lucide-react";
-import { useNavigate, useRouter } from "@tanstack/react-router";
-import { toast } from "sonner";
-import {
-  activeOrganizationOptions,
-  organizationsListOptions,
-} from "@/lib/query-options/organizations";
-import { sessionOptions } from "@/lib/query-options/auth";
+} from "@app/ui/components/sidebar";
 
 export const DashboardOrganizationSwitcher = () => {
   const navigate = useNavigate();
@@ -31,9 +29,7 @@ export const DashboardOrganizationSwitcher = () => {
   const queryClient = useQueryClient();
   const { isMobile } = useSidebar();
 
-  const { data: activeOrganization, isLoading } = useQuery(
-    activeOrganizationOptions(),
-  );
+  const { data: activeOrganization, isLoading } = useQuery(activeOrganizationOptions());
 
   const { data: organizations, isLoading: isOrganizationsLoading } = useQuery(
     organizationsListOptions(),
@@ -84,7 +80,7 @@ export const DashboardOrganizationSwitcher = () => {
                 size="lg"
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center">
                   <Avatar className="rounded-md">
                     <AvatarImage src={activeOrganization.logo ?? undefined} />
                     <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground">
@@ -93,19 +89,15 @@ export const DashboardOrganizationSwitcher = () => {
                   </Avatar>
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">
-                    {activeOrganization.name}
-                  </span>
-                  <span className="truncate text-xs">
-                    {activeOrganization.slug}
-                  </span>
+                  <span className="truncate font-medium">{activeOrganization.name}</span>
+                  <span className="truncate text-xs">{activeOrganization.slug}</span>
                 </div>
                 <ChevronsUpDownIcon className="ml-auto" />
               </SidebarMenuButton>
             }
           />
           <DropdownMenuContent
-            className="w-(--anchor-width) min-w-56 rounded-lg"
+            className="w-(--anchor-width) min-w-56"
             align="start"
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
@@ -128,9 +120,7 @@ export const DashboardOrganizationSwitcher = () => {
                     <div className="flex size-6 items-center justify-center rounded-md border">
                       <Avatar className="rounded-md size-6">
                         <AvatarImage src={organization.logo ?? undefined} />
-                        <AvatarFallback>
-                          {organization.name.charAt(0).toUpperCase()}
-                        </AvatarFallback>
+                        <AvatarFallback>{organization.name.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                     </div>
                     {organization.name}
@@ -138,16 +128,11 @@ export const DashboardOrganizationSwitcher = () => {
                 ))
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-2 p-2"
-                onClick={() => onOrganizationCreate()}
-              >
+              <DropdownMenuItem className="gap-2 p-2" onClick={() => onOrganizationCreate()}>
                 <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                   <PlusIcon className="size-4" />
                 </div>
-                <div className="text-muted-foreground font-medium">
-                  Add organization
-                </div>
+                <div className="text-muted-foreground font-medium">Add organization</div>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

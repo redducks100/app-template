@@ -1,12 +1,30 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import type { InferResponseType } from "hono/client";
-import type { apiClient } from "@/lib/api-client";
 import { createColumnHelper } from "@tanstack/react-table";
+import { MoreHorizontalIcon, Trash2Icon } from "lucide-react";
+import { useState } from "react";
 
-type Invitation = InferResponseType<(typeof apiClient)["invitations"]["$get"], 200>["data"][number];
+import type { InvitationListItem } from "@app/shared/schemas/invitation";
 
-const columnHelper = createColumnHelper<Invitation>();
+import { Badge } from "@app/ui/components/badge";
+import { Button } from "@app/ui/components/button";
+import {
+  ConfirmDialog,
+  ConfirmDialogContent,
+  ConfirmDialogDescription,
+  ConfirmDialogFooter,
+  ConfirmDialogHeader,
+  ConfirmDialogTitle,
+} from "@app/ui/components/confirm-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@app/ui/components/dropdown-menu";
+import { formatDateTime } from "@app/ui/lib/utils";
+
+export type { InvitationListItem };
+
+const columnHelper = createColumnHelper<InvitationListItem>();
 
 const statusVariant: Record<string, "secondary" | "default" | "destructive"> = {
   pending: "secondary",
@@ -15,36 +33,84 @@ const statusVariant: Record<string, "secondary" | "default" | "destructive"> = {
   rejected: "destructive",
 };
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
+function InvitationActions({
+  invitation,
+  onCancel,
+  isCanceling,
+  t,
+}: {
+  invitation: InvitationListItem;
+  onCancel: (invitationId: string) => void;
+  isCanceling: boolean;
+  t: (key: string) => string;
+}) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon-sm" disabled={isCanceling}>
+              <MoreHorizontalIcon />
+              <span className="sr-only">Actions</span>
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem variant="destructive" onClick={() => setDialogOpen(true)}>
+            <span className="flex items-center gap-2">
+              <Trash2Icon />
+              {t("cancel")}
+            </span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <ConfirmDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <ConfirmDialogContent>
+          <ConfirmDialogHeader>
+            <ConfirmDialogTitle>{t("cancelConfirmTitle")}</ConfirmDialogTitle>
+            <ConfirmDialogDescription>{t("cancelConfirmDescription")}</ConfirmDialogDescription>
+          </ConfirmDialogHeader>
+          <ConfirmDialogFooter
+            variant="destructive"
+            confirmLabel={t("revokeInvitation")}
+            cancelLabel={t("keepIt")}
+            onConfirm={() => onCancel(invitation.id)}
+          />
+        </ConfirmDialogContent>
+      </ConfirmDialog>
+    </>
+  );
+}
 
 export function createInvitationColumns(
   onCancel: (invitationId: string) => void,
   isCanceling: boolean,
   t: (key: string) => string,
+  locale: string,
 ) {
   return [
-    columnHelper.accessor("email", {
+    columnHelper.display({
+      id: "email",
       header: t("emailColumn"),
-      cell: (info) => (
-        <span className="font-medium">{info.getValue()}</span>
-      ),
+      cell: (info) => <span>{info.row.original.email}</span>,
     }),
-    columnHelper.accessor("role", {
+    columnHelper.display({
+      id: "role",
       header: t("roleColumn"),
       cell: (info) => (
         <Badge variant="outline" className="capitalize">
-          {info.getValue()}
+          {info.row.original.role}
         </Badge>
       ),
     }),
-    columnHelper.accessor("status", {
+    columnHelper.display({
+      id: "status",
       header: t("statusColumn"),
       cell: (info) => {
-        const status = info.getValue();
+        const status = info.row.original.status;
         return (
           <Badge variant={statusVariant[status] ?? "secondary"} className="capitalize">
             {status}
@@ -52,29 +118,28 @@ export function createInvitationColumns(
         );
       },
     }),
-    columnHelper.accessor("expiresAt", {
+    columnHelper.display({
+      id: "expiresAt",
       header: t("expiresColumn"),
       cell: (info) => {
-        const value = info.getValue();
+        const value = info.row.original.expiresAt;
         if (!value) return <span className="text-muted-foreground">-</span>;
-        return dateFormatter.format(new Date(value));
+        return <span>{formatDateTime(value, locale)}</span>;
       },
     }),
     columnHelper.display({
       id: "actions",
       header: "",
+      meta: { className: "w-12" },
       cell: (info) => {
-        const status = info.row.original.status;
-        if (status !== "pending") return null;
+        if (info.row.original.status !== "pending") return null;
         return (
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={isCanceling}
-            onClick={() => onCancel(info.row.original.id)}
-          >
-            {t("cancel")}
-          </Button>
+          <InvitationActions
+            invitation={info.row.original}
+            onCancel={onCancel}
+            isCanceling={isCanceling}
+            t={t}
+          />
         );
       },
     }),

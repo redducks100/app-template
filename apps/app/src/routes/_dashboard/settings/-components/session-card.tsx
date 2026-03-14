@@ -1,18 +1,18 @@
 import type { InferResponseType } from "hono/client";
-import type { apiClient } from "@/lib/api-client";
-import {
-  Loader2Icon,
-  MonitorIcon,
-  SmartphoneIcon,
-  Trash2Icon,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UAParser } from "ua-parser-js";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { revokeSession as revokeSessionMutation } from "@/lib/mutations/user";
-import { toast } from "sonner";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2Icon, MonitorIcon, SmartphoneIcon, Trash2Icon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { UAParser } from "ua-parser-js";
+
+import type { apiClient } from "@/lib/api-client";
+
+import { revokeSession as revokeSessionMutation } from "@/lib/mutations/user";
+import { Badge } from "@app/ui/components/badge";
+import { Button } from "@app/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@app/ui/components/card";
+import { formatDateTime } from "@app/ui/lib/utils";
 
 type SessionData = InferResponseType<
   (typeof apiClient)["user"]["sessions"]["$get"],
@@ -24,6 +24,7 @@ type SessionCardProps = {
 };
 
 export const SessionCard = ({ session }: SessionCardProps) => {
+  const { i18n } = useTranslation();
   const queryClient = useQueryClient();
   const userAgentInfo = session.userAgent ? UAParser(session.userAgent) : null;
 
@@ -46,13 +47,6 @@ export const SessionCard = ({ session }: SessionCardProps) => {
     return `${userAgentInfo.browser.name}, ${userAgentInfo.os.name}`;
   }
 
-  function formatDate(date: Date) {
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(date);
-  }
-
   return (
     <Card>
       <CardHeader className="flex justify-between">
@@ -62,27 +56,19 @@ export const SessionCard = ({ session }: SessionCardProps) => {
       <CardContent>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {userAgentInfo?.device.type === "mobile" ? (
-              <SmartphoneIcon />
-            ) : (
-              <MonitorIcon />
-            )}
+            {userAgentInfo?.device.type === "mobile" ? <SmartphoneIcon /> : <MonitorIcon />}
             <div>
               <p className="text-sm text-muted-foreground">
-                Created: {formatDate(new Date(session.createdAt))}
+                Created: {formatDateTime(session.createdAt, i18n.language)}
               </p>
               <p className="text-sm text-muted-foreground">
-                Expires: {formatDate(new Date(session.expiresAt))}
+                Expires: {formatDateTime(session.expiresAt, i18n.language)}
               </p>
             </div>
           </div>
           {!session.current && (
             <Button variant="destructive" size="sm" onClick={() => revokeMutation.mutate()}>
-              {revokeMutation.isPending ? (
-                <Loader2Icon className="animate-spin" />
-              ) : (
-                <Trash2Icon />
-              )}
+              {revokeMutation.isPending ? <Loader2Icon className="animate-spin" /> : <Trash2Icon />}
             </Button>
           )}
         </div>

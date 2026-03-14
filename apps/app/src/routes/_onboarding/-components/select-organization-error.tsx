@@ -1,6 +1,7 @@
-import { Alert, AlertTitle } from "@/components/ui/alert";
 import { CircleAlertIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+import { Alert, AlertTitle } from "@app/ui/components/alert";
 
 export const SelectOrganizationError = () => {
   const { t } = useTranslation("selectOrg");

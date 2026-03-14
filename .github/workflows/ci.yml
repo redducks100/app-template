@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, dev]
+    branches: [main]
 
 jobs:
   build:
@@ -25,3 +25,5 @@ jobs:
       - name: Lint
         run: pnpm lint
       - run: pnpm build
+      - name: Typecheck
+        run: pnpm typecheck

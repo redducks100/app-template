@@ -1,44 +1,34 @@
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import {
-  LockIcon,
-  MailIcon,
-  UserIcon,
-  Loader2,
-  MailCheckIcon,
-  Building2,
-} from "lucide-react";
-import { authClient } from "@/lib/auth-client";
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { signUpSchema } from "@app/shared/schemas/sign-up-schema";
-import { useAppForm } from "@/components/ui/form/hooks";
-import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
+import { Building2, Loader2, LockIcon, MailCheckIcon, MailIcon, UserIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+
+import { authClient } from "@/lib/auth-client";
 import {
   SUPPORTED_OATH_PROVIDER_DETAILS,
   SUPPORTED_OAUTH_PROVIDERS,
   SupportedOAuthProvider,
 } from "@/lib/constants";
-import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
-import { invitationGetOptions } from "@/lib/query-options/invitations";
-import { sessionOptions } from "@/lib/query-options/auth";
+import { sessionOptions } from "@/lib/queries/auth";
+import { invitationGetOptions } from "@/lib/queries/invitations";
+import { signUpSchema } from "@app/shared/schemas/sign-up-schema";
+import { Badge } from "@app/ui/components/badge";
+import { Button, buttonVariants } from "@app/ui/components/button";
+import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
+import { Separator } from "@app/ui/components/separator";
 
 type AcceptInvitationViewProps = {
   invitationId: string;
 };
 
-export const AcceptInvitationView = ({
-  invitationId,
-}: AcceptInvitationViewProps) => {
+export const AcceptInvitationView = ({ invitationId }: AcceptInvitationViewProps) => {
   const { t } = useTranslation("invitations");
   const { data: session } = useQuery(sessionOptions());
 
-  const { data: invitation } = useSuspenseQuery(
-    invitationGetOptions(invitationId),
-  );
+  const { data: invitation } = useSuspenseQuery(invitationGetOptions(invitationId));
 
   const isExpired = new Date(invitation.expiresAt) < new Date();
   const isInvalid =
@@ -50,18 +40,13 @@ export const AcceptInvitationView = ({
     return (
       <div className="animate-in-stagger">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            {t("unavailableTitle")}
-          </h1>
+          <h1 className="text-2xl font-medium tracking-tight">{t("unavailableTitle")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {isExpired ? t("expired") : t("noLongerValid")}
           </p>
         </div>
 
-        <Link
-          to="/sign-in"
-          className={buttonVariants({ className: "w-full" })}
-        >
+        <Link to="/sign-in" className={buttonVariants({ className: "w-full" })}>
           {t("goToSignIn")}
         </Link>
       </div>
@@ -75,19 +60,15 @@ export const AcceptInvitationView = ({
   return (
     <div className="animate-in-stagger">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {t("youveBeenInvited")}
-        </h1>
+        <h1 className="text-2xl font-medium tracking-tight">{t("youveBeenInvited")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("invitedBy", { name: invitation.inviter.name })}{" "}
-          <span className="font-medium text-foreground">
-            {invitation.organization.name}
-          </span>
+          <span className="font-medium text-foreground">{invitation.organization.name}</span>
         </p>
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between rounded-xl border border-border bg-muted/50 p-4">
+        <div className="flex items-center justify-between border border-border bg-muted/50 p-4">
           <div className="flex items-center gap-3">
             <Building2 className="size-5 text-muted-foreground" />
             <span className="font-medium">{invitation.organization.name}</span>
@@ -103,15 +84,9 @@ export const AcceptInvitationView = ({
         {session && session.user.emailVerified ? (
           <AuthenticatedActions invitationId={invitationId} />
         ) : session && !session.user.emailVerified ? (
-          <UnverifiedActions
-            invitationId={invitationId}
-            email={session.user.email}
-          />
+          <UnverifiedActions invitationId={invitationId} email={session.user.email} />
         ) : (
-          <UnauthenticatedActions
-            invitationId={invitationId}
-            invitationEmail={invitation.email}
-          />
+          <UnauthenticatedActions invitationId={invitationId} invitationEmail={invitation.email} />
         )}
       </div>
     </div>
@@ -143,7 +118,9 @@ function AuthenticatedActions({ invitationId }: { invitationId: string }) {
         },
       },
     );
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [invitationId]);
 
   if (error) {
@@ -164,13 +141,7 @@ function AuthenticatedActions({ invitationId }: { invitationId: string }) {
   );
 }
 
-function UnverifiedActions({
-  invitationId,
-  email,
-}: {
-  invitationId: string;
-  email: string;
-}) {
+function UnverifiedActions({ invitationId, email }: { invitationId: string; email: string }) {
   const { t } = useTranslation("invitations");
   const [resending, setResending] = useState(false);
 
@@ -199,21 +170,10 @@ function UnverifiedActions({
       <MailCheckIcon className="size-10 text-muted-foreground" />
       <div className="space-y-1 text-center">
         <p className="text-sm font-medium">{t("verifyEmail")}</p>
-        <p className="text-sm text-muted-foreground">
-          {t("verifyEmailDescription")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("verifyEmailDescription")}</p>
       </div>
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={handleResend}
-        disabled={resending}
-      >
-        {resending ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          t("resendVerification")
-        )}
+      <Button variant="outline" className="w-full" onClick={handleResend} disabled={resending}>
+        {resending ? <Loader2 className="size-4 animate-spin" /> : t("resendVerification")}
       </Button>
       <button
         type="button"
@@ -291,9 +251,7 @@ function UnauthenticatedActions({
 
   return (
     <>
-      <p className="text-sm text-muted-foreground text-center">
-        {t("createAccountDescription")}
-      </p>
+      <p className="text-sm text-muted-foreground text-center">{t("createAccountDescription")}</p>
 
       {SUPPORTED_OAUTH_PROVIDERS.map((provider) => {
         const Icon = SUPPORTED_OATH_PROVIDER_DETAILS[provider].Icon;
@@ -302,7 +260,7 @@ function UnauthenticatedActions({
             variant="outline"
             disabled={loading}
             onClick={() => onProviderSubmit(provider)}
-            className="w-full h-11"
+            className="w-full h-10"
             key={provider}
           >
             <Icon />
@@ -315,7 +273,9 @@ function UnauthenticatedActions({
 
       <div className="flex items-center gap-3 py-1">
         <Separator className="flex-1" />
-        <span className="text-xs text-muted-foreground/60 uppercase tracking-wider font-medium">{tCommon("or")}</span>
+        <span className="text-[10px] tracking-[0.2em] text-muted-foreground/60 uppercase font-medium">
+          {tCommon("or")}
+        </span>
         <Separator className="flex-1" />
       </div>
 

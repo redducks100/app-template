@@ -1,7 +1,9 @@
 import type { Context } from "hono";
-import { HTTPException } from "hono/http-exception";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
+
+import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
+
 import { getLogger } from "@app/shared/logger";
 
 export function onError(err: Error, c: Context): Response {
@@ -14,24 +16,15 @@ export function onError(err: Error, c: Context): Response {
     } else {
       getLogger().warn(err.message, reqContext);
     }
-    return c.json(
-      { success: false as const, error: { message: err.message } },
-      status,
-    );
+    return c.json({ success: false as const, error: { message: err.message } }, status);
   }
 
   if (err instanceof z.ZodError) {
     const message = err.issues.map((e) => e.message).join("\n");
     getLogger().warn(message, reqContext);
-    return c.json(
-      { success: false as const, error: { message } },
-      400,
-    );
+    return c.json({ success: false as const, error: { message } }, 400);
   }
 
   getLogger().error(err, reqContext);
-  return c.json(
-    { success: false as const, error: { message: "Internal server error" } },
-    500,
-  );
+  return c.json({ success: false as const, error: { message: "Internal server error" } }, 500);
 }

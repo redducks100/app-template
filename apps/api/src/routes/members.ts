@@ -1,14 +1,20 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { getAuth } from "../lib/auth.js";
-import { authMiddleware } from "../middleware/auth.js";
-import { ok } from "../lib/result.js";
-import { zv } from "../lib/validation.js";
+
+import type { MemberPermissions } from "@app/shared/schemas/member";
+
+import { findMemberById, findMembersPaginated } from "@app/data-ops/queries/members";
+import { SearchPaginationParams } from "@app/shared/types/result";
+
+import { getAuth } from "../lib/auth";
+import { ok, okPaginated } from "../lib/result";
+import { zv } from "../lib/validation";
+import { authMiddleware } from "../middleware/auth";
 
 export const memberRoutes = new Hono()
   .use(authMiddleware)
-  .get("/", async (c) => {
+  .get("/", zv("query", SearchPaginationParams), async (c) => {
     const session = c.get("session");
     const organizationId = session.activeOrganizationId;
 
@@ -16,12 +22,23 @@ export const memberRoutes = new Hono()
       throw new HTTPException(400, { message: "No active organization selected." });
     }
 
-    const response = await getAuth(c.env.R2).api.listMembers({
-      query: { organizationId },
-      headers: c.req.raw.headers,
+    const { page, pageSize, search } = c.req.valid("query");
+    const { members, total } = await findMembersPaginated({
+      organizationId,
+      page,
+      pageSize,
+      search,
     });
 
-    return ok(c, response);
+    return okPaginated(c, {
+      data: members,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
   })
   .get("/permissions", async (c) => {
     const headers = c.req.raw.headers;
@@ -41,7 +58,24 @@ export const memberRoutes = new Hono()
         .then((r) => r.success),
     ]);
 
-    return ok(c, { canUpdate, canDelete });
+    return ok(c, { canUpdate, canDelete } satisfies MemberPermissions);
+  })
+  .get("/:id", zv("param", z.object({ id: z.string() })), async (c) => {
+    const session = c.get("session");
+    const organizationId = session.activeOrganizationId;
+
+    if (!organizationId) {
+      throw new HTTPException(400, { message: "No active organization selected." });
+    }
+
+    const { id } = c.req.valid("param");
+    const member = await findMemberById(id, organizationId);
+
+    if (!member) {
+      throw new HTTPException(404, { message: "Member not found." });
+    }
+
+    return ok(c, member);
   })
   .patch(
     "/:id/role",
@@ -73,30 +107,26 @@ export const memberRoutes = new Hono()
       return ok(c, response);
     },
   )
-  .delete(
-    "/:id",
-    zv("param", z.object({ id: z.string() })),
-    async (c) => {
-      const session = c.get("session");
-      const { id: memberIdOrEmail } = c.req.valid("param");
-      const organizationId = session.activeOrganizationId;
+  .delete("/:id", zv("param", z.object({ id: z.string() })), async (c) => {
+    const session = c.get("session");
+    const { id: memberIdOrEmail } = c.req.valid("param");
+    const organizationId = session.activeOrganizationId;
 
-      if (!organizationId) {
-        throw new HTTPException(400, { message: "No active organization selected." });
-      }
+    if (!organizationId) {
+      throw new HTTPException(400, { message: "No active organization selected." });
+    }
 
-      const response = await getAuth(c.env.R2).api.removeMember({
-        body: {
-          memberIdOrEmail,
-          organizationId,
-        },
-        headers: c.req.raw.headers,
-      });
+    const response = await getAuth(c.env.R2).api.removeMember({
+      body: {
+        memberIdOrEmail,
+        organizationId,
+      },
+      headers: c.req.raw.headers,
+    });
 
-      if (!response) {
-        throw new HTTPException(500, { message: "Failed to remove member." });
-      }
+    if (!response) {
+      throw new HTTPException(500, { message: "Failed to remove member." });
+    }
 
-      return ok(c, response);
-    },
-  );
+    return ok(c, response);
+  });

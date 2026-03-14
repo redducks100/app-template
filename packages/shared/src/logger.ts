@@ -18,18 +18,22 @@ export class ConsoleLogger implements Logger {
   private contexts: Record<string, Record<string, unknown>> = {};
 
   debug(message: string, context?: LogContext): void {
+    // oxlint-disable-next-line no-console
     console.debug(message, this.buildMeta(context));
   }
 
   info(message: string, context?: LogContext): void {
+    // oxlint-disable-next-line no-console
     console.info(message, this.buildMeta(context));
   }
 
   warn(message: string, context?: LogContext): void {
+    // oxlint-disable-next-line no-console
     console.warn(message, this.buildMeta(context));
   }
 
   error(error: Error | string, context?: LogContext): void {
+    // oxlint-disable-next-line no-console
     console.error(error, this.buildMeta(context));
   }
 

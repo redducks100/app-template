@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+
 import { VerifyEmailView } from "./-components/verify-email-view";
 
 export const Route = createFileRoute("/_guest/verify-email")({

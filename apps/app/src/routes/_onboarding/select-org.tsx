@@ -1,10 +1,9 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { SelectOrganizationView } from "./-components/select-organization-view";
-import {
-  organizationsListOptions,
-  activeOrganizationOptions,
-} from "@/lib/query-options/organizations";
 import { useTranslation } from "react-i18next";
+
+import { activeOrganizationOptions, organizationsListOptions } from "@/lib/queries/organizations";
+
+import { SelectOrganizationView } from "./-components/select-organization-view";
 
 export const Route = createFileRoute("/_onboarding/select-org")({
   beforeLoad: async ({ context }) => {
@@ -28,9 +27,7 @@ function SelectOrgPage() {
       <div className="w-full max-w-3xl">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold">{t("title")}</h1>
-          <p className="text-muted-foreground mt-1">
-            {t("description")}
-          </p>
+          <p className="text-muted-foreground mt-1">{t("description")}</p>
         </div>
         <SelectOrganizationView />
       </div>

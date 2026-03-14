@@ -1,24 +1,26 @@
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { LockIcon, MailIcon } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
-import { useState } from "react";
-import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { sessionOptions } from "@/lib/query-options/auth";
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
+import { LockIcon, MailIcon } from "lucide-react";
+import { useState } from "react";
+
+import { authClient } from "@/lib/auth-client";
+import { sessionOptions } from "@/lib/queries/auth";
+import { Button } from "@app/ui/components/button";
+import { Separator } from "@app/ui/components/separator";
 
 const routeApi = getRouteApi("/_guest/sign-in");
-import { signInSchema } from "@app/shared/schemas/sign-in-schema";
-import { useAppForm } from "@/components/ui/form/hooks";
-import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
-import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+
 import {
   SUPPORTED_OATH_PROVIDER_DETAILS,
   SUPPORTED_OAUTH_PROVIDERS,
   SupportedOAuthProvider,
 } from "@/lib/constants";
-import { useTranslation } from "react-i18next";
+import { signInSchema } from "@app/shared/schemas/sign-in-schema";
+import { Field, FieldDescription, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
 export const SignInView = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -58,7 +60,10 @@ export const SignInView = () => {
   const onProviderSubmit = (provider: SupportedOAuthProvider) => {
     setLoading(true);
     authClient.signIn.social(
-      { provider: provider, callbackURL: new URL(callbackURL, window.location.origin).href },
+      {
+        provider: provider,
+        callbackURL: new URL(callbackURL, window.location.origin).href,
+      },
       {
         onSuccess: async () => {
           await queryClient.fetchQuery({ ...sessionOptions(), staleTime: 0 });
@@ -75,9 +80,7 @@ export const SignInView = () => {
   return (
     <div className="animate-in-stagger">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {t("sign_in.title")}
-        </h1>
+        <h1 className="text-2xl font-medium tracking-tight">{t("sign_in.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("sign_in.description")}</p>
       </div>
 
@@ -90,7 +93,7 @@ export const SignInView = () => {
               variant="outline"
               disabled={loading}
               onClick={() => onProviderSubmit(provider)}
-              className="w-full h-11"
+              className="w-full h-10"
               key={provider}
             >
               <Icon />
@@ -103,7 +106,9 @@ export const SignInView = () => {
 
         <div className="flex items-center gap-3 py-1">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground/60 uppercase tracking-wider font-medium">{tCommon("or")}</span>
+          <span className="text-[10px] tracking-[0.2em] text-muted-foreground/60 uppercase font-medium">
+            {tCommon("or")}
+          </span>
           <Separator className="flex-1" />
         </div>
 
@@ -146,12 +151,12 @@ export const SignInView = () => {
               <form.AppForm>
                 <form.SubmitButton label={t("sign_in.submit")} />
               </form.AppForm>
-              <p className="text-center text-xs text-muted-foreground">
-                {t("sign_in.terms")}
-              </p>
+              <p className="text-center text-xs text-muted-foreground">{t("sign_in.terms")}</p>
               <FieldDescription className="text-center">
                 {t("sign_in.noAccount")}{" "}
-                <Link to="/sign-up" className="text-primary hover:underline underline-offset-4">{t("sign_in.signUp")}</Link>
+                <Link to="/sign-up" className="text-primary hover:underline underline-offset-4">
+                  {t("sign_in.signUp")}
+                </Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

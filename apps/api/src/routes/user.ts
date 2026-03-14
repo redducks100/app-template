@@ -1,48 +1,41 @@
 import { Hono } from "hono";
+import { setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { setCookie } from "hono/cookie";
-import { getAuth } from "../lib/auth.js";
-import { getDb } from "../lib/db.js";
-import { authMiddleware } from "../middleware/auth.js";
-import { ok } from "../lib/result.js";
-import { zv } from "../lib/validation.js";
+
+import {
+  deleteUserAvatar,
+  hasPasswordCredential,
+  updateUserAvatar,
+  updateUserLocale,
+} from "@app/data-ops/queries/user";
 import { updateLanguageSchema } from "@app/shared/schemas/update-language-schema";
+
+import { getAuth } from "../lib/auth";
+import { ok } from "../lib/result";
+import { zv } from "../lib/validation";
+import { authMiddleware } from "../middleware/auth";
 
 export const userRoutes = new Hono<{ Bindings: CloudflareBindings }>()
   .use(authMiddleware)
-  .patch(
-    "/language",
-    zv("json", updateLanguageSchema),
-    async (c) => {
-      const sessionData = c.get("session");
-      const input = c.req.valid("json");
+  .patch("/language", zv("json", updateLanguageSchema), async (c) => {
+    const sessionData = c.get("session");
+    const input = c.req.valid("json");
 
-      await getDb()
-        .updateTable("user")
-        .set({ locale: input.locale })
-        .where("id", "=", sessionData.userId)
-        .execute();
+    await updateUserLocale(sessionData.userId, input.locale);
 
-      setCookie(c, "NEXT_LOCALE", input.locale, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-        sameSite: "Lax",
-      });
+    setCookie(c, "NEXT_LOCALE", input.locale, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "Lax",
+    });
 
-      return ok(c, { success: true, locale: input.locale });
-    },
-  )
+    return ok(c, { success: true, locale: input.locale });
+  })
   .get("/password", async (c) => {
     const sessionData = c.get("session");
-    const accounts = await getDb()
-      .selectFrom("account")
-      .selectAll()
-      .where("userId", "=", sessionData.userId)
-      .where("providerId", "=", "credential")
-      .execute();
-
-    return ok(c, { hasPassword: accounts && accounts.length > 0 });
+    const hasPassword = await hasPasswordCredential(sessionData.userId);
+    return ok(c, { hasPassword });
   })
   .get("/linked-accounts", async (c) => {
     const accounts = await getAuth(c.env.R2).api.listUserAccounts({
@@ -71,18 +64,14 @@ export const userRoutes = new Hono<{ Bindings: CloudflareBindings }>()
     });
     return ok(c, { success: true });
   })
-  .delete(
-    "/sessions/:token",
-    zv("param", z.object({ token: z.string() })),
-    async (c) => {
-      const { token } = c.req.valid("param");
-      await getAuth(c.env.R2).api.revokeSession({
-        body: { token },
-        headers: c.req.raw.headers,
-      });
-      return ok(c, { success: true });
-    },
-  )
+  .delete("/sessions/:token", zv("param", z.object({ token: z.string() })), async (c) => {
+    const { token } = c.req.valid("param");
+    await getAuth(c.env.R2).api.revokeSession({
+      body: { token },
+      headers: c.req.raw.headers,
+    });
+    return ok(c, { success: true });
+  })
   .put(
     "/avatar",
     zv(
@@ -95,9 +84,7 @@ export const userRoutes = new Hono<{ Bindings: CloudflareBindings }>()
       const sessionData = c.get("session");
       const { image } = c.req.valid("json");
 
-      const match = image.match(
-        /^data:(image\/(?:jpeg|png|webp));base64,(.+)$/,
-      );
+      const match = image.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/);
       if (!match) {
         throw new HTTPException(400, { message: "Invalid image format" });
       }
@@ -124,11 +111,7 @@ export const userRoutes = new Hono<{ Bindings: CloudflareBindings }>()
       });
 
       const url = `${process.env.ASSETS_URL}/${key}?v=${Date.now()}`;
-      await getDb()
-        .updateTable("user")
-        .set({ image: url })
-        .where("id", "=", sessionData.userId)
-        .execute();
+      await updateUserAvatar(sessionData.userId, url);
 
       return ok(c, { url });
     },
@@ -138,11 +121,7 @@ export const userRoutes = new Hono<{ Bindings: CloudflareBindings }>()
     const key = `profile-pictures/${sessionData.userId}.webp`;
 
     await c.env.R2.delete(key);
-    await getDb()
-      .updateTable("user")
-      .set({ image: null })
-      .where("id", "=", sessionData.userId)
-      .execute();
+    await deleteUserAvatar(sessionData.userId);
 
     return ok(c, { success: true });
   });

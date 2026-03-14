@@ -1,13 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
-import { SessionsSection } from "./-components/sessions-section";
-import { sessionsOptions } from "@/lib/query-options/user";
 
-export const Route = createFileRoute(
-  "/_dashboard/settings/sessions",
-)({
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(sessionsOptions()),
+import { sessionsOptions } from "@/lib/queries/user";
+
+import { SessionsSection } from "./-components/sessions-section";
+
+export const Route = createFileRoute("/_dashboard/settings/sessions")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(sessionsOptions()),
   component: SettingsSessionsPage,
 });
 

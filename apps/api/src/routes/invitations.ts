@@ -1,81 +1,77 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { getAuth } from "../lib/auth.js";
-import { getDb } from "../lib/db.js";
-import { authMiddleware } from "../middleware/auth.js";
-import { ok } from "../lib/result.js";
-import { zv } from "../lib/validation.js";
+
+import type { InvitationDetail, InvitationPermissions } from "@app/shared/schemas/invitation";
+
+import { findInvitationDetails, findInvitationsPaginated } from "@app/data-ops/queries/invitations";
 import { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
+import { SearchPaginationParams } from "@app/shared/types/result";
+
+import { getAuth } from "../lib/auth";
+import { ok, okPaginated } from "../lib/result";
+import { zv } from "../lib/validation";
+import { authMiddleware } from "../middleware/auth";
 
 export const invitationRoutes = new Hono()
-  .get(
-    "/:id",
-    zv("param", z.object({ id: z.string() })),
-    async (c) => {
-      const { id } = c.req.valid("param");
-      const result = await getDb()
-        .selectFrom("invitation")
-        .innerJoin("user", "user.id", "invitation.inviterId")
-        .innerJoin(
-          "organization",
-          "organization.id",
-          "invitation.organizationId",
-        )
-        .select([
-          "invitation.id",
-          "invitation.organizationId",
-          "invitation.email",
-          "invitation.role",
-          "invitation.status",
-          "invitation.expiresAt",
-          "invitation.inviterId",
-          "user.name as inviterName",
-          "user.email as inviterEmail",
-          "user.image as inviterImage",
-          "organization.name as organizationName",
-          "organization.slug as organizationSlug",
-          "organization.logo as organizationLogo",
-        ])
-        .where("invitation.id", "=", id)
-        .executeTakeFirst();
+  .get("/:id", zv("param", z.object({ id: z.string() })), async (c) => {
+    const { id } = c.req.valid("param");
+    const result = await findInvitationDetails(id);
 
-      if (!result) {
-        throw new HTTPException(404, { message: "Invitation not found" });
-      }
+    if (!result) {
+      throw new HTTPException(404, { message: "Invitation not found" });
+    }
 
-      return ok(c, {
-        ...result,
-        inviter: {
-          id: result.inviterId,
-          name: result.inviterName,
-          email: result.inviterEmail,
-          image: result.inviterImage,
-        },
-        organization: {
-          id: result.organizationId,
-          name: result.organizationName,
-          slug: result.organizationSlug,
-          logo: result.organizationLogo,
-        },
-      });
-    },
-  )
+    return ok(c, result satisfies InvitationDetail);
+  })
   .use(authMiddleware)
-  .get("/", async (c) => {
+  .get("/", zv("query", SearchPaginationParams), async (c) => {
     const session = c.get("session");
     const organizationId = session.activeOrganizationId;
 
     if (!organizationId) {
-      throw new HTTPException(400, { message: "No active organization selected." });
+      throw new HTTPException(400, {
+        message: "No active organization selected.",
+      });
     }
 
-    const response = await getAuth(c.env.R2).api.listInvitations({
-      query: { organizationId },
-      headers: c.req.raw.headers,
+    const { page, pageSize, search } = c.req.valid("query");
+    const { invitations, total } = await findInvitationsPaginated({
+      organizationId,
+      page,
+      pageSize,
+      search,
     });
 
-    return ok(c, response);
+    return okPaginated(c, {
+      data: invitations,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
+  })
+  .get("/permissions", async (c) => {
+    const headers = c.req.raw.headers;
+
+    const [canCreate, canCancel] = await Promise.all([
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { invitation: ["create"] } },
+        })
+        .then((r) => r.success),
+      getAuth(c.env.R2)
+        .api.hasPermission({
+          headers,
+          body: { permissions: { invitation: ["cancel"] } },
+        })
+        .then((r) => r.success),
+    ]);
+
+    return ok(c, { canCreate, canCancel } satisfies InvitationPermissions);
   })
   .post("/", zv("json", createInvitationSchema), async (c) => {
     const session = c.get("session");
@@ -83,13 +79,15 @@ export const invitationRoutes = new Hono()
     const organizationId = session.activeOrganizationId;
 
     if (!organizationId) {
-      throw new HTTPException(400, { message: "No active organization selected." });
+      throw new HTTPException(400, {
+        message: "No active organization selected.",
+      });
     }
 
     const response = await getAuth(c.env.R2).api.createInvitation({
       body: {
         email: input.email,
-        role: input.role as "admin" | "member" | "owner",
+        role: input.role as "member" | "owner" | "admin", // BA types don't reflect dynamicAccessControl custom roles
         organizationId,
       },
       headers: c.req.raw.headers,
@@ -103,23 +101,19 @@ export const invitationRoutes = new Hono()
 
     return ok(c, response, 201);
   })
-  .delete(
-    "/:id",
-    zv("param", z.object({ id: z.string() })),
-    async (c) => {
-      const { id: invitationId } = c.req.valid("param");
+  .delete("/:id", zv("param", z.object({ id: z.string() })), async (c) => {
+    const { id: invitationId } = c.req.valid("param");
 
-      const response = await getAuth(c.env.R2).api.cancelInvitation({
-        body: { invitationId },
-        headers: c.req.raw.headers,
+    const response = await getAuth(c.env.R2).api.cancelInvitation({
+      body: { invitationId },
+      headers: c.req.raw.headers,
+    });
+
+    if (!response) {
+      throw new HTTPException(500, {
+        message: "Something went wrong while canceling the invitation.",
       });
+    }
 
-      if (!response) {
-        throw new HTTPException(500, {
-          message: "Something went wrong while canceling the invitation.",
-        });
-      }
-
-      return ok(c, response);
-    },
-  );
+    return ok(c, response);
+  });

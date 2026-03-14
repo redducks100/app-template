@@ -12,27 +12,14 @@
   "r2_buckets": [
     {
       "binding": "R2",
-      "bucket_name": "app-storage"
-    }
+      "bucket_name": "app-storage",
+      "preview_bucket_name": "app-storage-dev",
+    },
   ],
   "vars": {
     "APP_URL": "https://app.enomisoft.com",
     "BETTER_AUTH_URL": "https://api.enomisoft.com",
     "COOKIE_DOMAIN": ".enomisoft.com",
-    "ASSETS_URL": "https://assets.enomisoft.com"
+    "ASSETS_URL": "https://assets.enomisoft.com",
   },
-  "env": {
-    "dev": {
-      "name": "api-dev",
-      "r2_buckets": [
-        { "binding": "R2", "bucket_name": "app-storage-dev" }
-      ],
-      "vars": {
-        "APP_URL": "https://app-dev.enomisoft.com",
-        "BETTER_AUTH_URL": "https://api-dev.enomisoft.com",
-        "COOKIE_DOMAIN": ".enomisoft.com",
-        "ASSETS_URL": "https://assets-dev.enomisoft.com"
-      }
-    }
-  }
 }

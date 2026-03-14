@@ -1,5 +1,6 @@
-import { GoogleIcon } from "@/components/ui/google-icon";
 import { ComponentProps, ElementType } from "react";
+
+import { GoogleIcon } from "@app/ui/components/google-icon";
 
 export const SUPPORTED_OAUTH_PROVIDERS = ["google"] as const;
 export type SupportedOAuthProvider = (typeof SUPPORTED_OAUTH_PROVIDERS)[number];

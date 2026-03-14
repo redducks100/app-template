@@ -1,10 +1,11 @@
-import { Field, FieldGroup } from "@/components/ui/field";
-import { useAppForm } from "@/components/ui/form/hooks";
-import { Separator } from "@/components/ui/separator";
-import { authClient } from "@/lib/auth-client";
-import { changePasswordSchema } from "@app/shared/schemas/change-password-schema";
 import { LockIcon } from "lucide-react";
 import { toast } from "sonner";
+
+import { authClient } from "@/lib/auth-client";
+import { changePasswordSchema } from "@app/shared/schemas/change-password-schema";
+import { Field, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
+import { Separator } from "@app/ui/components/separator";
 
 export const ChangePasswordForm = () => {
   const form = useAppForm({
@@ -32,7 +33,7 @@ export const ChangePasswordForm = () => {
           onError: (error) => {
             toast.error(error.error.message || "Failed to change password");
           },
-        }
+        },
       );
     },
   });
@@ -45,7 +46,7 @@ export const ChangePasswordForm = () => {
       }}
     >
       <FieldGroup>
-        <div className="rounded-xl border border-border bg-card">
+        <div className="border border-border bg-card">
           <form.AppField name="password">
             {(field) => (
               <field.Input

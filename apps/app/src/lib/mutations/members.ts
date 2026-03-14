@@ -1,9 +1,6 @@
 import { apiClient, callRPC } from "../api-client";
 
-export async function updateMemberRole(data: {
-  memberId: string;
-  role: string;
-}) {
+export async function updateMemberRole(data: { memberId: string; role: string }) {
   const res = await callRPC(
     apiClient.members[":id"].role.$patch({
       param: { id: data.memberId },

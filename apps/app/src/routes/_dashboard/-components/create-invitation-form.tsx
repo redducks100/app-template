@@ -1,20 +1,18 @@
-import { useAppForm } from "@/components/ui/form/hooks";
-import { Field, FieldGroup } from "@/components/ui/field";
-import { SelectItem } from "@/components/ui/select";
-import { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { rolesListOptions } from "@/lib/query-options/roles";
+
 import { createInvitation as createInvitationMutation } from "@/lib/mutations/invitations";
+import { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
+import { Field, FieldGroup } from "@app/ui/components/field";
+import { useAppForm } from "@app/ui/components/form/hooks";
+import { SelectItem } from "@app/ui/components/select";
+
+const assignableRoles = [{ role: "admin" }, { role: "member" }];
 
 export const CreateInvitationForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const { t } = useTranslation("invitations");
   const queryClient = useQueryClient();
-
-  const { data: roles } = useQuery(rolesListOptions());
-
-  const assignableRoles = (roles ?? []).filter((r) => r.role !== "owner");
 
   const createInvitation = useMutation({
     mutationFn: createInvitationMutation,
@@ -50,12 +48,7 @@ export const CreateInvitationForm = ({ onSuccess }: { onSuccess?: () => void }) 
     >
       <FieldGroup>
         <form.AppField name="email">
-          {(field) => (
-            <field.Input
-              label={t("email")}
-              placeholder={t("emailPlaceholder")}
-            />
-          )}
+          {(field) => <field.Input label={t("email")} placeholder={t("emailPlaceholder")} />}
         </form.AppField>
 
         <form.AppField name="role">

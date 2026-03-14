@@ -1,10 +1,12 @@
-import { useMutation, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
-import { SessionCard } from "./session-card";
-import { Button } from "@/components/ui/button";
-import { revokeOtherSessions as revokeOtherSessionsMutation } from "@/lib/mutations/user";
 import { toast } from "sonner";
-import { sessionsOptions } from "@/lib/query-options/user";
+
+import { revokeOtherSessions as revokeOtherSessionsMutation } from "@/lib/mutations/user";
+import { sessionsOptions } from "@/lib/queries/user";
+import { Button } from "@app/ui/components/button";
+
+import { SessionCard } from "./session-card";
 
 export const SessionsSection = () => {
   const queryClient = useQueryClient();
@@ -29,11 +31,7 @@ export const SessionsSection = () => {
         <>
           <div className="flex items-center justify-between pt-4">
             <p className="text-sm font-medium text-muted-foreground">Other Active Sessions</p>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => revokeAllMutation.mutate()}
-            >
+            <Button variant="destructive" size="sm" onClick={() => revokeAllMutation.mutate()}>
               {revokeAllMutation.isPending ? (
                 <Loader2Icon className="size-4 animate-spin" />
               ) : (
@@ -48,7 +46,7 @@ export const SessionsSection = () => {
       )}
 
       {otherSessions.length === 0 && (
-        <div className="rounded-xl border border-border bg-card py-8 text-center text-muted-foreground">
+        <div className="border border-border bg-card py-8 text-center text-muted-foreground">
           No other active sessions
         </div>
       )}

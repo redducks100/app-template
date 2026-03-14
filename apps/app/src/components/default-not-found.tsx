@@ -1,5 +1,6 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { buttonVariants } from "@/components/ui/button";
+
+import { buttonVariants } from "@app/ui/components/button";
 
 export function DefaultNotFound() {
   const router = useRouter();

@@ -1,10 +1,4 @@
-import {
-  AlertTriangle,
-  Link2,
-  Monitor,
-  Shield,
-  User,
-} from "lucide-react";
+import { AlertTriangle, Link2, Monitor, Shield, User } from "lucide-react";
 
 export type SettingsValue = "profile" | "security" | "sessions" | "integrations" | "danger";
 

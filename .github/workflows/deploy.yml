@@ -27,6 +27,8 @@ jobs:
       - run: pnpm run build
         env:
           VITE_API_URL: https://api.enomisoft.com
+      - name: Typecheck
+        run: pnpm typecheck
       - name: Run database migrations
         run: pnpm db:migrate
         env:

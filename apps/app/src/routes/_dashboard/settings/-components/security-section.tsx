@@ -1,8 +1,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { User } from "better-auth";
+
+import { hasPasswordOptions } from "@/lib/queries/user";
+
 import { ChangePasswordForm } from "./change-password-form";
 import { SendChangePasswordEmailForm } from "./send-change-password-email-form";
-import { hasPasswordOptions } from "@/lib/query-options/user";
 
 type SecuritySectionProps = {
   user: User;
