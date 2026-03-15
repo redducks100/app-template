@@ -7,6 +7,11 @@ import { ac, admin, member, owner } from "@app/shared/permissions";
 
 import { getDb } from "./db";
 import { hashPassword, verifyPassword } from "./password";
+import {
+  getFirstMembership,
+  getUserLastOrganizationId,
+  updateUserLastOrganizationId,
+} from "./queries/user";
 
 export interface AuthOptions {
   onOAuthUserCreated?: {
@@ -43,7 +48,7 @@ function createAuth(options?: AuthOptions) {
       },
       deleteUser: {
         enabled: true,
-        sendDeleteAccountVerification: async ({ user, url, token }) => {
+        sendDeleteAccountVerification: async ({ user, url, token: _token }) => {
           const { default: sendAccountDeletionEmail } =
             await import("./emails/send-account-deletion-email");
           await sendAccountDeletionEmail({
@@ -69,7 +74,7 @@ function createAuth(options?: AuthOptions) {
     emailAndPassword: {
       enabled: true,
       password: { hash: hashPassword, verify: verifyPassword },
-      sendResetPassword: async ({ user, url, token }, request) => {
+      sendResetPassword: async ({ user, url, token: _token }, _request) => {
         const { default: sendForgotPasswordEmail } =
           await import("./emails/send-forgot-password-email");
         await sendForgotPasswordEmail({ user, url });
@@ -142,6 +147,28 @@ function createAuth(options?: AuthOptions) {
               }
             }
             return { data: user };
+          },
+        },
+      },
+      session: {
+        create: {
+          before: async (session) => {
+            let orgId = await getUserLastOrganizationId(session.userId);
+            if (!orgId) {
+              orgId = await getFirstMembership(session.userId);
+              if (orgId) await updateUserLastOrganizationId(session.userId, orgId);
+            }
+            return { data: { ...session, activeOrganizationId: orgId } };
+          },
+        },
+        update: {
+          after: async (session) => {
+            if (session.activeOrganizationId) {
+              await updateUserLastOrganizationId(
+                session.userId,
+                session.activeOrganizationId as string,
+              );
+            }
           },
         },
       },

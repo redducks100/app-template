@@ -17,9 +17,10 @@ export const CreateInvitationForm = ({ onSuccess }: { onSuccess?: () => void }) 
   const createInvitation = useMutation({
     mutationFn: createInvitationMutation,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["invitations", "list"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["invitations", "list"] }),
+        queryClient.invalidateQueries({ queryKey: ["invitations", "count"] }),
+      ]);
       toast.success(t("sentSuccess"));
       form.reset();
       onSuccess?.();

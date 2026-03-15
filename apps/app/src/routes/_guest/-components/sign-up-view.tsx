@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { LockIcon, MailIcon, UserIcon } from "lucide-react";
+import { Loader2Icon, LockIcon, MailIcon, UserIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -96,7 +96,7 @@ export const SignUpView = () => {
               className="w-full h-10"
               key={provider}
             >
-              <Icon />
+              {loading ? <Loader2Icon className="animate-spin" /> : <Icon />}
               {tCommon("continueWith", {
                 provider: SUPPORTED_OATH_PROVIDER_DETAILS[provider].name,
               })}

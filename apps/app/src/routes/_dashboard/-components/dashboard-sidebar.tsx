@@ -1,28 +1,7 @@
 import { Link, useMatchRoute } from "@tanstack/react-router";
-import {
-  BuildingIcon,
-  ChartBarIcon,
-  ChevronRightIcon,
-  CogIcon,
-  InfoIcon,
-  LayoutDashboardIcon,
-  MailsIcon,
-  UsersIcon,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChartBarIcon, CogIcon, LayoutDashboardIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@app/ui/components/collapsible";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@app/ui/components/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -33,10 +12,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  useSidebar,
 } from "@app/ui/components/sidebar";
 
 import { DashboardOrganizationSwitcher } from "./dashboard-organization-switcher";
@@ -49,7 +24,6 @@ export const DashboardSidebar = ({ ...props }: React.ComponentProps<typeof Sideb
   const { t } = useTranslation("dashboard");
   const { t: tCommon } = useTranslation("common");
   const matchRoute = useMatchRoute();
-  const { state } = useSidebar();
 
   const isSettingsActive = !!matchRoute({ to: "/settings", fuzzy: true });
 
@@ -57,22 +31,6 @@ export const DashboardSidebar = ({ ...props }: React.ComponentProps<typeof Sideb
     { title: t("sidebar.dashboard"), url: "/", icon: LayoutDashboardIcon },
     { title: t("sidebar.analytics"), url: "#", icon: ChartBarIcon },
   ];
-
-  const organizationSubItems = [
-    { title: t("sidebar.general"), url: "/organization", icon: InfoIcon },
-    { title: t("sidebar.invitations"), url: "/invitations", icon: MailsIcon },
-    { title: t("sidebar.users"), url: "/users", icon: UsersIcon },
-  ];
-
-  const isOrgSectionActive = organizationSubItems.some(
-    (item) => !!matchRoute({ to: item.url, fuzzy: true }),
-  );
-
-  const [orgOpen, setOrgOpen] = useState(isOrgSectionActive);
-
-  useEffect(() => {
-    if (isOrgSectionActive) setOrgOpen(true);
-  }, [isOrgSectionActive]);
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -105,72 +63,6 @@ export const DashboardSidebar = ({ ...props }: React.ComponentProps<typeof Sideb
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* Organization group — collapsible / dropdown */}
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                {state === "collapsed" ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <SidebarMenuButton>
-                          <BuildingIcon />
-                        </SidebarMenuButton>
-                      }
-                    />
-                    <DropdownMenuContent side="right" sideOffset={4} align="start">
-                      {organizationSubItems.map((item) => (
-                        <DropdownMenuItem key={item.url} render={<Link to={item.url} />}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <Collapsible
-                    open={orgOpen}
-                    onOpenChange={setOrgOpen}
-                    className="group/collapsible"
-                  >
-                    <CollapsibleTrigger
-                      render={
-                        <SidebarMenuButton tooltip={t("sidebar.organizationSection")}>
-                          <BuildingIcon />
-                          <span>{t("sidebar.organizationSection")}</span>
-                          <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[open]/collapsible:rotate-90" />
-                        </SidebarMenuButton>
-                      }
-                    />
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {organizationSubItems.map((item) => {
-                          const isActive = !!matchRoute({ to: item.url, fuzzy: true });
-                          return (
-                            <SidebarMenuSubItem key={item.url}>
-                              <SidebarMenuSubButton
-                                isActive={isActive}
-                                className={isActive ? activeClass : ""}
-                                render={
-                                  <Link to={item.url}>
-                                    <item.icon />
-                                    <span>{item.title}</span>
-                                  </Link>
-                                }
-                              />
-                            </SidebarMenuSubItem>
-                          );
-                        })}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </Collapsible>
-                )}
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
@@ -180,7 +72,7 @@ export const DashboardSidebar = ({ ...props }: React.ComponentProps<typeof Sideb
               isActive={isSettingsActive}
               className={isSettingsActive ? activeClass : ""}
               render={
-                <Link to="/settings/profile">
+                <Link to="/settings/general">
                   <CogIcon />
                   <span>{tCommon("settings")}</span>
                 </Link>

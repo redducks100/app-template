@@ -1,21 +1,22 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { revokeOtherSessions as revokeOtherSessionsMutation } from "@/lib/mutations/user";
 import { sessionsOptions } from "@/lib/queries/user";
-import { Button } from "@app/ui/components/button";
+import { LoaderButton } from "@app/ui/components/loader-button";
 
 import { SessionCard } from "./session-card";
 
 export const SessionsSection = () => {
+  const { t } = useTranslation("settings");
   const queryClient = useQueryClient();
   const { data: sessions } = useSuspenseQuery(sessionsOptions());
 
   const revokeAllMutation = useMutation({
     mutationFn: revokeOtherSessionsMutation,
     onSuccess: () => {
-      toast.success("Successfully revoked all other sessions");
+      toast.success(t("sessions.revokeAllSuccess"));
       queryClient.invalidateQueries({ queryKey: ["user", "sessions"] });
     },
   });
@@ -30,14 +31,17 @@ export const SessionsSection = () => {
       {otherSessions.length > 0 && (
         <>
           <div className="flex items-center justify-between pt-4">
-            <p className="text-sm font-medium text-muted-foreground">Other Active Sessions</p>
-            <Button variant="destructive" size="sm" onClick={() => revokeAllMutation.mutate()}>
-              {revokeAllMutation.isPending ? (
-                <Loader2Icon className="size-4 animate-spin" />
-              ) : (
-                "Revoke all"
-              )}
-            </Button>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("sessions.otherActiveSessions")}
+            </p>
+            <LoaderButton
+              variant="destructive"
+              size="sm"
+              loading={revokeAllMutation.isPending}
+              onClick={() => revokeAllMutation.mutate()}
+            >
+              {t("sessions.revokeAll")}
+            </LoaderButton>
           </div>
           {otherSessions.map((session) => (
             <SessionCard key={session.id} session={session} />
@@ -47,7 +51,7 @@ export const SessionsSection = () => {
 
       {otherSessions.length === 0 && (
         <div className="border border-border bg-card py-8 text-center text-muted-foreground">
-          No other active sessions
+          {t("sessions.noOtherSessions")}
         </div>
       )}
     </div>

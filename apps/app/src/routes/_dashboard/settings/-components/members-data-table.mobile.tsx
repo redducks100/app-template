@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import { Badge } from "@app/ui/components/badge";
 import {
   CardList,
@@ -6,7 +7,7 @@ import {
   CardListLoadMore,
   CardListSearch,
 } from "@app/ui/components/card-list";
-import { formatDate } from "@app/ui/lib/utils";
+import { formatDate, getInitials } from "@app/ui/lib/utils";
 
 import type { MemberColumn } from "./members-columns";
 
@@ -52,12 +53,22 @@ export const MembersMobileDataTable = ({
             onClick={() => onMemberClick(member.id)}
           >
             <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="truncate font-medium">
-                  {member.user.name ?? "-"}
-                  {isYou && <span className="ml-1.5 text-muted-foreground">({t("you")})</span>}
-                </p>
-                <p className="mt-0.5 truncate text-sm text-muted-foreground">{member.user.email}</p>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Avatar size="default" className="shrink-0">
+                  <AvatarImage src={member.user.image ?? undefined} />
+                  <AvatarFallback>
+                    {getInitials(member.user.name ?? member.user.email ?? "")}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <p className="truncate font-medium">
+                    {member.user.name ?? "-"}
+                    {isYou && <span className="ml-1.5 text-muted-foreground">({t("you")})</span>}
+                  </p>
+                  <p className="mt-0.5 truncate text-sm text-muted-foreground">
+                    {member.user.email}
+                  </p>
+                </div>
               </div>
               <Badge variant="outline" className="shrink-0 capitalize">
                 {member.role}

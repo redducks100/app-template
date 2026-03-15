@@ -23,7 +23,7 @@ export function FormSubmitButton({
     else {
       setTimeToNextSubmit(0);
     }
-  }, []);
+  }, [dontStartOnRender]);
 
   function startCountdown(time = timer) {
     if (time && time > 0) {
@@ -57,7 +57,8 @@ export function FormSubmitButton({
           onClick={timer ? submit : undefined}
           {...props}
         >
-          {!isSubmitting ? label : <Loader2 className="animate-spin size-4" />}
+          {isSubmitting && <Loader2 className="animate-spin size-4" />}
+          {label}
           {timeToNextSubmit > 0 && ` (${timeToNextSubmit})`}
         </Button>
       )}

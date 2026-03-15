@@ -1,11 +1,13 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { Suspense } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import { membersListOptions } from "@/lib/queries/members";
 import { DEFAULT_PAGE_SIZE } from "@app/shared/types/result";
 
-import { MembersSection } from "./-components/members-section";
+import { InviteMemberDialog } from "../-components/invite-member-dialog";
+import { MembersSection } from "../-components/members-section";
 
 const searchDefaults = { page: 1, search: "" } as const;
 
@@ -14,7 +16,7 @@ const searchSchema = z.object({
   search: z.string().default("").catch(""),
 });
 
-export const Route = createFileRoute("/_dashboard/users/")({
+export const Route = createFileRoute("/_dashboard/settings/members/")({
   validateSearch: searchSchema,
   search: {
     middlewares: [stripSearchParams(searchDefaults)],
@@ -24,21 +26,24 @@ export const Route = createFileRoute("/_dashboard/users/")({
     context.queryClient.ensureQueryData(
       membersListOptions({ page: deps.page, pageSize: DEFAULT_PAGE_SIZE, search: deps.search }),
     ),
-  component: UsersPage,
+  component: MembersPage,
 });
 
-function UsersPage() {
+function MembersPage() {
+  const { t } = useTranslation("members");
+
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="h-full flex justify-center">
-        <div className="w-full max-w-screen-2xl">
-          <div className="p-4 space-y-6">
-            <Suspense>
-              <MembersSection />
-            </Suspense>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold">{t("allMembers")}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{t("membersDescription")}</p>
         </div>
+        <InviteMemberDialog />
       </div>
-    </main>
+      <Suspense>
+        <MembersSection />
+      </Suspense>
+    </div>
   );
 }

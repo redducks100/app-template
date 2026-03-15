@@ -68,6 +68,16 @@ export async function findMembersPaginated({
   return { members, total: countResult.count };
 }
 
+export async function countMembers(organizationId: string): Promise<number> {
+  const result = await getDb()
+    .selectFrom("member")
+    .where("member.organizationId", "=", organizationId)
+    .select(sql<number>`count(*)::int`.as("count"))
+    .executeTakeFirstOrThrow();
+
+  return result.count;
+}
+
 export async function findMemberById(
   memberId: string,
   organizationId: string,

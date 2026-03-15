@@ -61,6 +61,17 @@ export async function findInvitationsPaginated({
   return { invitations, total: countResult.count };
 }
 
+export async function countPendingInvitations(organizationId: string): Promise<number> {
+  const result = await getDb()
+    .selectFrom("invitation")
+    .where("invitation.organizationId", "=", organizationId)
+    .where("invitation.status", "=", "pending")
+    .select(sql<number>`count(*)::int`.as("count"))
+    .executeTakeFirstOrThrow();
+
+  return result.count;
+}
+
 export async function findInvitationDetails(id: string): Promise<InvitationDetail | null> {
   const result = await getDb()
     .selectFrom("invitation")

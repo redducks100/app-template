@@ -1,36 +1,49 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { LinkIcon, PlusIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-import { SUPPORTED_OAUTH_PROVIDERS } from "@/lib/constants";
 import { linkedAccountsOptions } from "@/lib/queries/user";
+import { Button } from "@app/ui/components/button";
 import { Separator } from "@app/ui/components/separator";
 
-import { LinkedAccountCard, LinkedAccountCardProps } from "./linked-account-card";
+import { LinkedAccountCard } from "./linked-account-card";
 
-export const LinkedAccountsSection = () => {
+interface LinkedAccountsSectionProps {
+  onLinkClick?: () => void;
+}
+
+export const LinkedAccountsSection = ({ onLinkClick }: LinkedAccountsSectionProps) => {
+  const { t } = useTranslation("settings");
   const { data: currentAccounts } = useSuspenseQuery(linkedAccountsOptions());
 
-  const currentProviders = currentAccounts.map((account) => ({
-    provider: account.providerId,
-    account: account,
-  })) as LinkedAccountCardProps[];
-  const supportedProvider = SUPPORTED_OAUTH_PROVIDERS.filter(
-    (provider) => !currentAccounts.find((account) => account.providerId === provider),
-  ).map(
-    (provider) =>
-      ({
-        provider: provider as string,
-        account: undefined,
-      }) as LinkedAccountCardProps,
-  );
-
-  const allProviders = currentProviders.concat(supportedProvider);
+  if (currentAccounts.length === 0) {
+    return (
+      <div className="border border-border bg-card p-12 text-center">
+        <div className="flex flex-col items-center">
+          <div className="rounded-lg bg-muted p-3 text-muted-foreground">
+            <LinkIcon className="size-6" />
+          </div>
+          <h3 className="mt-4 text-sm font-medium">{t("integrations.emptyTitle")}</h3>
+          <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">
+            {t("integrations.noLinkedAccounts")}
+          </p>
+          {onLinkClick && (
+            <Button variant="outline" className="mt-4" onClick={onLinkClick}>
+              <PlusIcon />
+              {t("integrations.connectProvider")}
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="border border-border bg-card">
-      {allProviders.map((provider, index) => (
-        <div key={provider.provider}>
+    <div>
+      {currentAccounts.map((account, index) => (
+        <div key={account.providerId}>
           {index > 0 && <Separator orientation="horizontal" />}
-          <LinkedAccountCard account={provider.account} provider={provider.provider} />
+          <LinkedAccountCard account={account} provider={account.providerId} />
         </div>
       ))}
     </div>

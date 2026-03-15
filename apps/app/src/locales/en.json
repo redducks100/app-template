@@ -47,7 +47,6 @@
   },
   "settings": {
     "title": "Settings",
-    "description": "Manage your account settings and preferences.",
     "navigation": {
       "account": "Account",
       "integrations": "Integrations",
@@ -78,7 +77,55 @@
       "avatarUploaded": "Profile picture updated",
       "avatarUploadError": "Failed to upload profile picture",
       "avatarRemoved": "Profile picture removed",
-      "avatarRemoveError": "Failed to remove profile picture"
+      "avatarRemoveError": "Failed to remove profile picture",
+      "deleteAccount": "Delete account",
+      "deleteAccountDescription": "Permanently delete your account and all associated data. This action is irreversible.",
+      "deleteAccountButton": "Delete",
+      "deleteAccountEmailSent": "Account deletion email sent",
+      "deleteAccountError": "Failed to send account deletion email."
+    },
+    "general": {
+      "title": "Organization settings",
+      "description": "View and update your organization details"
+    },
+    "account": {
+      "title": "Account",
+      "description": "View and update your account details"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Manage your password and authentication"
+    },
+    "sessions": {
+      "title": "Sessions",
+      "description": "Manage your active sessions",
+      "otherActiveSessions": "Other Active Sessions",
+      "revokeAll": "Revoke all",
+      "revokeAllSuccess": "Successfully revoked all other sessions",
+      "noOtherSessions": "No other active sessions",
+      "revokeSuccess": "Session successfully revoked",
+      "unknownDevice": "Unknown Device",
+      "currentSession": "Current Session",
+      "created": "Created: {{date}}",
+      "expires": "Expires: {{date}}"
+    },
+    "integrations": {
+      "title": "Integrations",
+      "description": "Connect third-party apps and services",
+      "linkProvider": "Link",
+      "linkProviderTitle": "Link a provider",
+      "linkProviderDescription": "Choose a provider to connect to your account.",
+      "emptyTitle": "No integrations connected",
+      "noLinkedAccounts": "Connect third-party accounts for easier sign-in and more features.",
+      "connectProvider": "Connect a provider",
+      "link": "Link",
+      "unlink": "Unlink",
+      "connectDescription": "Connect your {{provider}} account for easier sign-in",
+      "linkedOn": "Linked on {{date}}",
+      "linkError": "Something went wrong while linking your account",
+      "unlinkSuccess": "Account was unlinked successfully",
+      "unlinkError": "Something went wrong while unlinking the account",
+      "accountNotFound": "Account not found"
     },
     "language": {
       "title": "Language",
@@ -88,6 +135,21 @@
       "romanian": "Romanian",
       "success": "Language updated successfully",
       "error": "Failed to update language"
+    }
+  },
+  "organization": {
+    "title": "Organization",
+    "description": "Manage your organization settings, members, and invitations.",
+    "danger": {
+      "title": "Danger Zone",
+      "deleteOrganization": "Delete Organization",
+      "deleteDescription": "Permanently delete this organization and all its data. This action is irreversible.",
+      "confirmTitle": "Delete Organization?",
+      "confirmDescription": "Are you sure you want to delete this organization? All members will lose access and all data will be permanently removed.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "deleteSuccess": "Organization deleted successfully",
+      "deleteError": "Failed to delete organization"
     }
   },
   "invitations": {
@@ -171,14 +233,6 @@
     "memberDetails": "Member Details",
     "dangerZone": "Danger Zone",
     "removeDescription": "This member will lose access to this organization. This action cannot be undone."
-  },
-  "selectOrg": {
-    "title": "Select organization",
-    "description": "Choose which organization you'd like to work with",
-    "createNew": "Create new organization",
-    "alreadyActive": "This organization is already active",
-    "loadingOrgs": "Loading organizations...",
-    "loadError": "Failed to load organizations"
   },
   "auth": {
     "sign_in": {

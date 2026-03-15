@@ -2,8 +2,9 @@ import { createColumnHelper } from "@tanstack/react-table";
 
 import type { MemberListItem } from "@app/shared/schemas/member";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
 import { Badge } from "@app/ui/components/badge";
-import { formatDate } from "@app/ui/lib/utils";
+import { formatDate, getInitials } from "@app/ui/lib/utils";
 
 export type MemberColumn = MemberListItem;
 
@@ -22,11 +23,18 @@ export function createMemberColumns(
         const member = info.row.original;
         const name = member.user.name ?? "-";
         const isYou = member.userId === currentUserId;
+        const initials = getInitials(member.user.name ?? member.user.email ?? "");
         return (
-          <span className="font-medium">
-            {name}
-            {isYou && <span className="text-muted-foreground ml-1.5">({t("you")})</span>}
-          </span>
+          <div className="flex items-center gap-2">
+            <Avatar size="sm">
+              <AvatarImage src={member.user.image ?? undefined} />
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+            <span className="font-medium">
+              {name}
+              {isYou && <span className="text-muted-foreground ml-1.5">({t("you")})</span>}
+            </span>
+          </div>
         );
       },
     }),

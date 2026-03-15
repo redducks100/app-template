@@ -1,68 +1,69 @@
-import { useSuspenseInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseInfiniteQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { getRouteApi } from "@tanstack/react-router";
 import { type PaginationState, type Updater } from "@tanstack/react-table";
-import { UsersIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
-import { authClient } from "@/lib/auth-client";
-import { membersInfiniteOptions, membersListOptions } from "@/lib/queries/members";
+import { cancelInvitation as cancelInvitationMutation } from "@/lib/mutations/invitations";
+import { invitationsInfiniteOptions, invitationsListOptions } from "@/lib/queries/invitations";
 import { DEFAULT_PAGE_SIZE } from "@app/shared/types/result";
 import { useIsMobile } from "@app/ui/hooks/use-mobile";
 
-import { createMemberColumns } from "./members-columns";
-import { MembersDesktopDataTable } from "./members-data-table.desktop";
-import { MembersMobileDataTable } from "./members-data-table.mobile";
+import { createInvitationColumns } from "./invitations-columns";
+import { InvitationsDesktopDataTable } from "./invitations-data-table.desktop";
+import { InvitationsMobileDataTable } from "./invitations-data-table.mobile";
+
 const DEBOUNCE_MS = 300;
 
-const routeApi = getRouteApi("/_dashboard/users/");
+const routeApi = getRouteApi("/_dashboard/settings/invitations");
 
-const MembersDesktopContent = ({
+const InvitationsDesktopContent = ({
   page,
   urlSearch,
   localSearch,
-  currentUserId,
   noResultsMessage,
-  locale,
   onSearchChange,
   onPaginationChange,
-  onRowClick,
+  onCancel,
+  isCanceling,
+  locale,
 }: {
   page: number;
   urlSearch: string;
   localSearch: string;
-  currentUserId: string;
   noResultsMessage: string;
-  locale: string;
   onSearchChange: (value: string) => void;
   onPaginationChange: (updater: Updater<PaginationState>) => void;
-  onRowClick: (row: { id: string }) => void;
+  onCancel: (invitationId: string) => void;
+  isCanceling: boolean;
+  locale: string;
 }) => {
-  const { t } = useTranslation("members");
-  const columns = createMemberColumns(currentUserId, t, locale);
+  const { t } = useTranslation("invitations");
+  const columns = createInvitationColumns(onCancel, isCanceling, t, locale);
 
   const {
-    data: { data: members, pagination },
+    data: { data: invitations, pagination },
   } = useSuspenseQuery(
-    membersListOptions({ page, pageSize: DEFAULT_PAGE_SIZE, search: urlSearch }),
+    invitationsListOptions({ page, pageSize: DEFAULT_PAGE_SIZE, search: urlSearch }),
   );
 
   if (pagination.total === 0 && !urlSearch) {
     return (
-      <div className="border border-border bg-card p-12 text-center">
-        <div className="flex flex-col items-center">
-          <div className="rounded-lg bg-muted p-3 text-muted-foreground">
-            <UsersIcon className="size-6" />
-          </div>
-          <h3 className="mt-4 text-sm font-medium">{t("emptyState")}</h3>
-        </div>
+      <div className="border border-border bg-card p-8 text-center">
+        <p className="text-muted-foreground">{t("emptyState")}</p>
       </div>
     );
   }
 
   return (
-    <MembersDesktopDataTable
-      members={members}
+    <InvitationsDesktopDataTable
+      invitations={invitations}
       columns={columns}
       totalRows={pagination.total}
       page={page}
@@ -70,80 +71,71 @@ const MembersDesktopContent = ({
       onSearchChange={onSearchChange}
       noResultsMessage={noResultsMessage}
       onPaginationChange={onPaginationChange}
-      onRowClick={onRowClick}
     />
   );
 };
 
-const MembersMobileContent = ({
+const InvitationsMobileContent = ({
   urlSearch,
   localSearch,
-  currentUserId,
   noResultsMessage,
   locale,
   onSearchChange,
-  onMemberClick,
+  onCancel,
+  isCanceling,
 }: {
   urlSearch: string;
   localSearch: string;
-  currentUserId: string;
   noResultsMessage: string;
   locale: string;
   onSearchChange: (value: string) => void;
-  onMemberClick: (memberId: string) => void;
+  onCancel: (invitationId: string) => void;
+  isCanceling: boolean;
 }) => {
-  const { t } = useTranslation("members");
+  const { t } = useTranslation("invitations");
   const { data, hasNextPage, fetchNextPage } = useSuspenseInfiniteQuery(
-    membersInfiniteOptions(urlSearch, DEFAULT_PAGE_SIZE),
+    invitationsInfiniteOptions(urlSearch, DEFAULT_PAGE_SIZE),
   );
 
-  const allMembers = data.pages.flatMap((p) => p.data);
+  const allInvitations = data.pages.flatMap((p) => p.data);
   const firstPageTotal = data.pages[0]?.pagination.total ?? 0;
 
   if (firstPageTotal === 0 && !urlSearch) {
     return (
-      <div className="border border-border bg-card p-12 text-center">
-        <div className="flex flex-col items-center">
-          <div className="rounded-lg bg-muted p-3 text-muted-foreground">
-            <UsersIcon className="size-6" />
-          </div>
-          <h3 className="mt-4 text-sm font-medium">{t("emptyState")}</h3>
-        </div>
+      <div className="border border-border bg-card p-8 text-center">
+        <p className="text-muted-foreground">{t("emptyState")}</p>
       </div>
     );
   }
 
   return (
-    <MembersMobileDataTable
-      members={allMembers}
-      currentUserId={currentUserId}
+    <InvitationsMobileDataTable
+      invitations={allInvitations}
       hasNextPage={hasNextPage}
       onLoadMore={() => fetchNextPage()}
       search={localSearch}
       onSearchChange={onSearchChange}
+      isCanceling={isCanceling}
       noResultsMessage={noResultsMessage}
       locale={locale}
       t={t}
-      onMemberClick={onMemberClick}
+      onCancel={onCancel}
     />
   );
 };
 
-export const MembersDataTable = () => {
-  const { i18n } = useTranslation("members");
+export const InvitationsDataTable = () => {
+  const { t, i18n } = useTranslation("invitations");
   const { t: tCommon } = useTranslation("common");
   const isMobile = useIsMobile();
+  const queryClient = useQueryClient();
   const navigate = routeApi.useNavigate();
   const { page, search: urlSearch } = routeApi.useSearch();
-
-  const { data: session } = authClient.useSession();
-  const currentUserId = session?.user?.id ?? "";
 
   // Local search state for debouncing
   const [localSearch, setLocalSearch] = useState(urlSearch);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // Sync local search when URL changes externally
   useEffect(() => {
     setLocalSearch(urlSearch);
   }, [urlSearch]);
@@ -160,6 +152,17 @@ export const MembersDataTable = () => {
     },
     [navigate],
   );
+
+  const cancelInvitation = useMutation({
+    mutationFn: cancelInvitationMutation,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["invitations", "list"] }),
+        queryClient.invalidateQueries({ queryKey: ["invitations", "count"] }),
+      ]);
+      toast.success(t("canceled"));
+    },
+  });
 
   const onPaginationChange = useCallback(
     (updater: Updater<PaginationState>) => {
@@ -180,29 +183,29 @@ export const MembersDataTable = () => {
 
   if (isMobile) {
     return (
-      <MembersMobileContent
+      <InvitationsMobileContent
         urlSearch={urlSearch}
         localSearch={localSearch}
-        currentUserId={currentUserId}
         noResultsMessage={tCommon("noResults")}
         locale={i18n.language}
         onSearchChange={handleSearchChange}
-        onMemberClick={(memberId) => navigate({ to: `/users/${memberId}` })}
+        onCancel={(invitationId) => cancelInvitation.mutate({ invitationId })}
+        isCanceling={cancelInvitation.isPending}
       />
     );
   }
 
   return (
-    <MembersDesktopContent
+    <InvitationsDesktopContent
       page={page}
       urlSearch={urlSearch}
       localSearch={localSearch}
-      currentUserId={currentUserId}
       noResultsMessage={tCommon("noResults")}
-      locale={i18n.language}
       onSearchChange={handleSearchChange}
       onPaginationChange={onPaginationChange}
-      onRowClick={(row) => navigate({ to: `/users/${row.id}` })}
+      onCancel={(invitationId) => cancelInvitation.mutate({ invitationId })}
+      isCanceling={cancelInvitation.isPending}
+      locale={i18n.language}
     />
   );
 };

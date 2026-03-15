@@ -3,11 +3,9 @@ import { Link } from "@tanstack/react-router";
 import { CogIcon, MailsIcon, UserPlusIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { invitationsListOptions } from "@/lib/queries/invitations";
-import { membersListOptions } from "@/lib/queries/members";
+import { invitationsCountOptions } from "@/lib/queries/invitations";
+import { membersCountOptions } from "@/lib/queries/members";
 import { Button } from "@app/ui/components/button";
-
-const defaultListParams = { page: 1, pageSize: 100, search: "" };
 
 type StatCardProps = {
   label: string;
@@ -54,13 +52,8 @@ function QuickAction({ label, icon, href }: QuickActionProps) {
 
 export const DashboardView = () => {
   const { t } = useTranslation("dashboard");
-  const { data: membersResult } = useSuspenseQuery(membersListOptions(defaultListParams));
-  const { data: invitationsResult } = useSuspenseQuery(invitationsListOptions(defaultListParams));
-
-  const membersCount = membersResult.pagination.total;
-  const pendingInvitations = invitationsResult.data.filter(
-    (inv) => inv.status === "pending",
-  ).length;
+  const { data: membersCount } = useSuspenseQuery(membersCountOptions());
+  const { data: pendingInvitations } = useSuspenseQuery(invitationsCountOptions());
 
   const today = new Date().toLocaleDateString(undefined, {
     weekday: "long",
@@ -83,13 +76,13 @@ export const DashboardView = () => {
           label={t("stats.members")}
           value={membersCount}
           icon={<UsersIcon className="size-5" />}
-          href="/users"
+          href="/settings/members"
         />
         <StatCard
           label={t("stats.pendingInvitations")}
           value={pendingInvitations}
           icon={<MailsIcon className="size-5" />}
-          href="/invitations"
+          href="/settings/invitations"
         />
       </div>
 
@@ -100,12 +93,12 @@ export const DashboardView = () => {
           <QuickAction
             label={t("actions.inviteMember")}
             icon={<UserPlusIcon className="size-5 text-muted-foreground" />}
-            href="/invitations"
+            href="/settings/invitations"
           />
           <QuickAction
             label={t("actions.settings")}
             icon={<CogIcon className="size-5 text-muted-foreground" />}
-            href="/settings/profile"
+            href="/settings/general"
           />
         </div>
       </div>

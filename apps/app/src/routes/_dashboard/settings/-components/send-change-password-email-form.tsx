@@ -41,10 +41,10 @@ export const SendChangePasswordEmailForm = ({ email }: SendChangePasswordEmailFo
         form.handleSubmit();
       }}
     >
-      <div className="border border-border bg-card">
+      <div>
         <div className="flex items-center justify-between p-6">
           <div>
-            <p className="font-medium">Set Password</p>
+            <p className="text-sm font-medium">Set Password</p>
             <p className="text-sm text-muted-foreground">
               We will send you a password reset email to set up a password.
             </p>

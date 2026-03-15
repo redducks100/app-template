@@ -4,7 +4,11 @@ import { z } from "zod";
 
 import type { InvitationDetail, InvitationPermissions } from "@app/shared/schemas/invitation";
 
-import { findInvitationDetails, findInvitationsPaginated } from "@app/data-ops/queries/invitations";
+import {
+  countPendingInvitations,
+  findInvitationDetails,
+  findInvitationsPaginated,
+} from "@app/data-ops/queries/invitations";
 import { createInvitationSchema } from "@app/shared/schemas/create-invitation-schema";
 import { SearchPaginationParams } from "@app/shared/types/result";
 
@@ -13,8 +17,11 @@ import { ok, okPaginated } from "../lib/result";
 import { zv } from "../lib/validation";
 import { authMiddleware } from "../middleware/auth";
 
-export const invitationRoutes = new Hono()
-  .get("/:id", zv("param", z.object({ id: z.string() })), async (c) => {
+// Public routes (no auth required)
+const publicInvitationRoutes = new Hono().get(
+  "/:id",
+  zv("param", z.object({ id: z.string() })),
+  async (c) => {
     const { id } = c.req.valid("param");
     const result = await findInvitationDetails(id);
 
@@ -23,8 +30,23 @@ export const invitationRoutes = new Hono()
     }
 
     return ok(c, result satisfies InvitationDetail);
-  })
+  },
+);
+
+// Authenticated routes
+const authedInvitationRoutes = new Hono()
   .use(authMiddleware)
+  .get("/count", async (c) => {
+    const session = c.get("session");
+    const organizationId = session.activeOrganizationId;
+
+    if (!organizationId) {
+      throw new HTTPException(400, { message: "No active organization selected." });
+    }
+
+    const count = await countPendingInvitations(organizationId);
+    return ok(c, { count });
+  })
   .get("/", zv("query", SearchPaginationParams), async (c) => {
     const session = c.get("session");
     const organizationId = session.activeOrganizationId;
@@ -117,3 +139,8 @@ export const invitationRoutes = new Hono()
 
     return ok(c, response);
   });
+
+// Compose: authed first so static paths win, then public /:id as fallback
+export const invitationRoutes = new Hono()
+  .route("/", authedInvitationRoutes)
+  .route("/", publicInvitationRoutes);
