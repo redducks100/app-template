@@ -1,9 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-.claude/agent-memory
+.claude/*
+.agents/*
 .playwright-mcp/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+
+skills-lock.json
 
 # dependencies
 node_modules/
