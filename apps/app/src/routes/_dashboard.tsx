@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import i18n from "@/lib/i18n";
 import { SidebarInset, SidebarProvider } from "@app/ui/components/sidebar";
 
-import { DashboardNavbar } from "./_dashboard/-components/dashboard-navbar";
 import { DashboardSidebar } from "./_dashboard/-components/dashboard-sidebar";
 
 export const Route = createFileRoute("/_dashboard")({
@@ -12,7 +11,7 @@ export const Route = createFileRoute("/_dashboard")({
     if (!context.authData) throw redirect({ to: "/sign-in" });
     if (!context.authData.user.emailVerified) throw redirect({ to: "/verify-email" });
     if (!context.authData.user.hasMembership) throw redirect({ to: "/create-org" });
-    if (!context.authData.session?.activeOrganizationId) throw redirect({ to: "/select-org" });
+    if (!context.authData.session?.activeOrganizationId) throw redirect({ to: "/create-org" });
 
     return {
       user: context.authData.user,
@@ -36,7 +35,6 @@ function AppLayout() {
     <SidebarProvider>
       <DashboardSidebar />
       <SidebarInset>
-        <DashboardNavbar />
         <Outlet />
       </SidebarInset>
     </SidebarProvider>

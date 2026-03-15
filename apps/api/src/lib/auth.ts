@@ -1,4 +1,4 @@
-import { type AuthOptions, getAuth as getAuthBase } from "@app/data-ops/auth";
+import { getAuth as getAuthBase } from "@app/data-ops/auth";
 
 export type { auth } from "@app/data-ops/auth";
 

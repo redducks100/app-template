@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# App Template
+
+A template/starter for building multi-tenant SaaS applications with React, Hono, and Cloudflare Workers.
+
+## Tech Stack
+
+- **React 19** with TypeScript — client-only SPA
+- **TanStack Router** — file-based routing with type-safe data loading
+- **Hono** — API framework with RPC for end-to-end type safety
+- **Cloudflare Workers** — edge deployment for both SPA and API
+- **Better Auth** — authentication (email/password + Google OAuth, organizations)
+- **Kysely + Neon** — type-safe SQL query builder with serverless PostgreSQL
+- **Tailwind CSS 4** — utility-first styling with oklch color system
+- **Turborepo** — monorepo build orchestration with caching
+- **pnpm** workspaces
+
+## Monorepo Structure
+
+```
+app-template/
+├── apps/
+│   ├── api/          # Standalone Hono API worker
+│   └── app/          # TanStack Router SPA (Cloudflare Workers Static Assets)
+├── packages/
+│   ├── data-ops/     # Database, auth, password, emails, migrations, queries
+│   ├── shared/       # Zod schemas, types, permissions
+│   └── ui/           # UI components, hooks, utilities, CSS theme
+├── turbo.json
+├── pnpm-workspace.yaml
+└── package.json
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 22+
+- pnpm
+
+### Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The API requires a `.dev.vars` file in `apps/api/` with database and auth secrets (see [CLAUDE.md](CLAUDE.md) for the full list of environment variables).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The SPA defaults `VITE_API_URL` to `http://localhost:8787` for local development.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Development
 
-## Learn More
+```bash
+pnpm dev        # Start both API (port 8787) and SPA (port 3000)
+pnpm dev:app    # SPA only
+pnpm dev:api    # API only
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command                               | Description                                 |
+| ------------------------------------- | ------------------------------------------- |
+| `pnpm dev`                            | Run all dev servers in parallel             |
+| `pnpm build`                          | Build all packages with dependency ordering |
+| `pnpm typecheck`                      | TypeScript checks across workspace          |
+| `pnpm lint` / `pnpm lint:fix`         | Lint with oxlint                            |
+| `pnpm fmt` / `pnpm fmt:check`         | Format with oxfmt                           |
+| `pnpm fix`                            | Lint + format fixes combined                |
+| `pnpm db:migrate`                     | Run all pending database migrations         |
+| `pnpm db:codegen`                     | Regenerate DB types after migrations        |
+| `pnpm syncpack` / `pnpm syncpack:fix` | Check/fix dependency version consistency    |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+CI-driven via GitHub Actions. Push/merge to `main` triggers deployment to Cloudflare Workers.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **API**: `api.enomisoft.com`
+- **SPA**: `app.enomisoft.com`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Documentation
+
+See [CLAUDE.md](CLAUDE.md) for detailed architecture, patterns, and environment variable reference.

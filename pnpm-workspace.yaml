@@ -16,6 +16,7 @@ catalog:
   "@vitejs/plugin-react": ^4.5.0
   tailwindcss: ^4
   "@tailwindcss/vite": ^4
+  lucide-react: ^0.511.0
   vite-tsconfig-paths: ^4.3.0
 
 catalogs:

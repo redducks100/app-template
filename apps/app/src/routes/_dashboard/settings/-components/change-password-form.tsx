@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 import { changePasswordSchema } from "@app/shared/schemas/change-password-schema";
-import { Field, FieldGroup } from "@app/ui/components/field";
+import { FieldGroup } from "@app/ui/components/field";
 import { useAppForm } from "@app/ui/components/form/hooks";
 import { Separator } from "@app/ui/components/separator";
 
@@ -40,13 +40,14 @@ export const ChangePasswordForm = () => {
 
   return (
     <form
+      id="security-form"
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
       }}
     >
       <FieldGroup>
-        <div className="border border-border bg-card">
+        <div>
           <form.AppField name="password">
             {(field) => (
               <field.Input
@@ -100,14 +101,6 @@ export const ChangePasswordForm = () => {
             </form.AppField>
           </div>
         </div>
-
-        <Field>
-          <form.AppForm>
-            <div className="flex justify-end">
-              <form.SubmitButton label="Change" />
-            </div>
-          </form.AppForm>
-        </Field>
       </FieldGroup>
     </form>
   );

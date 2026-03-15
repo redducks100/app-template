@@ -30,24 +30,6 @@ export interface Account {
   userId: string;
 }
 
-export interface AuditLog {
-  action: string;
-  actorId: string;
-  createdAt: Generated<Timestamp>;
-  id: Generated<string>;
-  metadata: string | null;
-  organizationId: string;
-  resourceId: string;
-  resourceType: string;
-}
-
-export interface DismissedAuditLog {
-  auditLogId: string;
-  createdAt: Generated<Timestamp>;
-  id: Generated<string>;
-  userId: string;
-}
-
 export interface Invitation {
   createdAt: Generated<Timestamp>;
   email: string;
@@ -62,7 +44,6 @@ export interface Invitation {
 export interface Member {
   createdAt: Timestamp;
   id: string;
-  notificationReadAt: Generated<Timestamp>;
   organizationId: string;
   role: Generated<string>;
   userId: string;
@@ -111,6 +92,7 @@ export interface User {
   emailVerified: Generated<boolean>;
   id: string;
   image: string | null;
+  lastOrganizationId: string | null;
   locale: Generated<string | null>;
   name: string;
   updatedAt: Generated<Timestamp>;
@@ -127,8 +109,6 @@ export interface Verification {
 
 export interface DB {
   account: Account;
-  auditLog: AuditLog;
-  dismissedAuditLog: DismissedAuditLog;
   invitation: Invitation;
   member: Member;
   organization: Organization;

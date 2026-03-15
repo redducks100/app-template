@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { ArrowLeftIcon, BuildingIcon, Link2Icon } from "lucide-react";
-import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
 import { createOrganization as createOrganizationMutation } from "@/lib/mutations/organizations";

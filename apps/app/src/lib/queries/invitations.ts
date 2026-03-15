@@ -67,6 +67,16 @@ export const invitationsInfiniteOptions = (search: string, pageSize = DEFAULT_PA
     },
   });
 
+export const invitationsCountOptions = () =>
+  queryOptions({
+    queryKey: ["invitations", "count"],
+    queryFn: async () => {
+      const res = await callRPC(apiClient.invitations.count.$get());
+      if (!res.success) throw new Error(res.error.message);
+      return res.data.count;
+    },
+  });
+
 export const invitationPermissionsOptions = () =>
   queryOptions({
     queryKey: ["invitations", "permissions"],

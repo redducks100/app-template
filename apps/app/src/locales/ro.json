@@ -47,7 +47,6 @@
   },
   "settings": {
     "title": "Setări",
-    "description": "Gestionează setările contului și preferințele tale.",
     "navigation": {
       "account": "Cont",
       "integrations": "Integrări",
@@ -78,7 +77,55 @@
       "avatarUploaded": "Poza de profil a fost actualizată",
       "avatarUploadError": "Nu s-a putut încărca poza de profil",
       "avatarRemoved": "Poza de profil a fost eliminată",
-      "avatarRemoveError": "Nu s-a putut elimina poza de profil"
+      "avatarRemoveError": "Nu s-a putut elimina poza de profil",
+      "deleteAccount": "Șterge contul",
+      "deleteAccountDescription": "Șterge permanent contul tău și toate datele asociate. Această acțiune este ireversibilă.",
+      "deleteAccountButton": "Șterge",
+      "deleteAccountEmailSent": "Email de ștergere a contului trimis",
+      "deleteAccountError": "Nu s-a putut trimite emailul de ștergere a contului."
+    },
+    "general": {
+      "title": "Setări organizație",
+      "description": "Vizualizează și actualizează detaliile organizației"
+    },
+    "account": {
+      "title": "Cont",
+      "description": "Vizualizează și actualizează detaliile contului"
+    },
+    "security": {
+      "title": "Securitate",
+      "description": "Gestionează parola și autentificarea"
+    },
+    "sessions": {
+      "title": "Sesiuni",
+      "description": "Gestionează sesiunile active",
+      "otherActiveSessions": "Alte sesiuni active",
+      "revokeAll": "Revocă toate",
+      "revokeAllSuccess": "Toate sesiunile au fost revocate cu succes",
+      "noOtherSessions": "Nicio altă sesiune activă",
+      "revokeSuccess": "Sesiunea a fost revocată cu succes",
+      "unknownDevice": "Dispozitiv necunoscut",
+      "currentSession": "Sesiunea curentă",
+      "created": "Creat: {{date}}",
+      "expires": "Expiră: {{date}}"
+    },
+    "integrations": {
+      "title": "Integrări",
+      "description": "Conectează aplicații și servicii terțe",
+      "linkProvider": "Conectează",
+      "linkProviderTitle": "Conectează un furnizor",
+      "linkProviderDescription": "Alege un furnizor pentru a-l conecta la contul tău.",
+      "emptyTitle": "Nicio integrare conectată",
+      "noLinkedAccounts": "Conectează conturi terțe pentru autentificare mai ușoară și funcționalități suplimentare.",
+      "connectProvider": "Conectează un furnizor",
+      "link": "Conectează",
+      "unlink": "Deconectează",
+      "connectDescription": "Conectează contul tău {{provider}} pentru autentificare mai ușoară",
+      "linkedOn": "Conectat pe {{date}}",
+      "linkError": "Ceva nu a mers bine la conectarea contului",
+      "unlinkSuccess": "Contul a fost deconectat cu succes",
+      "unlinkError": "Ceva nu a mers bine la deconectarea contului",
+      "accountNotFound": "Contul nu a fost găsit"
     },
     "language": {
       "title": "Limbă",
@@ -88,6 +135,21 @@
       "romanian": "Română",
       "success": "Limba a fost actualizată cu succes",
       "error": "Nu s-a putut actualiza limba"
+    }
+  },
+  "organization": {
+    "title": "Organizație",
+    "description": "Gestionează setările organizației, membrii și invitațiile.",
+    "danger": {
+      "title": "Zonă periculoasă",
+      "deleteOrganization": "Șterge organizația",
+      "deleteDescription": "Șterge permanent această organizație și toate datele asociate. Această acțiune este ireversibilă.",
+      "confirmTitle": "Ștergi organizația?",
+      "confirmDescription": "Ești sigur că vrei să ștergi această organizație? Toți membrii vor pierde accesul și toate datele vor fi eliminate permanent.",
+      "confirm": "Șterge",
+      "cancel": "Anulează",
+      "deleteSuccess": "Organizația a fost ștearsă cu succes",
+      "deleteError": "Nu s-a putut șterge organizația"
     }
   },
   "invitations": {
@@ -171,14 +233,6 @@
     "memberDetails": "Detalii membru",
     "dangerZone": "Zonă periculoasă",
     "removeDescription": "Acest membru va pierde accesul la această organizație. Această acțiune nu poate fi anulată."
-  },
-  "selectOrg": {
-    "title": "Selectează organizația",
-    "description": "Alege organizația cu care dorești să lucrezi",
-    "createNew": "Creează organizație nouă",
-    "alreadyActive": "Această organizație este deja activă",
-    "loadingOrgs": "Se încarcă organizațiile...",
-    "loadError": "Nu s-au putut încărca organizațiile"
   },
   "auth": {
     "sign_in": {

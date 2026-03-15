@@ -24,22 +24,22 @@ type SessionCardProps = {
 };
 
 export const SessionCard = ({ session }: SessionCardProps) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation("settings");
   const queryClient = useQueryClient();
   const userAgentInfo = session.userAgent ? UAParser(session.userAgent) : null;
 
   const revokeMutation = useMutation({
     mutationFn: () => revokeSessionMutation({ token: session.token }),
     onSuccess: () => {
-      toast.success("Session successfully revoked");
+      toast.success(t("sessions.revokeSuccess"));
       queryClient.invalidateQueries({ queryKey: ["user", "sessions"] });
     },
   });
 
   function getBrowserInformation() {
-    if (userAgentInfo == null) return "Unknown Device";
+    if (userAgentInfo == null) return t("sessions.unknownDevice");
     if (userAgentInfo.browser.name == null && userAgentInfo.os.name == null)
-      return "Unknown Device";
+      return t("sessions.unknownDevice");
 
     if (userAgentInfo.browser.name == null) return userAgentInfo.os.name;
     if (userAgentInfo.os.name == null) return userAgentInfo.browser.name;
@@ -51,7 +51,7 @@ export const SessionCard = ({ session }: SessionCardProps) => {
     <Card>
       <CardHeader className="flex justify-between">
         <CardTitle>{getBrowserInformation()}</CardTitle>
-        {session.current && <Badge>Current Session</Badge>}
+        {session.current && <Badge>{t("sessions.currentSession")}</Badge>}
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between">
@@ -59,10 +59,10 @@ export const SessionCard = ({ session }: SessionCardProps) => {
             {userAgentInfo?.device.type === "mobile" ? <SmartphoneIcon /> : <MonitorIcon />}
             <div>
               <p className="text-sm text-muted-foreground">
-                Created: {formatDateTime(session.createdAt, i18n.language)}
+                {t("sessions.created", { date: formatDateTime(session.createdAt, i18n.language) })}
               </p>
               <p className="text-sm text-muted-foreground">
-                Expires: {formatDateTime(session.expiresAt, i18n.language)}
+                {t("sessions.expires", { date: formatDateTime(session.expiresAt, i18n.language) })}
               </p>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import type { MemberPermissions } from "@app/shared/schemas/member";
 
-import { findMemberById, findMembersPaginated } from "@app/data-ops/queries/members";
+import { countMembers, findMemberById, findMembersPaginated } from "@app/data-ops/queries/members";
 import { SearchPaginationParams } from "@app/shared/types/result";
 
 import { getAuth } from "../lib/auth";
@@ -39,6 +39,17 @@ export const memberRoutes = new Hono()
         totalPages: Math.ceil(total / pageSize),
       },
     });
+  })
+  .get("/count", async (c) => {
+    const session = c.get("session");
+    const organizationId = session.activeOrganizationId;
+
+    if (!organizationId) {
+      throw new HTTPException(400, { message: "No active organization selected." });
+    }
+
+    const count = await countMembers(organizationId);
+    return ok(c, { count });
   })
   .get("/permissions", async (c) => {
     const headers = c.req.raw.headers;

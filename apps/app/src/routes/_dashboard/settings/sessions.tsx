@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
+import { useTranslation } from "react-i18next";
 
 import { sessionsOptions } from "@/lib/queries/user";
 
@@ -11,8 +12,14 @@ export const Route = createFileRoute("/_dashboard/settings/sessions")({
 });
 
 function SettingsSessionsPage() {
+  const { t } = useTranslation("settings");
+
   return (
-    <div className="py-8 md:py-10">
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold">{t("sessions.title")}</h2>
+        <p className="text-sm text-muted-foreground mt-1">{t("sessions.description")}</p>
+      </div>
       <Suspense>
         <SessionsSection />
       </Suspense>

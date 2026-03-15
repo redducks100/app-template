@@ -1,29 +1,33 @@
-import { AlertTriangle, Link2, Monitor, Shield, User } from "lucide-react";
+import { InfoIcon, Link2, MailsIcon, Monitor, Shield, User, UsersIcon } from "lucide-react";
 
-export type SettingsValue = "profile" | "security" | "sessions" | "integrations" | "danger";
+export type SettingsValue =
+  | "general"
+  | "invitations"
+  | "members"
+  | "profile"
+  | "security"
+  | "sessions"
+  | "integrations";
 
 export const settingsNavigation: {
   key: string;
-  label: string;
   items: { value: SettingsValue; label: string; icon: typeof User }[];
 }[] = [
   {
-    key: "account",
-    label: "Account",
+    key: "organization",
     items: [
-      { value: "profile", label: "Profile", icon: User },
-      { value: "security", label: "Security", icon: Shield },
-      { value: "sessions", label: "Sessions", icon: Monitor },
+      { value: "general", label: "Organization", icon: InfoIcon },
+      { value: "invitations", label: "Invitations", icon: MailsIcon },
+      { value: "members", label: "Members", icon: UsersIcon },
     ],
   },
   {
-    key: "integrations",
-    label: "Integrations",
-    items: [{ value: "integrations", label: "OAuth Providers", icon: Link2 }],
-  },
-  {
-    key: "advanced",
-    label: "Advanced",
-    items: [{ value: "danger", label: "Danger Zone", icon: AlertTriangle }],
+    key: "account",
+    items: [
+      { value: "profile", label: "Account", icon: User },
+      { value: "security", label: "Security", icon: Shield },
+      { value: "sessions", label: "Sessions", icon: Monitor },
+      { value: "integrations", label: "Integrations", icon: Link2 },
+    ],
   },
 ];

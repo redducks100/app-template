@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { type User } from "better-auth";
 import { Loader2, MailIcon, Trash2, Upload, UserIcon } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -12,14 +12,43 @@ import { removeAvatar, uploadAvatar } from "@/lib/mutations/user";
 import { sessionOptions } from "@/lib/queries/auth";
 import { updateUserProfileSchema } from "@app/shared/schemas/update-user-profile-schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@app/ui/components/avatar";
-import { Button } from "@app/ui/components/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@app/ui/components/field";
+import { FieldDescription, FieldGroup, FieldLabel } from "@app/ui/components/field";
 import { useAppForm } from "@app/ui/components/form/hooks";
+import { LoaderButton } from "@app/ui/components/loader-button";
 import { Separator } from "@app/ui/components/separator";
 import { getInitials } from "@app/ui/lib/utils";
 
 type ProfileSectionProps = {
   user: User;
+};
+
+const DeleteAccountButton = () => {
+  const { t } = useTranslation("settings");
+  const [isPending, setIsPending] = useState(false);
+
+  return (
+    <LoaderButton
+      type="button"
+      variant="destructive"
+      size="sm"
+      loading={isPending}
+      onClick={async () => {
+        setIsPending(true);
+        await authClient.deleteUser(undefined, {
+          onError: (error) => {
+            setIsPending(false);
+            toast.error(error.error.message || t("profile.deleteAccountError"));
+          },
+          onSuccess: () => {
+            setIsPending(false);
+            toast.success(t("profile.deleteAccountEmailSent"));
+          },
+        });
+      }}
+    >
+      {t("profile.deleteAccountButton")}
+    </LoaderButton>
+  );
 };
 
 export const ProfileSection = ({ user }: ProfileSectionProps) => {
@@ -102,13 +131,14 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
 
   return (
     <form
+      id="profile-form"
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
       }}
     >
       <FieldGroup>
-        <div className="border border-border bg-card">
+        <div>
           <div className="flex items-center gap-4 p-6">
             <Avatar className="size-14 rounded-lg">
               <AvatarImage src={user.image ?? undefined} />
@@ -124,29 +154,31 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
               <FieldDescription>{t("profile.profilePictureDescription")}</FieldDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button
+              <LoaderButton
                 type="button"
                 variant="outline"
                 size="sm"
                 className="flex gap-2"
+                loading={uploadMutation.isPending}
                 disabled={isAvatarLoading}
+                icon={<Upload className="size-4" />}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Upload className="size-4" />
                 {user.image ? tCommon("change") : tCommon("upload")}
-              </Button>
+              </LoaderButton>
               {user.image && (
-                <Button
+                <LoaderButton
                   type="button"
                   variant="outline"
                   size="sm"
                   className="flex gap-2"
+                  loading={removeMutation.isPending}
                   disabled={isAvatarLoading}
+                  icon={<Trash2 className="size-4" />}
                   onClick={() => removeMutation.mutate()}
                 >
-                  <Trash2 className="size-4" />
                   {tCommon("remove")}
-                </Button>
+                </LoaderButton>
               )}
             </div>
             <input
@@ -197,15 +229,19 @@ export const ProfileSection = ({ user }: ProfileSectionProps) => {
               />
             )}
           </form.AppField>
-        </div>
 
-        <Field>
-          <form.AppForm>
-            <div className="flex justify-end">
-              <form.SubmitButton label={tCommon("update")} />
+          <Separator orientation="horizontal" />
+
+          <div className="flex items-center justify-between p-6">
+            <div>
+              <p className="text-sm font-medium">{t("profile.deleteAccount")}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("profile.deleteAccountDescription")}
+              </p>
             </div>
-          </form.AppForm>
-        </Field>
+            <DeleteAccountButton />
+          </div>
+        </div>
       </FieldGroup>
     </form>
   );

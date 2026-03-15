@@ -121,7 +121,7 @@ function AuthenticatedActions({ invitationId }: { invitationId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [invitationId]);
+  }, [invitationId, queryClient, t, router, navigate]);
 
   if (error) {
     return (

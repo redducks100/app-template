@@ -63,6 +63,16 @@ export const membersInfiniteOptions = (search: string, pageSize = DEFAULT_PAGE_S
     },
   });
 
+export const membersCountOptions = () =>
+  queryOptions({
+    queryKey: ["members", "count"],
+    queryFn: async () => {
+      const res = await callRPC(apiClient.members.count.$get());
+      if (!res.success) throw new Error(res.error.message);
+      return res.data.count;
+    },
+  });
+
 export const membersPermissionsOptions = () =>
   queryOptions({
     queryKey: ["members", "permissions"],
