@@ -14,7 +14,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **DB migrate down**: `pnpm db:migrate:down` (rolls back last migration)
 - **DB migrate make**: `pnpm db:migrate:make` (scaffolds a new migration file)
 - **DB migrate list**: `pnpm db:migrate:list` (shows migration status)
-- **DB codegen**: `pnpm db:codegen` (introspects DB and regenerates `packages/shared/src/types/db.generated.ts`; run after migrations)
+- **DB codegen**: `pnpm db:codegen` (introspects DB and regenerates `packages/data-ops/src/types/db.generated.ts`; run after migrations)
+- **Format**: `pnpm fmt` / `pnpm fmt:check` (oxfmt formatting)
+- **Typecheck**: `pnpm typecheck` (TypeScript checks across workspace)
+- **Lint**: `pnpm lint` / `pnpm lint:fix` (oxlint linting)
+- **Fix**: `pnpm fix` (lint + format fixes combined)
+- **Syncpack**: `pnpm syncpack` / `pnpm syncpack:fix` (dependency version consistency)
 
 No test framework is configured.
 
@@ -92,8 +97,8 @@ Client-only SPA using TanStack Router, deployed to Cloudflare Workers with Stati
 - UI components, hooks, and utilities are in `@app/ui` (`packages/ui`)
 - `src/lib/api-client.ts` — Hono RPC client (`hc<AppType>`) pointing to `VITE_API_URL`
 - `src/lib/auth-client.ts` — Better Auth client pointing to `VITE_API_URL`
-- `src/lib/query-options.ts` — TanStack Query option factories
-- `src/lib/mutations.ts` — Mutation functions using Hono RPC
+- `src/lib/queries/` — TanStack Query option factories (auth, invitations, members, organizations, user)
+- `src/lib/mutations/` — Mutation functions using Hono RPC (invitations, members, organizations, user)
 - `src/lib/i18n.ts` — i18next configuration
 - `src/locales/` — Translation files (en.json, ro.json)
 - `wrangler.jsonc` — Cloudflare Workers config (Static Assets with SPA routing)
@@ -104,17 +109,20 @@ Feature-specific components are co-located with their route files using TanStack
 
 ```
 src/routes/_dashboard/
-├── roles/
-│   ├── index.tsx              # /roles route
-│   ├── create.tsx             # /roles/create route
-│   ├── $roleId.tsx            # /roles/$roleId route
-│   └── -components/           # Role-specific components
-├── users/
-│   ├── index.tsx
-│   ├── $memberId.tsx
-│   └── -components/
+├── index.tsx                  # /dashboard route
+├── settings.tsx               # Settings layout
 ├── settings/
-│   └── -components/
+│   ├── index.tsx              # /settings (redirects)
+│   ├── general.tsx            # /settings/general
+│   ├── profile.tsx            # /settings/profile
+│   ├── security.tsx           # /settings/security
+│   ├── sessions.tsx           # /settings/sessions
+│   ├── invitations.tsx        # /settings/invitations
+│   ├── integrations.tsx       # /settings/integrations
+│   ├── members/
+│   │   └── index.tsx          # /settings/members
+│   ├── -components/           # Settings-specific components
+│   └── -lib/                  # Settings-specific utilities
 └── -components/               # Dashboard-level shared components
 ```
 
@@ -124,27 +132,26 @@ src/routes/_dashboard/
 - `_guest` layout — centered card wrapper for sign-in, sign-up, forgot/reset password, verify email, accept-invitation
 - `_onboarding` layout — auth guard only (no sidebar), reads `context.authData`, redirects to `/sign-in` if no session. Used for `/create-org` and `/select-org`
 - `_dashboard` layout — auth guard + org guard + sidebar layout. Reads `context.authData`. All dashboard routes at root level
-- `_dashboard/users` — member list + `$memberId` detail
-- `_dashboard/roles` — role list + `create` + `$roleId` detail
-- `_dashboard/settings` layout — settings sidebar + header
+- `_dashboard/settings/*` — general, profile, security, sessions, invitations, members, integrations
 
 ### Data Fetching Pattern
 
 ```tsx
-// Query options (src/lib/query-options.ts)
-export const rolesListOptions = () =>
+// Query options (src/lib/queries/members.ts)
+export const membersListOptions = (params: { page: number; pageSize: number; search: string }) =>
   queryOptions({
-    queryKey: ["roles", "list"],
+    queryKey: ["members", "list", params],
     queryFn: async () => {
-      const res = await apiClient.roles.list.$get();
-      return res.json();
+      const res = await callRPC(apiClient.members.$get({ query: { ...params } }));
+      return res;
     },
   });
 
 // In route files — loader + component
-export const Route = createFileRoute("/_dashboard/roles/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(rolesListOptions()),
-  component: RolesPage,
+export const Route = createFileRoute("/_dashboard/settings/members/")({
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(membersListOptions({ page: 1, pageSize: 20, search: "" })),
+  component: MembersPage,
 });
 ```
 
@@ -152,11 +159,11 @@ export const Route = createFileRoute("/_dashboard/roles/")({
 
 Auth session is fetched once at the root route's `beforeLoad`. Layout guards read `context.authData` synchronously — no additional API calls during navigation. The `cookieCache` (5 min TTL) on the server makes the root fetch cheap.
 
-### Shared Components (`apps/app/src/components/ui/`)
+### Shared Components (`packages/ui/src/components/ui/`)
 
-Built on Base UI + shadcn. Key subsystem:
+Built on Base UI + shadcn, lives in the `@app/ui` package. Key subsystem:
 
-**Form components** (`components/ui/form/`): `useAppForm` hook wraps TanStack React Form with pre-registered field components (`Input`, `Textarea`, `Select`, `Checkbox`) and `SubmitButton`.
+**Form components** (`packages/ui/src/components/ui/form/`): `useAppForm` hook wraps TanStack React Form with pre-registered field components (`Input`, `Textarea`, `Select`, `Checkbox`) and `SubmitButton`.
 
 ## Data Ops Package (`packages/data-ops`)
 
@@ -188,6 +195,7 @@ Import pattern: `@app/ui/components/button`, `@app/ui/lib/utils`, `@app/ui/hooks
 - `src/schemas/` — Zod validation schemas shared between API and web
 - `src/types/` — Shared TypeScript types
 - `src/permissions.ts` — Access control definitions (owner/admin/member roles)
+- `src/logger.ts` — Logger interface with ConsoleLogger + Sentry integration
 
 ## Path Aliases
 
@@ -208,7 +216,7 @@ Turborepo orchestrates builds, dev servers, and deploys across the monorepo. Con
 
 ### API Worker (wrangler vars/secrets)
 
-Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `COOKIE_DOMAIN`.
+Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_URL`, `ASSETS_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `COOKIE_DOMAIN`.
 Optional: `SENTRY_DSN` (enables Sentry error tracking in production; omit for local dev).
 
 ### SPA (Cloudflare Workers, build-time)
